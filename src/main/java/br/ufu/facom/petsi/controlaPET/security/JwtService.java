@@ -2,6 +2,7 @@ package br.ufu.facom.petsi.controlaPET.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,11 +18,14 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    @Value("${jwt.secret}")
+    @Value("${api.security.token.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
+    @Value("${api.security.token.expiration}")
     private long jwtExpiration;
+
+    @Value("${api.security.token.refresh.expiration}")
+    private long refreshJwtExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -43,6 +47,15 @@ public class JwtService {
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
+                .compact();
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return Jwts.builder()
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshJwtExpiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
