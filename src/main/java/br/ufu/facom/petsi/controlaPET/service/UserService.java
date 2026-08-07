@@ -1,6 +1,6 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
-import br.ufu.facom.petsi.controlaPET.dto.CreateUserRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.CreateUserRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

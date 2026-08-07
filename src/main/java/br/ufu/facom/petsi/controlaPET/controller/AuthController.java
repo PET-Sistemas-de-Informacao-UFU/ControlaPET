@@ -1,8 +1,8 @@
 package br.ufu.facom.petsi.controlaPET.controller;
 
-import br.ufu.facom.petsi.controlaPET.dto.AuthResponseDTO;
-import br.ufu.facom.petsi.controlaPET.dto.LoginRequestDTO;
-import br.ufu.facom.petsi.controlaPET.dto.RefreshTokenRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.AuthResponseDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.LoginRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.RefreshTokenRequestDTO;
 import br.ufu.facom.petsi.controlaPET.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

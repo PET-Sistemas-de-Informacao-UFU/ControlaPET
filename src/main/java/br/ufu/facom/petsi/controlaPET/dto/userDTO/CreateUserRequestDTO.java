@@ -1,4 +1,4 @@
-package br.ufu.facom.petsi.controlaPET.dto;
+package br.ufu.facom.petsi.controlaPET.dto.userDTO;
 
 import br.ufu.facom.petsi.controlaPET.model.enums.UserRole;
 

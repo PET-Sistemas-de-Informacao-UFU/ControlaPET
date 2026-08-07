@@ -1,8 +1,8 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
-import br.ufu.facom.petsi.controlaPET.dto.AuthResponseDTO;
-import br.ufu.facom.petsi.controlaPET.dto.LoginRequestDTO;
-import br.ufu.facom.petsi.controlaPET.dto.RefreshTokenRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.AuthResponseDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.LoginRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.RefreshTokenRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.repository.UserRepository;
 import br.ufu.facom.petsi.controlaPET.security.JwtService;
