@@ -27,6 +27,9 @@ public class Loan {
     private Item item;
 
     @Column(nullable = false)
+    int quantity;
+
+    @Column(nullable = false)
     private LocalDate checkoutDate;
 
     @Column(nullable = false)
