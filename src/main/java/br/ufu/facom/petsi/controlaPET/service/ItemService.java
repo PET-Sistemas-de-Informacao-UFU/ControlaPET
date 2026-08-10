@@ -4,7 +4,6 @@ import br.ufu.facom.petsi.controlaPET.dto.itemDTO.CreateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.ItemResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.UpdateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.Item;
-import br.ufu.facom.petsi.controlaPET.model.enums.ItemCondition;
 import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +28,18 @@ public class ItemService {
                 .stockQuantity(request.stockQuantity())
                 .build();
 
-        itemRepository.save(item);
+        Item newItem = itemRepository.save(item);
 
         return new ItemResponseDTO(
-                item.getId(),
-                item.getName(),
-                item.getDescription(),
-                item.getType(),
-                item.getCondition(),
-                item.getTotalQuantity(),
-                item.getStockQuantity(),
-                item.getCreatedAt(),
-                item.getUpdatedAt()
+                newItem.getId(),
+                newItem.getName(),
+                newItem.getDescription(),
+                newItem.getType(),
+                newItem.getCondition(),
+                newItem.getTotalQuantity(),
+                newItem.getStockQuantity(),
+                newItem.getCreatedAt(),
+                newItem.getUpdatedAt()
         );
     }
 

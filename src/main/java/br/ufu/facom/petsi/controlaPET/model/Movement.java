@@ -1,6 +1,5 @@
 package br.ufu.facom.petsi.controlaPET.model;
 
-import br.ufu.facom.petsi.controlaPET.model.enums.ItemType;
 import br.ufu.facom.petsi.controlaPET.model.enums.MovementType;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,6 +33,8 @@ public class Movement {
 
     @Column(nullable = false)
     private int quantity;
+
+    String notes;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

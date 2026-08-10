@@ -48,17 +48,17 @@ public class LoanService {
                 .status(LoanStatus.ACTIVE)
                 .build();
 
-        loanRepository.save(loan);
+        Loan newLoan = loanRepository.save(loan);
 
         return new LoanResponseDTO(
-                loan.getId(),
+                newLoan.getId(),
                 user,
-                loan.getItem(),
-                loan.getQuantity(),
-                loan.getCheckoutDate(),
-                loan.getExpectedReturnDate(),
-                loan.getActualReturnDate(),
-                loan.getStatus()
+                newLoan.getItem(),
+                newLoan.getQuantity(),
+                newLoan.getCheckoutDate(),
+                newLoan.getExpectedReturnDate(),
+                newLoan.getActualReturnDate(),
+                newLoan.getStatus()
         );
     }
 
