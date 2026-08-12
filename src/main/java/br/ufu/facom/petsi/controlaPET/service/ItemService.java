@@ -88,6 +88,10 @@ public class ItemService {
             item.setDescription(request.description());
         }
 
+        if(request.type() != null) {
+            item.setType(request.type());
+        }
+
         if (request.condition() != null) {
             item.setCondition(request.condition());
         }
@@ -100,7 +104,7 @@ public class ItemService {
             item.setStockQuantity(request.stockQuantity());
         }
 
-        Item newItem = itemRepository.save(item);
+        Item newItem = itemRepository.saveAndFlush(item);
 
         return new ItemResponseDTO(
                 newItem.getId(),
