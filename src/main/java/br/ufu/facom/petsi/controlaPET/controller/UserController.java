@@ -4,6 +4,7 @@ import br.ufu.facom.petsi.controlaPET.dto.userDTO.CreateUserRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.UserResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UserController {
 
      @PostMapping
      @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> createUser(@RequestBody CreateUserRequestDTO request){
+    public ResponseEntity<Void> createUser(@Valid @RequestBody CreateUserRequestDTO request){
         userService.createUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

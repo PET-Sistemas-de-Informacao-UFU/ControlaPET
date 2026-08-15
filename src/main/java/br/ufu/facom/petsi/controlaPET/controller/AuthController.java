@@ -4,6 +4,7 @@ import br.ufu.facom.petsi.controlaPET.dto.userDTO.AuthResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.LoginRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.RefreshTokenRequestDTO;
 import br.ufu.facom.petsi.controlaPET.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,12 +20,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<AuthResponseDTO> login(@RequestBody LoginRequestDTO request){
+    private ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request){
         return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/refresh")
-    private ResponseEntity<AuthResponseDTO> refresh(@RequestBody RefreshTokenRequestDTO request){
+    private ResponseEntity<AuthResponseDTO> refresh(@Valid @RequestBody RefreshTokenRequestDTO request){
         return ResponseEntity.ok(authService.refreshToken(request));
     }
 }

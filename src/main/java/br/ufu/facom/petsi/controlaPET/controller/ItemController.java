@@ -4,6 +4,7 @@ import br.ufu.facom.petsi.controlaPET.dto.itemDTO.CreateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.ItemResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.UpdateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.service.ItemService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class ItemController {
 
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ItemResponseDTO> createItem(@RequestBody CreateItemRequestDTO request){
+    public ResponseEntity<ItemResponseDTO> createItem(@Valid @RequestBody CreateItemRequestDTO request){
         ItemResponseDTO response = itemService.createItem(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -40,7 +41,7 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id, @RequestBody UpdateItemRequestDTO request){
+    public ResponseEntity<ItemResponseDTO> updateItem(@PathVariable Long id, @Valid @RequestBody UpdateItemRequestDTO request){
         ItemResponseDTO response = itemService.updateItem(id, request);
 
         return ResponseEntity.ok(response);

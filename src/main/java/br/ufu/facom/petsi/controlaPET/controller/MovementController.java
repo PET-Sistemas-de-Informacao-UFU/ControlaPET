@@ -5,6 +5,7 @@ import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.CreateMovementRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.MovementResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.MovementService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class MovementController {
 
     @PostMapping("/consume")
     public ResponseEntity<MovementResponseDTO> createConsumeMovement(@AuthenticationPrincipal User user,
-                                                              @RequestBody ConsumeItemRequestDTO request){
+                                                                     @Valid @RequestBody ConsumeItemRequestDTO request){
 
         MovementResponseDTO response = movementService.createConsumeMovement(user, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -32,7 +33,7 @@ public class MovementController {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<MovementResponseDTO> createMovement(@AuthenticationPrincipal User user,
-                                                              @RequestBody CreateMovementRequestDTO request) {
+                                                              @Valid @RequestBody CreateMovementRequestDTO request) {
 
         MovementResponseDTO response = movementService.createMovement(user, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

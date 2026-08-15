@@ -4,6 +4,7 @@ import br.ufu.facom.petsi.controlaPET.dto.loanDTO.CreateLoanRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.loanDTO.LoanResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.LoanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class LoanController {
 
     @PostMapping
     public ResponseEntity<LoanResponseDTO> createLoan(@AuthenticationPrincipal User user,
-                                                      @RequestBody CreateLoanRequestDTO request){
+                                                      @Valid @RequestBody CreateLoanRequestDTO request){
 
         LoanResponseDTO response = loanService.createLoan(user, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
