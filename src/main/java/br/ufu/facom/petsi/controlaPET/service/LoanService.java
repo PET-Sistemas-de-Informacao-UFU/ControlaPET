@@ -52,8 +52,9 @@ public class LoanService {
 
         return new LoanResponseDTO(
                 newLoan.getId(),
-                user,
-                newLoan.getItem(),
+                user.getName(),
+                newLoan.getItem().getId(),
+                newLoan.getItem().getName(),
                 newLoan.getQuantity(),
                 newLoan.getCheckoutDate(),
                 newLoan.getExpectedReturnDate(),
@@ -66,8 +67,9 @@ public class LoanService {
         return loanRepository.findAllByUser(user).stream().map(
                 loan -> new LoanResponseDTO(
                         loan.getId(),
-                        loan.getUser(),
-                        loan.getItem(),
+                        loan.getUser().getName(),
+                        loan.getItem().getId(),
+                        loan.getItem().getName(),
                         loan.getQuantity(),
                         loan.getCheckoutDate(),
                         loan.getExpectedReturnDate(),
@@ -81,8 +83,9 @@ public class LoanService {
         return loanRepository.findAll().stream().map(
                 loan -> new LoanResponseDTO(
                         loan.getId(),
-                        loan.getUser(),
-                        loan.getItem(),
+                        loan.getUser().getName(),
+                        loan.getItem().getId(),
+                        loan.getItem().getName(),
                         loan.getQuantity(),
                         loan.getCheckoutDate(),
                         loan.getExpectedReturnDate(),
@@ -113,8 +116,9 @@ public class LoanService {
 
         return new LoanResponseDTO(
                 newLoan.getId(),
-                newLoan.getUser(),
-                newLoan.getItem(),
+                newLoan.getUser().getName(),
+                newLoan.getItem().getId(),
+                newLoan.getItem().getName(),
                 loan.getQuantity(),
                 newLoan.getCheckoutDate(),
                 newLoan.getExpectedReturnDate(),
@@ -131,8 +135,9 @@ public class LoanService {
                 .stream().map(
                         loan -> new LoanResponseDTO(
                                 loan.getId(),
-                                loan.getUser(),
-                                loan.getItem(),
+                                loan.getUser().getName(),
+                                loan.getItem().getId(),
+                                loan.getItem().getName(),
                                 loan.getQuantity(),
                                 loan.getCheckoutDate(),
                                 loan.getExpectedReturnDate(),

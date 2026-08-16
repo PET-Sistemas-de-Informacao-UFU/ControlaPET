@@ -49,8 +49,9 @@ public class MovementService {
 
         return new MovementResponseDTO(
                 newMovement.getId(),
-                newMovement.getUser(),
-                newMovement.getItem(),
+                newMovement.getUser().getName(),
+                newMovement.getItem().getId(),
+                newMovement.getItem().getName(),
                 newMovement.getMovementType(),
                 newMovement.getNotes(),
                 newMovement.getQuantity(),
@@ -91,8 +92,9 @@ public class MovementService {
 
         return new MovementResponseDTO(
                 newMovement.getId(),
-                newMovement.getUser(),
-                newMovement.getItem(),
+                newMovement.getUser().getName(),
+                newMovement.getItem().getId(),
+                newMovement.getItem().getName(),
                 newMovement.getMovementType(),
                 newMovement.getNotes(),
                 newMovement.getQuantity(),
@@ -104,8 +106,9 @@ public class MovementService {
         return movementRepository.findAll().stream().map(
                 movement -> new MovementResponseDTO(
                         movement.getId(),
-                        movement.getUser(),
-                        movement.getItem(),
+                        movement.getUser().getName(),
+                        movement.getItem().getId(),
+                        movement.getItem().getName(),
                         movement.getMovementType(),
                         movement.getNotes(),
                         movement.getQuantity(),
@@ -118,8 +121,9 @@ public class MovementService {
         return movementRepository.findAllByUser(user).stream().map(
                 movement -> new MovementResponseDTO(
                         movement.getId(),
-                        movement.getUser(),
-                        movement.getItem(),
+                        movement.getUser().getName(),
+                        movement.getItem().getId(),
+                        movement.getItem().getName(),
                         movement.getMovementType(),
                         movement.getNotes(),
                         movement.getQuantity(),
@@ -132,8 +136,9 @@ public class MovementService {
         return movementRepository.findAllByItemId(id).stream().map(
                 movement -> new MovementResponseDTO(
                         movement.getId(),
-                        movement.getUser(),
-                        movement.getItem(),
+                        movement.getUser().getName(),
+                        movement.getItem().getId(),
+                        movement.getItem().getName(),
                         movement.getMovementType(),
                         movement.getNotes(),
                         movement.getQuantity(),

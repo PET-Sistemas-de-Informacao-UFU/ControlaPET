@@ -8,8 +8,9 @@ import java.time.LocalDate;
 
 public record LoanResponseDTO(
         Long id,
-        User user,
-        Item item,
+        String userName,
+        Long itemId,
+        String itemName,
         int quantity,
         LocalDate checkoutDate,
         LocalDate expectedReturnDate,

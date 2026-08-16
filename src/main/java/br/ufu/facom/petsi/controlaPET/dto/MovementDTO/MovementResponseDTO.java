@@ -8,8 +8,9 @@ import java.time.LocalDate;
 
 public record MovementResponseDTO(
         Long id,
-        User user,
-        Item item,
+        String userName,
+        Long itemId,
+        String itemName,
         MovementType type,
         String notes,
         int quantity,
