@@ -53,7 +53,19 @@ As credenciais padrão do banco de dados (já configuradas no Docker Compose e n
 
 O Spring Boot se encarregará de criar as tabelas automaticamente no banco (`ddl-auto=update`).
 
-### 4. Rodar a API Spring Boot
+### 4. Conectar a um Banco Remoto (.env)
+Se você precisa apontar a aplicação para um banco remoto (como o **Supabase**) em vez do Postgres local, copie o arquivo de exemplo na raiz do projeto e preencha os valores:
+cp .env.example .env
+
+O Spring Boot carrega esse arquivo automaticamente através da linha `spring.config.import` no `application.properties`. As variáveis disponíveis são:
+- **`DB_URL_CONTROLAPET`:** URL JDBC do banco (no Supabase, use o *Transaction Pooler* e mantenha o `?prepareThreshold=0`)
+- **`DB_USER_CONTROLAPET`:** usuário do banco
+- **`DB_PASSWORD_CONTROLAPET`:** senha do banco
+- **`JWT_SECRET_CONTROLAPET`:** chave de assinatura dos tokens (gere a sua com `openssl rand -base64 64 | tr -d '\n'`)
+
+*O arquivo `.env` está no `.gitignore` e nunca deve ser commitado. O sufixo `_CONTROLAPET` evita conflito com variáveis genéricas (`DB_URL`, `JWT_SECRET`) que você possa ter exportadas no sistema por causa de outros projetos.*
+
+### 5. Rodar a API Spring Boot
 Agora basta iniciar o servidor da API. Se estiver usando o IntelliJ IDEA ou Eclipse, basta dar "Run" na classe principal da aplicação.
 
 Pelo terminal, com o Maven:
@@ -84,4 +96,4 @@ As mensagens de commit devem ser escritas em minúsculo, no seguinte formato:
 - `refactor: otimiza DTOs com flattening e usa enum LoanStatus`
 - `fix: resolve erro ao buscar utilizador logado e corrige retorno da data`
 
-*Observação: Não é necessário criar arquivos de exemplo como `.env-example` ou `application-example.properties`, pois as configurações estão blindadas através da sintaxe `${VARIAVEL:valor_padrao}`.*
+*Observação: Para rodar localmente não é preciso configurar nada, pois as configurações estão blindadas através da sintaxe `${VARIAVEL:valor_padrao}`. O arquivo `.env.example` serve apenas para quem for apontar a aplicação para um banco remoto.*
