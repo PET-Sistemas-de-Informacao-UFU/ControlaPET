@@ -69,6 +69,7 @@ O Spring Boot carrega esse arquivo automaticamente através da linha `spring.con
 Agora basta iniciar o servidor da API. Se estiver usando o IntelliJ IDEA ou Eclipse, basta dar "Run" na classe principal da aplicação.
 
 Pelo terminal, com o Maven:
+cd backend
 mvn spring-boot:run
 
 
