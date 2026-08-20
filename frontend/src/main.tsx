@@ -4,7 +4,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './context/AuthProvider.tsx'
 import { ItemsProvider } from './context/ItemsProvider.tsx'
 import { AppRouter } from './routes/AppRouter.tsx'
-import './index.css'
+import './styles/base.css'
+import './styles/mobile.css'
+import './styles/desktop.css'
 
 const queryClient = new QueryClient();
 

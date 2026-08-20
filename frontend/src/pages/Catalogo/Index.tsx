@@ -4,10 +4,12 @@ import ItemCard from "../../components/item/ItemCard";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
 import { SearchIcon } from "../../components/ui/Icons";
+import { useIsDesktop } from "../../hooks/useIsDesktop";
 import type { Item } from "../../interfaces/Item";
 
 export default function Catalogo() {
     const { items, addItem, updateItem, removeItem } = useContext(ItemsContext);
+    const isDesktop = useIsDesktop();
     const [detailsIndex, setDetailsIndex] = useState<number | null>(null);
     const [formOpen, setFormOpen] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
@@ -44,18 +46,28 @@ export default function Catalogo() {
 
     return (
         <>
-            <div className="search-bar"><SearchIcon /><span>Procurar...</span></div>
+            <div className="catalog-toolbar">
+                <div className="search-bar"><SearchIcon /><span>Procurar...</span></div>
 
-            <div className="section-label">Itens do catálogo</div>
+                {isDesktop && (
+                    <button type="button" className="header-btn" onClick={openAddModal}>
+                        + Novo item
+                    </button>
+                )}
+            </div>
 
-            {items.map((item, index) => (
-                <ItemCard
-                    key={index}
-                    item={item}
-                    onOpen={() => setDetailsIndex(index)}
-                    onEdit={() => openEditModal(index)}
-                />
-            ))}
+            {!isDesktop && <div className="section-label">Itens do catálogo</div>}
+
+            <div className="catalog-grid">
+                {items.map((item, index) => (
+                    <ItemCard
+                        key={index}
+                        item={item}
+                        onOpen={() => setDetailsIndex(index)}
+                        onEdit={() => openEditModal(index)}
+                    />
+                ))}
+            </div>
 
             <div className="fab-add" onClick={openAddModal} title="Adicionar item">+</div>
 
