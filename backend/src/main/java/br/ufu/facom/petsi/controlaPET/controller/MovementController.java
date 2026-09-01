@@ -7,13 +7,15 @@ import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.MovementService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/movements")
@@ -41,24 +43,44 @@ public class MovementController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<MovementResponseDTO>> getAllMovements(){
+    public ResponseEntity<Page<MovementResponseDTO>> getAllMovements(
+            @PageableDefault(
+                    size = 20,
+                    sort = "movementDate",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ){
 
-        List<MovementResponseDTO> response = movementService.getAllMovements();
+        Page<MovementResponseDTO> response = movementService.getAllMovements(pageable);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<MovementResponseDTO>> getAllUserMovements(@AuthenticationPrincipal User user){
+    public ResponseEntity<Page<MovementResponseDTO>> getAllUserMovements(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(
+                    size = 20,
+                    sort = "movementDate",
+                    direction = Sort.Direction.DESC
+            )Pageable pageable
+    ){
 
-        List<MovementResponseDTO> response = movementService.getAllUserMovements(user);
+        Page<MovementResponseDTO> response = movementService.getAllUserMovements(user, pageable);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/item/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<MovementResponseDTO>> getAllItemMovements(@PathVariable Long id){
+    public ResponseEntity<Page<MovementResponseDTO>> getAllItemMovements(
+            @PathVariable Long id,
+            @PageableDefault(
+                    size = 20,
+                    sort = "movementDate",
+                    direction = Sort.Direction.DESC
+            )Pageable pageable
+    ){
 
-        List<MovementResponseDTO> response = movementService.getAllItemMovements(id);
+        Page<MovementResponseDTO> response = movementService.getAllItemMovements(id, pageable);
         return ResponseEntity.ok(response);
     }
 }

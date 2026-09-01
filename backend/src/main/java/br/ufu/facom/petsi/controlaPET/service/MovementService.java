@@ -12,10 +12,11 @@ import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import br.ufu.facom.petsi.controlaPET.repository.MovementRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -102,8 +103,8 @@ public class MovementService {
         );
     }
 
-    public List<MovementResponseDTO> getAllMovements() {
-        return movementRepository.findAll().stream().map(
+    public Page<MovementResponseDTO> getAllMovements(Pageable pageable) {
+        return movementRepository.findAll(pageable).map(
                 movement -> new MovementResponseDTO(
                         movement.getId(),
                         movement.getUser().getName(),
@@ -114,11 +115,11 @@ public class MovementService {
                         movement.getQuantity(),
                         movement.getMovementDate()
                 )
-        ).toList();
+        );
     }
 
-    public List<MovementResponseDTO> getAllUserMovements(User user) {
-        return movementRepository.findAllByUser(user).stream().map(
+    public Page<MovementResponseDTO> getAllUserMovements(User user, Pageable pageable) {
+        return movementRepository.findAllByUser(user, pageable).map(
                 movement -> new MovementResponseDTO(
                         movement.getId(),
                         movement.getUser().getName(),
@@ -129,11 +130,11 @@ public class MovementService {
                         movement.getQuantity(),
                         movement.getMovementDate()
                 )
-        ).toList();
+        );
     }
 
-    public List<MovementResponseDTO> getAllItemMovements(Long id) {
-        return movementRepository.findAllByItemId(id).stream().map(
+    public Page<MovementResponseDTO> getAllItemMovements(Long id, Pageable pageable) {
+        return movementRepository.findAllByItemId(id, pageable).map(
                 movement -> new MovementResponseDTO(
                         movement.getId(),
                         movement.getUser().getName(),
@@ -144,6 +145,6 @@ public class MovementService {
                         movement.getQuantity(),
                         movement.getMovementDate()
                 )
-        ).toList();
+        );
     }
 }

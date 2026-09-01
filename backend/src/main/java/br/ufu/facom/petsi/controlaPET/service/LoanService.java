@@ -12,6 +12,8 @@ import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import br.ufu.facom.petsi.controlaPET.repository.LoanRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -63,8 +65,8 @@ public class LoanService {
         );
     }
 
-    public List<LoanResponseDTO> getUserLoans(User user) {
-        return loanRepository.findAllByUser(user).stream().map(
+    public Page<LoanResponseDTO> getUserLoans(User user, Pageable pageable) {
+        return loanRepository.findAllByUser(user, pageable).map(
                 loan -> new LoanResponseDTO(
                         loan.getId(),
                         loan.getUser().getName(),
@@ -76,11 +78,11 @@ public class LoanService {
                         loan.getActualReturnDate(),
                         loan.getStatus()
                 )
-        ).toList();
+        );
     }
 
-    public List<LoanResponseDTO> getAllLoans() {
-        return loanRepository.findAll().stream().map(
+    public Page<LoanResponseDTO> getAllLoans(Pageable pageable) {
+        return loanRepository.findAll(pageable).map(
                 loan -> new LoanResponseDTO(
                         loan.getId(),
                         loan.getUser().getName(),
@@ -92,7 +94,7 @@ public class LoanService {
                         loan.getActualReturnDate(),
                         loan.getStatus()
                 )
-        ).toList();
+        );
     }
 
     @Transactional
@@ -128,11 +130,11 @@ public class LoanService {
     }
 
 
-    public List<LoanResponseDTO> getUserPendingLoans(User user) {
+    public Page<LoanResponseDTO> getUserPendingLoans(User user, Pageable pageable) {
         List<LoanStatus> statusPendents = List.of(LoanStatus.ACTIVE, LoanStatus.OVERDUE);
 
-        return loanRepository.findAllByUserAndStatusIn(user, statusPendents)
-                .stream().map(
+        return loanRepository.findAllByUserAndStatusIn(user, statusPendents, pageable)
+                .map(
                         loan -> new LoanResponseDTO(
                                 loan.getId(),
                                 loan.getUser().getName(),
@@ -144,6 +146,6 @@ public class LoanService {
                                 loan.getActualReturnDate(),
                                 loan.getStatus()
                         )
-                ).toList();
+                );
     }
 }

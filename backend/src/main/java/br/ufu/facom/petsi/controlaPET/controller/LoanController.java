@@ -6,13 +6,15 @@ import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.LoanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/loans")
@@ -30,21 +32,39 @@ public class LoanController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<LoanResponseDTO>> getUserLoans(@AuthenticationPrincipal User user){
-        List<LoanResponseDTO> response = loanService.getUserLoans(user);
+    public ResponseEntity<Page<LoanResponseDTO>> getUserLoans(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(size = 20,
+                sort = "checkoutDate",
+                direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ){
+
+        Page<LoanResponseDTO> response = loanService.getUserLoans(user, pageable);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<List<LoanResponseDTO>> getAllLoans(){
-        List<LoanResponseDTO> response = loanService.getAllLoans();
+    public ResponseEntity<Page<LoanResponseDTO>> getAllLoans(
+            @PageableDefault(size = 20,
+                    sort = "checkoutDate",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ){
+        Page<LoanResponseDTO> response = loanService.getAllLoans(pageable);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/pending")
-    public ResponseEntity<List<LoanResponseDTO>> getUserPendingLoans(@AuthenticationPrincipal User user){
-        List<LoanResponseDTO> response = loanService.getUserPendingLoans(user);
+    public ResponseEntity<Page<LoanResponseDTO>> getUserPendingLoans(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(
+                    sort = "checkoutDate",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ){
+        Page<LoanResponseDTO> response = loanService.getUserPendingLoans(user, pageable);
         return ResponseEntity.ok(response);
     }
 

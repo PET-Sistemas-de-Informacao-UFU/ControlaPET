@@ -7,9 +7,9 @@ import br.ufu.facom.petsi.controlaPET.model.Item;
 import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -43,8 +43,16 @@ public class ItemService {
         );
     }
 
-    public List<ItemResponseDTO> getAllItems() {
-        return itemRepository.findAll().stream().map(
+    public Page<ItemResponseDTO> getAllItems(String name, Pageable pageable) {
+
+        Page<Item> itemPage;
+
+        if(name!=null && !name.trim().isEmpty())
+            itemPage = itemRepository.findByNameContainingIgnoreCase(name, pageable);
+        else
+            itemPage = itemRepository.findAll(pageable);
+
+        return itemPage.map(
                 item -> new ItemResponseDTO(
                         item.getId(),
                         item.getName(),
@@ -56,7 +64,7 @@ public class ItemService {
                         item.getCreatedAt(),
                         item.getUpdatedAt()
                 )
-        ).toList();
+        );
     }
 
 
