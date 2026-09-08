@@ -1,0 +1,32 @@
+name: PR Dev to Main
+
+on:
+  push:
+    branches:
+      - dev  # Dispara sempre que algo for enviado para a branch dev
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Criar Pull Request Automático
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Verifica se já existe um PR aberto de dev para main para não duplicar
+          EXISTING_PR=$(gh pr list --base main --head dev --json number -q '.[0].number')
+          
+          if [ -z "$EXISTING_PR" ]; then
+            gh pr create \
+              --base main \
+              --head dev \
+              --title "[AUTO] Release dev to main" \
+              --body "Pull Request automático gerado pelo workflow a partir dos últimos commits na dev."
+            echo "Pull Request criado com sucesso!"
+          else
+            echo "Já existe um Pull Request aberto da dev para a main (PR #$EXISTING_PR)."
+          fi
