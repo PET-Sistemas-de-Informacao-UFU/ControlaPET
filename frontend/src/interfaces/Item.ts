@@ -1,13 +1,32 @@
+export type ItemType = 'CONSUMIVEL' | 'EMPRESTAVEL' | 'PERMANENTE';
+export type ItemCondition = 'NOVO' | 'BOM' | 'DANIFICADO';
+
 export interface Item {
-    emoji: string
+    id: number
     name: string
-    qty: string
-    status: string
+    description: string
+    type: ItemType
+    condition: ItemCondition
+    totalQuantity: number
+    stockQuantity: number
+    createdAt: string
+    updatedAt: string
 }
 
-export interface ItemFormData {
-    emoji: string
+export interface CreateItemRequest {
     name: string
-    qty: string
-    status: string
+    description: string
+    type: ItemType
+    condition: ItemCondition
+    totalQuantity: number
+    stockQuantity: number
+}
+
+export interface updatedItemRequest {
+    name?: string
+    description?: string
+    type?: ItemType
+    condition?: ItemCondition
+    totalQuantity?: number
+    stockQuantity?: number
 }
