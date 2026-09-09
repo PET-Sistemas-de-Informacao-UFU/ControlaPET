@@ -18,7 +18,7 @@ export interface CreateMovementRequest {
     type: MovementType
 }
 
-export interface ConsumeItemDTO {
+export interface ConsumeItem {
     itemId: number,
     quantity: number
 }
