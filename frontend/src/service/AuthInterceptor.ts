@@ -1,10 +1,22 @@
 import axios from "axios";
 import { api, BASE_URL } from "./api";
-import { readRefreshToken, storeTokens } from "./authStorage";
+import { readRefreshToken, readToken, storeTokens } from "./authStorage";
 import type { AuthResponse } from "../interfaces/Auth";
 
 export function setupInterceptors(handleLogout: () => void) {
-    const interceptorId = api.interceptors.response.use(
+    const requestInterceptorId = api.interceptors.request.use(
+        (config) => {
+            const token = readToken();
+
+            if (token) {
+                config.headers.Authorization = `Bearer ${token}`;
+            }
+
+            return config;
+        }
+    );
+
+    const responseInterceptorId = api.interceptors.response.use(
         (response) => response,
 
         async (error) => {
@@ -24,11 +36,17 @@ export function setupInterceptors(handleLogout: () => void) {
             originalRequest._retry = true;
 
             try {
-                const response = await axios.post<AuthResponse>(`${BASE_URL}/auth/refresh`, {
-                    refreshToken
-                });
+                const response = await axios.post<AuthResponse>(
+                    `${BASE_URL}/auth/refresh`,
+                    {
+                        refreshToken
+                    }
+                );
 
-                storeTokens(response.data.token, response.data.refreshToken);
+                storeTokens(
+                    response.data.token,
+                    response.data.refreshToken
+                );
 
                 return api(originalRequest);
             } catch (refreshError) {
@@ -38,5 +56,8 @@ export function setupInterceptors(handleLogout: () => void) {
         }
     );
 
-    return () => api.interceptors.response.eject(interceptorId);
+    return () => {
+        api.interceptors.request.eject(requestInterceptorId);
+        api.interceptors.response.eject(responseInterceptorId);
+    };
 }
