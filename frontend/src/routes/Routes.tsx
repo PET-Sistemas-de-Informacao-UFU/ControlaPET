@@ -4,14 +4,19 @@ import HomeRoute from "./HomeRoute";
 import Scanner from "../pages/Scanner/Index";
 import Catalogo from "../pages/Catalogo/Index";
 import Auditoria from "../pages/Auditoria/Index";
+import Login from "../pages/Login/Index";
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
-        <Route element={<AppLayout />}>
-            <Route index path="/" element={<HomeRoute />} />
-            <Route path="/ler" element={<Scanner />} />
-            <Route path="/catalogo" element={<Catalogo />} />
-            <Route path="/auditoria" element={<Auditoria />} />
-        </Route>
+        <>
+            <Route path="/login" element={<Login />} />
+
+            <Route element={<AppLayout />}>
+                <Route index path="/" element={<HomeRoute />} />
+                <Route path="/ler" element={<Scanner />} />
+                <Route path="/catalogo" element={<Catalogo />} />
+                <Route path="/auditoria" element={<Auditoria />} />
+            </Route>
+        </>
     )
 )
