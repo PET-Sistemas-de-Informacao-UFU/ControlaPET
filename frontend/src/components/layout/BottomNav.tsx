@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuditIcon, CatalogIcon, ScanIcon } from "../ui/Icons";
+import { AuditIcon, CatalogIcon, LoanIcon } from "../ui/Icons";
 
 export default function BottomNav() {
     const navigate = useNavigate();
@@ -15,8 +15,12 @@ export default function BottomNav() {
                 <span>Catálogo</span>
             </div>
 
-            <div className="nav-scan" onClick={() => navigate("/")}>
-                <ScanIcon />
+            <div
+                className={pathname === "/emprestimos" ? "nav-item active" : "nav-item"}
+                onClick={() => navigate("/emprestimos")}
+            >
+                <LoanIcon />
+                <span>Empréstimos</span>
             </div>
 
             <div

@@ -182,6 +182,20 @@
     outline: none;
     border-color: var(--accent);
   }
+  .form-group textarea{
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font: inherit;
+    resize: vertical;
+  }
+  .form-group textarea:focus{
+    outline: none;
+    border-color: var(--accent);
+  }
 
   /* Botão flutuante de adicionar item */
   .fab-add{

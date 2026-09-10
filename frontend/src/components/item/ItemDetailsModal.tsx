@@ -4,9 +4,11 @@ import type { Item } from "../../interfaces/Item";
 interface ItemDetailsModalProps {
     item: Item | null
     onClose: () => void
+    onEmprestar: () => void
+    onRelatarDefeito: () => void
 }
 
-export default function ItemDetailsModal({ item, onClose }: ItemDetailsModalProps) {
+export default function ItemDetailsModal({ item, onClose, onEmprestar, onRelatarDefeito }: ItemDetailsModalProps) {
     const unitLabel = item?.totalQuantity === 1 ? "unidade" : "unidades";
     const typeLabels = {
         CONSUMABLE: "Consumível",
@@ -30,12 +32,16 @@ export default function ItemDetailsModal({ item, onClose }: ItemDetailsModalProp
             actions={
                 <>
                     {item?.type === "BORROWABLE" && (
-                        <div className="modal-btn primary">Registrar empréstimo</div>
+                        <div className="modal-btn primary" onClick={onEmprestar}>
+                            Registrar empréstimo
+                        </div>
                     )}
                     {item?.type === "CONSUMABLE" && (
                         <div className="modal-btn primary">Registrar consumo</div>
                     )}
-                    <div className="modal-btn danger">Reportar defeito</div>
+                    <div className="modal-btn danger" onClick={onRelatarDefeito}>
+                        Reportar defeito
+                    </div>
                 </>
             }
         >
