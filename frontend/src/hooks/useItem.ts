@@ -1,5 +1,5 @@
 import { api } from "../service/api"
-import type { Item, CreateItemRequest, UpdatedItemRequest } from "../interfaces/Item"
+import type { Item, CreateItemRequest, UpdateItemRequest } from "../interfaces/Item"
 import type { Page } from "../interfaces/Page"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -45,7 +45,7 @@ export function useAddItem(){
     })
 }
 
-const updateItem = async (itemId: number, data: UpdatedItemRequest): Promise<Item> => {
+const updateItem = async (itemId: number, data: UpdateItemRequest): Promise<Item> => {
     const response = await api.patch<Item>(`/items/${itemId}`, data);
     return response.data;
 }
@@ -58,7 +58,7 @@ export function useUpdateItem(){
             itemId, data
         }: {
             itemId: number;
-            data: UpdatedItemRequest;
+            data: UpdateItemRequest;
         }) => updateItem(itemId, data),
 
         onSuccess: (_, { itemId }) => {

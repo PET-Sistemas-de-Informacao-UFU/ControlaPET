@@ -1,13 +1,13 @@
 import Modal from "../ui/Modal";
 import ItemForm from "./ItemForm";
-import type { Item } from "../../interfaces/Item";
+import type { CreateItemRequest, Item } from "../../interfaces/Item";
 
 interface ItemFormModalProps {
     open: boolean
     item: Item | null
     formKey: number
     onClose: () => void
-    onSave: (item: Item) => void
+    onSave: (data: CreateItemRequest) => void
     onDelete: () => void
 }
 

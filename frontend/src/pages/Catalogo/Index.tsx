@@ -1,21 +1,27 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
 import ItemCard from "../../components/item/ItemCard";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
 import { SearchIcon } from "../../components/ui/Icons";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
-import type { Item } from "../../interfaces/Item";
+import type { CreateItemRequest } from "../../interfaces/Item";
 
 export default function Catalogo() {
     const {data, isLoading, isError } = useItemData();
+    const addItemMutation = useAddItem();
+    const updateItemMutation = useUpdateItem();
+    const deleteItemMutation = useDeleteItem();
+
     const isDesktop = useIsDesktop();
+
     const [detailsItemId, setDetailsItemId] = useState<number | null>(null);
-    const items = data?.content ?? [];
-    const selectedItem = items.find((item) => item.id === detailsItemId) ?? null;
     const [formOpen, setFormOpen] = useState(false);
     const [editingItemId, setEditingItemId] = useState<number | null>(null);
     const [formKey, setFormKey] = useState(0);
+
+    const items = data?.content ?? [];
+    const selectedItem = items.find((item) => item.id === detailsItemId) ?? null;
 
 
     function openAddModal() {
@@ -30,21 +36,32 @@ export default function Catalogo() {
         setFormOpen(true);
     }
 
-    function handleSave(item: Item) {
-        if (editingIndex === null) {
-            addItem(item);
+    function handleSave(data: CreateItemRequest) {
+        if (editingItemId === null) {
+            addItemMutation.mutate(data, {
+                onSuccess: () => setFormOpen(false)
+            });
         } else {
-            updateItem(editingIndex, item);
+            updateItemMutation.mutate(
+                {
+                    itemId: editingItemId,
+                    data
+                },
+                {
+                    onSuccess: () => setFormOpen(false)
+                }
+            );
         }
-
-        setFormOpen(false);
     }
 
     function handleDelete() {
-        if (editingIndex !== null) {
-            removeItem(editingIndex);
-            setFormOpen(false);
+        if (editingItemId === null) {
+            return;
         }
+
+        deleteItemMutation.mutate(editingItemId, {
+            onSuccess: () => setFormOpen(false)
+        });
     }
 
     return (
@@ -86,7 +103,8 @@ export default function Catalogo() {
             <ItemFormModal
                 open={formOpen}
                 formKey={formKey}
-                item={editingIndex === null ? null : items[editingIndex]}
+                item={editingItemId === null ? null
+                    : items.find((item) => item.id === editingItemId) ?? null }
                 onClose={() => setFormOpen(false)}
                 onSave={handleSave}
                 onDelete={handleDelete}

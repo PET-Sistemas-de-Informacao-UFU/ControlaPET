@@ -1,20 +1,28 @@
-import { useContext, useState } from "react";
-import { ItemsContext } from "../../context/ItemsContext";
+import { useState } from "react";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
+import { useItemData } from "../../hooks/useItem";
 
 const SCAN_IDLE = "Procurando algo para escanear...";
 
 export default function Scanner() {
-    const { items } = useContext(ItemsContext);
+    const { data } = useItemData();
     const [status, setStatus] = useState(SCAN_IDLE);
-    const [detailsIndex, setDetailsIndex] = useState<number | null>(null);
+    const [detailsItemId, setDetailsItemId] = useState<number | null>(null);
+    const items = data?.content ?? [];
 
     function simulateScan() {
         setStatus("Lendo código...");
 
         setTimeout(() => {
+            const item = items[0];
+
+            if (!item) {
+                setStatus("Nenhum item disponível para a simulação.");
+                return;
+            }
+
             setStatus("Item encontrado!");
-            setDetailsIndex(4);
+            setDetailsItemId(item.id);
         }, 700);
     }
 
@@ -33,9 +41,9 @@ export default function Scanner() {
             <button className="scan-demo-btn" onClick={simulateScan}>Simular leitura</button>
 
             <ItemDetailsModal
-                item={detailsIndex === null ? null : items[detailsIndex]}
+                item={items.find((item) => item.id === detailsItemId) ?? null}
                 onClose={() => {
-                    setDetailsIndex(null);
+                    setDetailsItemId(null);
                     setStatus(SCAN_IDLE);
                 }}
             />
