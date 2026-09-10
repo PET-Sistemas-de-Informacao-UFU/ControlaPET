@@ -7,6 +7,7 @@ interface ItemDetailsModalProps {
 }
 
 export default function ItemDetailsModal({ item, onClose }: ItemDetailsModalProps) {
+    const unitLabel = item?.totalQuantity === 1 ? "unidade" : "unidades";
     const typeLabels = {
         CONSUMABLE: "Consumível",
         BORROWABLE: "Emprestável",
@@ -22,15 +23,36 @@ export default function ItemDetailsModal({ item, onClose }: ItemDetailsModalProp
         <Modal
             open={item !== null}
             title={item?.name ?? "Item"}
-            subtitle={item ? `${item.stockQuantity} em estoque de ${item.totalQuantity}` : undefined}
+            subtitle={item ? `${item.stockQuantity} de ${item.totalQuantity} ${unitLabel} em estoque` : undefined}
+            subtitleClassName="item-stock-summary"
             closeLabel="Fechar"
             onClose={onClose}
+            actions={
+                <>
+                    {item?.type === "BORROWABLE" && (
+                        <div className="modal-btn primary">Registrar empréstimo</div>
+                    )}
+                    {item?.type === "CONSUMABLE" && (
+                        <div className="modal-btn primary">Registrar consumo</div>
+                    )}
+                    <div className="modal-btn danger">Reportar defeito</div>
+                </>
+            }
         >
             {item && (
                 <div className="item-details">
-                    <p>{item.description}</p>
-                    <p><strong>Tipo:</strong> {typeLabels[item.type]}</p>
-                    <p><strong>Condição:</strong> {conditionLabels[item.condition]}</p>
+                    <p className="item-description">{item.description}</p>
+
+                    <div className="item-metadata">
+                        <div>
+                            <span>Tipo</span>
+                            <strong>{typeLabels[item.type]}</strong>
+                        </div>
+                        <div>
+                            <span>Condição</span>
+                            <strong>{conditionLabels[item.condition]}</strong>
+                        </div>
+                    </div>
                 </div>
             )}
         </Modal>
