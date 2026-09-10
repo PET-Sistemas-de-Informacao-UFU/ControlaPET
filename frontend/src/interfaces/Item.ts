@@ -1,5 +1,5 @@
-export type ItemType = 'CONSUMIVEL' | 'EMPRESTAVEL' | 'PERMANENTE';
-export type ItemCondition = 'NOVO' | 'BOM' | 'DANIFICADO';
+export type ItemType = 'CONSUMABLE' | 'BORROWABLE' | 'PERMANENT';
+export type ItemCondition = 'NEW' | 'GOOD' | 'DAMAGED';
 
 export interface Item {
     id: number
