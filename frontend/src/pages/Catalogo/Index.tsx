@@ -3,6 +3,10 @@ import { ItemsContext } from "../../context/ItemsContext";
 import ItemCard from "../../components/item/ItemCard";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
+import LoanRequestModal from "../../components/item/LoanRequestModal";
+import DefectReportModal from "../../components/item/DefectReportModal";
+import Toast from "../../components/ui/Toast";
+import { useToast } from "../../hooks/useToast";
 import { SearchIcon } from "../../components/ui/Icons";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
 import type { Item } from "../../interfaces/Item";
@@ -14,6 +18,9 @@ export default function Catalogo() {
     const [formOpen, setFormOpen] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [formKey, setFormKey] = useState(0);
+    const [loanIndex, setLoanIndex] = useState<number | null>(null);
+    const [defectIndex, setDefectIndex] = useState<number | null>(null);
+    const { message, showToast } = useToast();
 
     function openAddModal() {
         setEditingIndex(null);
@@ -42,6 +49,26 @@ export default function Catalogo() {
             removeItem(editingIndex);
             setFormOpen(false);
         }
+    }
+
+    function openLoanModal(index: number) {
+        setDetailsIndex(null);
+        setLoanIndex(index);
+    }
+
+    function openDefectModal(index: number) {
+        setDetailsIndex(null);
+        setDefectIndex(index);
+    }
+
+    function handleLoanConfirm(_quantity: number, _notes: string) {
+        setLoanIndex(null);
+        showToast("Empréstimo solicitado");
+    }
+
+    function handleDefectConfirm(_description: string) {
+        setDefectIndex(null);
+        showToast("Defeito reportado");
     }
 
     return (
@@ -74,6 +101,8 @@ export default function Catalogo() {
             <ItemDetailsModal
                 item={detailsIndex === null ? null : items[detailsIndex]}
                 onClose={() => setDetailsIndex(null)}
+                onEmprestar={() => detailsIndex !== null && openLoanModal(detailsIndex)}
+                onRelatarDefeito={() => detailsIndex !== null && openDefectModal(detailsIndex)}
             />
 
             <ItemFormModal
@@ -84,6 +113,22 @@ export default function Catalogo() {
                 onSave={handleSave}
                 onDelete={handleDelete}
             />
+
+            <LoanRequestModal
+                open={loanIndex !== null}
+                itemName={loanIndex === null ? "" : items[loanIndex].name}
+                onClose={() => setLoanIndex(null)}
+                onConfirm={handleLoanConfirm}
+            />
+
+            <DefectReportModal
+                open={defectIndex !== null}
+                itemName={defectIndex === null ? "" : items[defectIndex].name}
+                onClose={() => setDefectIndex(null)}
+                onConfirm={handleDefectConfirm}
+            />
+
+            <Toast message={message} />
         </>
     );
 }

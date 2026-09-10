@@ -4,9 +4,11 @@ import type { Item } from "../../interfaces/Item";
 interface ItemDetailsModalProps {
     item: Item | null
     onClose: () => void
+    onEmprestar: () => void
+    onRelatarDefeito: () => void
 }
 
-export default function ItemDetailsModal({ item, onClose }: ItemDetailsModalProps) {
+export default function ItemDetailsModal({ item, onClose, onEmprestar, onRelatarDefeito }: ItemDetailsModalProps) {
     return (
         <Modal
             open={item !== null}
@@ -16,9 +18,8 @@ export default function ItemDetailsModal({ item, onClose }: ItemDetailsModalProp
             onClose={onClose}
             actions={
                 <>
-                    <div className="modal-btn primary">Emprestar</div>
-                    <div className="modal-btn">Devolver</div>
-                    <div className="modal-btn danger">Relatar defeito</div>
+                    <div className="modal-btn primary" onClick={onEmprestar}>Emprestar</div>
+                    <div className="modal-btn danger" onClick={onRelatarDefeito}>Relatar defeito</div>
                 </>
             }
         />
