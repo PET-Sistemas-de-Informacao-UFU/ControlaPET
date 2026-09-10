@@ -3,12 +3,16 @@ import { api, BASE_URL } from "./api";
 import { readRefreshToken, readToken, storeTokens } from "./authStorage";
 import type { AuthResponse } from "../interfaces/Auth";
 
+function isAuthRequest(url?: string) {
+    return url?.includes("/auth/login") || url?.includes("/auth/refresh");
+}
+
 export function setupInterceptors(handleLogout: () => void) {
     const requestInterceptorId = api.interceptors.request.use(
         (config) => {
             const token = readToken();
 
-            if (token) {
+            if (token && !isAuthRequest(config.url)) {
                 config.headers.Authorization = `Bearer ${token}`;
             }
 
@@ -22,7 +26,7 @@ export function setupInterceptors(handleLogout: () => void) {
         async (error) => {
             const originalRequest = error.config;
 
-            if (error.response?.status !== 401) {
+            if (error.response?.status !== 401 || isAuthRequest(originalRequest?.url)) {
                 return Promise.reject(error);
             }
 

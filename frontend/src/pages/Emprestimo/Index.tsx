@@ -55,7 +55,8 @@ export default function Emprestimo() {
         closeLoanModal();
     }
 
-    function handleDefectSubmit(_description: string) {
+    function handleDefectSubmit(description: string) {
+        void description;
         // Ainda não existe endpoint de defeito no back — fica só no front por enquanto.
         setDefectModalOpen(false);
         showToast("Defeito reportado");

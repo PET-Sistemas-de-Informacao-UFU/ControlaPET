@@ -19,10 +19,9 @@ export interface CreateItemRequest {
     type: ItemType
     condition: ItemCondition
     totalQuantity: number
-    stockQuantity: number
 }
 
-export interface updatedItemRequest {
+export interface UpdateItemRequest {
     name?: string
     description?: string
     type?: ItemType

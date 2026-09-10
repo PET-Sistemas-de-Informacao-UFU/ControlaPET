@@ -4,13 +4,14 @@ interface ModalProps {
     open: boolean
     title: string
     subtitle?: string
+    subtitleClassName?: string
     closeLabel: string
     onClose: () => void
     children?: ReactNode
     actions?: ReactNode
 }
 
-export default function Modal({ open, title, subtitle, closeLabel, onClose, children, actions }: ModalProps) {
+export default function Modal({ open, title, subtitle, subtitleClassName, closeLabel, onClose, children, actions }: ModalProps) {
     return (
         <div
             className={open ? "modal-overlay open" : "modal-overlay"}
@@ -21,7 +22,7 @@ export default function Modal({ open, title, subtitle, closeLabel, onClose, chil
             <div className="modal-sheet">
                 <div className="modal-handle"></div>
                 <div className="modal-title">{title}</div>
-                {subtitle && <div className="modal-sub">{subtitle}</div>}
+                {subtitle && <div className={`modal-sub ${subtitleClassName ?? ""}`}>{subtitle}</div>}
 
                 {children}
 

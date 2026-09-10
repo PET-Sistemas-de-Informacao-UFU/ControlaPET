@@ -1,130 +1,141 @@
-import { useContext, useState } from "react";
-import { ItemsContext } from "../../context/ItemsContext";
-import ItemCard from "../../components/item/ItemCard";
+import { useState } from "react";
+import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
 import LoanRequestModal from "../../components/item/LoanRequestModal";
 import DefectReportModal from "../../components/item/DefectReportModal";
 import Toast from "../../components/ui/Toast";
 import { useToast } from "../../hooks/useToast";
-import { SearchIcon } from "../../components/ui/Icons";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
-import type { Item } from "../../interfaces/Item";
+import type { CreateItemRequest } from "../../interfaces/Item";
+import CatalogToolbar from "./CatalogToolbar";
+import ItemList from "./ItemList";
 
 export default function Catalogo() {
-    const { items, addItem, updateItem, removeItem } = useContext(ItemsContext);
+    const { data, isLoading, isError } = useItemData();
+    const addItemMutation = useAddItem();
+    const updateItemMutation = useUpdateItem();
+    const deleteItemMutation = useDeleteItem();
     const isDesktop = useIsDesktop();
-    const [detailsIndex, setDetailsIndex] = useState<number | null>(null);
-    const [formOpen, setFormOpen] = useState(false);
-    const [editingIndex, setEditingIndex] = useState<number | null>(null);
-    const [formKey, setFormKey] = useState(0);
-    const [loanIndex, setLoanIndex] = useState<number | null>(null);
-    const [defectIndex, setDefectIndex] = useState<number | null>(null);
     const { message, showToast } = useToast();
 
+    const [detailsItemId, setDetailsItemId] = useState<number | null>(null);
+    const [formOpen, setFormOpen] = useState(false);
+    const [editingItemId, setEditingItemId] = useState<number | null>(null);
+    const [formKey, setFormKey] = useState(0);
+    const [loanItemId, setLoanItemId] = useState<number | null>(null);
+    const [defectItemId, setDefectItemId] = useState<number | null>(null);
+
+    const items = data?.content ?? [];
+    const selectedItem = items.find((item) => item.id === detailsItemId) ?? null;
+    const loanItem = items.find((item) => item.id === loanItemId) ?? null;
+    const defectItem = items.find((item) => item.id === defectItemId) ?? null;
+
     function openAddModal() {
-        setEditingIndex(null);
+        setEditingItemId(null);
         setFormKey((current) => current + 1);
         setFormOpen(true);
     }
 
-    function openEditModal(index: number) {
-        setEditingIndex(index);
+    function openEditModal(itemId: number) {
+        setEditingItemId(itemId);
         setFormKey((current) => current + 1);
         setFormOpen(true);
     }
 
-    function handleSave(item: Item) {
-        if (editingIndex === null) {
-            addItem(item);
+    function handleSave(data: CreateItemRequest) {
+        if (editingItemId === null) {
+            addItemMutation.mutate(data, {
+                onSuccess: () => setFormOpen(false)
+            });
         } else {
-            updateItem(editingIndex, item);
+            updateItemMutation.mutate(
+                { itemId: editingItemId, data },
+                { onSuccess: () => setFormOpen(false) }
+            );
         }
-
-        setFormOpen(false);
     }
 
     function handleDelete() {
-        if (editingIndex !== null) {
-            removeItem(editingIndex);
-            setFormOpen(false);
-        }
+        if (editingItemId === null) return;
+
+        deleteItemMutation.mutate(editingItemId, {
+            onSuccess: () => setFormOpen(false)
+        });
     }
 
-    function openLoanModal(index: number) {
-        setDetailsIndex(null);
-        setLoanIndex(index);
+    function openLoanModal(itemId: number) {
+        setDetailsItemId(null);
+        setLoanItemId(itemId);
     }
 
-    function openDefectModal(index: number) {
-        setDetailsIndex(null);
-        setDefectIndex(index);
+    function openDefectModal(itemId: number) {
+        setDetailsItemId(null);
+        setDefectItemId(itemId);
     }
 
-    function handleLoanConfirm(_quantity: number, _notes: string) {
-        setLoanIndex(null);
+    function handleLoanConfirm(quantity: number, notes: string) {
+        void quantity;
+        void notes;
+        setLoanItemId(null);
         showToast("Empréstimo solicitado");
     }
 
-    function handleDefectConfirm(_description: string) {
-        setDefectIndex(null);
+    function handleDefectConfirm(description: string) {
+        void description;
+        setDefectItemId(null);
         showToast("Defeito reportado");
     }
 
     return (
         <>
-            <div className="catalog-toolbar">
-                <div className="search-bar"><SearchIcon /><span>Procurar...</span></div>
+            <CatalogToolbar isDesktop={isDesktop} onAdd={openAddModal} />
 
-                {isDesktop && (
-                    <button type="button" className="header-btn" onClick={openAddModal}>
-                        + Novo item
-                    </button>
-                )}
-            </div>
+            {isError && <p>Erro ao carregar os itens.</p>}
 
-            {!isDesktop && <div className="section-label">Itens do catálogo</div>}
-
-            <div className="catalog-grid">
-                {items.map((item, index) => (
-                    <ItemCard
-                        key={index}
-                        item={item}
-                        onOpen={() => setDetailsIndex(index)}
-                        onEdit={() => openEditModal(index)}
-                    />
-                ))}
-            </div>
+            {!isLoading && !isError && (
+                <ItemList
+                    items={items}
+                    onOpen={setDetailsItemId}
+                    onEdit={openEditModal}
+                />
+            )}
 
             <div className="fab-add" onClick={openAddModal} title="Adicionar item">+</div>
 
             <ItemDetailsModal
-                item={detailsIndex === null ? null : items[detailsIndex]}
-                onClose={() => setDetailsIndex(null)}
-                onEmprestar={() => detailsIndex !== null && openLoanModal(detailsIndex)}
-                onRelatarDefeito={() => detailsIndex !== null && openDefectModal(detailsIndex)}
+                item={selectedItem}
+                onClose={() => setDetailsItemId(null)}
+                onEmprestar={() => {
+                    if (detailsItemId !== null) openLoanModal(detailsItemId);
+                }}
+                onRelatarDefeito={() => {
+                    if (detailsItemId !== null) openDefectModal(detailsItemId);
+                }}
             />
 
             <ItemFormModal
                 open={formOpen}
                 formKey={formKey}
-                item={editingIndex === null ? null : items[editingIndex]}
+                item={editingItemId === null
+                    ? null
+                    : items.find((item) => item.id === editingItemId) ?? null}
                 onClose={() => setFormOpen(false)}
                 onSave={handleSave}
                 onDelete={handleDelete}
             />
 
             <LoanRequestModal
-                open={loanIndex !== null}
-                itemName={loanIndex === null ? "" : items[loanIndex].name}
-                onClose={() => setLoanIndex(null)}
+                open={loanItem !== null}
+                itemName={loanItem?.name ?? ""}
+                onClose={() => setLoanItemId(null)}
                 onConfirm={handleLoanConfirm}
             />
 
             <DefectReportModal
-                open={defectIndex !== null}
-                itemName={defectIndex === null ? "" : items[defectIndex].name}
-                onClose={() => setDefectIndex(null)}
+                open={defectItem !== null}
+                itemName={defectItem?.name ?? ""}
+                onClose={() => setDefectItemId(null)}
                 onConfirm={handleDefectConfirm}
             />
 

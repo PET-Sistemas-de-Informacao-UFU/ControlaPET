@@ -8,13 +8,18 @@ interface ItemCardProps {
 }
 
 export default function ItemCard({ item, onOpen, onEdit }: ItemCardProps) {
+    const typeInitial = item.type.charAt(0);
+    const unitLabel = item.totalQuantity === 1 ? "unidade" : "unidades";
+
     return (
         <div className="item-card">
-            <div className="item-thumb" onClick={onOpen}>{item.emoji}</div>
+            <div className="item-thumb" onClick={onOpen}>{typeInitial}</div>
 
             <div className="item-info" onClick={onOpen}>
                 <div className="name">{item.name}</div>
-                <div className="qty">{item.qty}</div>
+                <div className="qty item-stock-summary">
+                    {item.stockQuantity} de {item.totalQuantity} {unitLabel} em estoque
+                </div>
             </div>
 
             <div
