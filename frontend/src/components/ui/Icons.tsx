@@ -59,20 +59,20 @@ export function CatalogIcon() {
     );
 }
 
-export function ScanIcon() {
-    return (
-        <svg {...strokeProps}>
-            <path d="M3 7V4a1 1 0 0 1 1-1h3M17 3h3a1 1 0 0 1 1 1v3M21 17v3a1 1 0 0 1-1 1h-3M7 21H4a1 1 0 0 1-1-1v-3" />
-            <rect x="9" y="9" width="6" height="6" rx="1" />
-        </svg>
-    );
-}
-
 export function AuditIcon() {
     return (
         <svg {...strokeProps}>
             <path d="M3 3v18h18" />
             <path d="M7 15v3M11 10v8M15 13v5M19 7v11" />
+        </svg>
+    );
+}
+
+export function LoanIcon() {
+    return (
+        <svg {...strokeProps}>
+            <rect x="3" y="4" width="18" height="16" rx="2" />
+            <path d="M8 9h8M8 13h5" />
         </svg>
     );
 }

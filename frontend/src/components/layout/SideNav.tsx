@@ -1,10 +1,11 @@
 import { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { AuditIcon, CatalogIcon } from "../ui/Icons";
+import { AuditIcon, CatalogIcon, LoanIcon } from "../ui/Icons";
 
 const DESTINATIONS = [
     { path: "/catalogo", label: "Catálogo", Icon: CatalogIcon },
+    { path: "/emprestimos", label: "Meus Empréstimos", Icon: LoanIcon },
     { path: "/auditoria", label: "Auditoria", Icon: AuditIcon }
 ];
 

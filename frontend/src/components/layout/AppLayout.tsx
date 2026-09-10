@@ -5,9 +5,8 @@ import SideNav from "./SideNav";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
 
 const TITLES: Record<string, string> = {
-    "/": "Ler",
-    "/ler": "Ler",
     "/catalogo": "Catálogo",
+    "/emprestimos": "Meus Empréstimos",
     "/auditoria": "Auditoria"
 };
 
