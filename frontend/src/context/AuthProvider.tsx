@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "./AuthContext";
 import type { User } from "../interfaces/User";
 import type { AuthResponse, LoginData, SignupData } from "../interfaces/Auth";
-import { api, BASE_URL } from "../service/api";
+import { api } from "../service/api";
 import { setupInterceptors } from "../service/AuthInterceptor";
 import { clearTokens, readToken, storeTokens } from "../service/authStorage";
 
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function handleLogin({ email, password }: LoginData) {
         try {
-            const response = await api.post<AuthResponse>(`${BASE_URL}/auth/login`, {
+            const response = await api.post<AuthResponse>("/auth/login", {
                 email,
                 password
             });
@@ -48,7 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function handleSignup({ name, email, password, role }: SignupData) {
         try {
-            await api.post(`${BASE_URL}/users`, {
+            await api.post("/users", {
                 name,
                 email,
                 password,

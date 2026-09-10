@@ -18,7 +18,7 @@ export default function Login() {
 
         try {
             await handleLogin({ email, password });
-            navigate("/catalogo");
+            navigate("/", { replace: true });
         } catch {
             setError("E-mail ou senha inválidos.");
         } finally {
