@@ -22,7 +22,7 @@ export interface CreateItemRequest {
     stockQuantity: number
 }
 
-export interface updatedItemRequest {
+export interface UpdatedItemRequest {
     name?: string
     description?: string
     type?: ItemType

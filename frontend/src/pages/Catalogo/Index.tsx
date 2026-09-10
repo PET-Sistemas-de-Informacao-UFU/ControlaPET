@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { ItemsContext } from "../../context/ItemsContext";
+import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
 import ItemCard from "../../components/item/ItemCard";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
@@ -8,21 +8,24 @@ import { useIsDesktop } from "../../hooks/useIsDesktop";
 import type { Item } from "../../interfaces/Item";
 
 export default function Catalogo() {
-    const { items, addItem, updateItem, removeItem } = useContext(ItemsContext);
+    const {data, isLoading, isError } = useItemData();
     const isDesktop = useIsDesktop();
-    const [detailsIndex, setDetailsIndex] = useState<number | null>(null);
+    const [detailsItemId, setDetailsItemId] = useState<number | null>(null);
+    const items = data?.content ?? [];
+    const selectedItem = items.find((item) => item.id === detailsItemId) ?? null;
     const [formOpen, setFormOpen] = useState(false);
-    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [editingItemId, setEditingItemId] = useState<number | null>(null);
     const [formKey, setFormKey] = useState(0);
 
+
     function openAddModal() {
-        setEditingIndex(null);
+        setEditingItemId(null);
         setFormKey((current) => current + 1);
         setFormOpen(true);
     }
 
-    function openEditModal(index: number) {
-        setEditingIndex(index);
+    function openEditModal(itemId: number) {
+        setEditingItemId(itemId);
         setFormKey((current) => current + 1);
         setFormOpen(true);
     }
@@ -58,22 +61,26 @@ export default function Catalogo() {
 
             {!isDesktop && <div className="section-label">Itens do catálogo</div>}
 
-            <div className="catalog-grid">
-                {items.map((item, index) => (
-                    <ItemCard
-                        key={index}
-                        item={item}
-                        onOpen={() => setDetailsIndex(index)}
-                        onEdit={() => openEditModal(index)}
-                    />
-                ))}
-            </div>
+            {isError && <p>Erro ao carregar os itens.</p>}
+
+            {!isLoading && !isError && (
+                <div className="catalog-grid">
+                    {items.map((item) => (
+                        <ItemCard
+                            key={item.id}
+                            item={item}
+                            onOpen={() => setDetailsItemId(item.id)}
+                            onEdit={() => openEditModal(item.id)}
+                        />
+                    ))}
+                </div>
+            )}
 
             <div className="fab-add" onClick={openAddModal} title="Adicionar item">+</div>
 
             <ItemDetailsModal
-                item={detailsIndex === null ? null : items[detailsIndex]}
-                onClose={() => setDetailsIndex(null)}
+                item={selectedItem}
+                onClose={() => setDetailsItemId(null)}
             />
 
             <ItemFormModal
