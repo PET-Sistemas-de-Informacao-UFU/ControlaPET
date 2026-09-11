@@ -144,8 +144,14 @@
   .item-info{ flex:1; min-width:0; }
   .item-info .name{ font-size: 14.5px; font-weight: 600; margin-bottom:2px; }
   .item-info .qty{ font-size: 12.5px; color: var(--text-dim); }
-  .item-arrow{ color: var(--text-dim); flex-shrink:0; }
-  .item-arrow svg{ width:18px; height:18px; }
+  .item-arrow{
+    color: var(--text-dim);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+  }
+  .item-arrow svg{ width:19px; height:19px; }
 
   .item-edit-btn{
     width: 32px; height:32px;
@@ -161,6 +167,11 @@
 
   /* Formulário (modal de adicionar/editar) */
   .form-group{ margin-bottom: 16px; }
+  .item-form-details{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:12px;
+  }
   .form-group label{
     display:block;
     font-size: 12.5px;
@@ -177,11 +188,124 @@
     color: var(--text);
     font-size: 14px;
     font-family: inherit;
+    line-height: 1.35;
   }
   .form-group input:focus{
     outline: none;
     border-color: var(--accent);
   }
+  .number-input{ position:relative; }
+  .number-input input{
+    padding-right:38px;
+    appearance:textfield;
+  }
+  .number-input input::-webkit-inner-spin-button,
+  .number-input input::-webkit-outer-spin-button{ appearance:none; margin:0; }
+  .number-stepper{
+    position:absolute;
+    top:1px;
+    right:1px;
+    bottom:1px;
+    width:32px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border-left:1px solid var(--border);
+    border-radius:0 9px 9px 0;
+  }
+  .number-stepper button{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition:background 0.15s, color 0.15s;
+  }
+  .number-stepper button + button{ border-top:1px solid var(--border); }
+  .number-stepper button:hover{ background:var(--surface); color:var(--text); }
+  .number-stepper svg{
+    width:14px;
+    height:14px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2.5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
+  .form-select{ position:relative; }
+  .form-select-trigger{
+    width:100%;
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding: 11px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface-2);
+    color:var(--text);
+    font:inherit;
+    font-size:14px;
+    line-height:1.35;
+    text-align:left;
+    cursor:pointer;
+    transition:border-color 0.15s, background 0.15s;
+  }
+  .form-select-trigger:hover{ border-color:#3a3a46; }
+  .form-select-trigger:focus,
+  .form-select-trigger.open{ outline:none; border-color:var(--accent); }
+  .form-select-placeholder{ color:var(--text-dim); }
+  .form-select-trigger span{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .form-select-trigger svg{
+    width:17px;
+    height:17px;
+    flex-shrink:0;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2.5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    color:var(--text-dim);
+    transition:transform 0.15s;
+  }
+  .form-select-trigger.open svg{ transform:rotate(180deg); }
+  .form-select-options{
+    position:absolute;
+    z-index:2;
+    top:calc(100% + 6px);
+    left:0;
+    width:100%;
+    overflow:hidden;
+    padding:5px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
+    box-shadow:0 12px 24px rgba(0,0,0,0.32);
+  }
+  .form-select-options button{
+    width:100%;
+    padding:10px 9px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--text);
+    font:inherit;
+    font-size:13.5px;
+    line-height:1.35;
+    text-align:left;
+    cursor:pointer;
+  }
+  .form-select-options button:hover,
+  .form-select-options button.selected{ background:var(--accent); }
   .form-group textarea{
     width: 100%;
     background: var(--surface-2);
@@ -189,13 +313,27 @@
     border-radius: 10px;
     padding: 11px 14px;
     color: var(--text);
-    font: inherit;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.4;
     resize: vertical;
   }
   .form-group textarea:focus{
     outline: none;
     border-color: var(--accent);
   }
+  .form-group textarea{
+    scrollbar-width:thin;
+    scrollbar-color:#4a4a58 transparent;
+  }
+  .form-group textarea::-webkit-scrollbar{ width:10px; }
+  .form-group textarea::-webkit-scrollbar-track{ background:transparent; }
+  .form-group textarea::-webkit-scrollbar-thumb{
+    background:#4a4a58;
+    border:3px solid var(--surface-2);
+    border-radius:999px;
+  }
+  .form-group textarea::-webkit-scrollbar-thumb:hover{ background:#666676; }
 
   /* Botão flutuante de adicionar item */
   .fab-add{
@@ -379,6 +517,10 @@
   .item-metadata span{ color: var(--text-dim); font-size: 12px; }
   .item-metadata strong{ font-size: 13px; font-weight: 600; }
   .modal-actions{ display:flex; flex-direction:column; gap:10px; }
+  .item-form-actions{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
   .modal-btn{
     padding: 13px;
     border-radius: 12px;

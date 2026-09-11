@@ -121,13 +121,13 @@
   /* ---- MODAIS ---- */
   .modal-overlay{ align-items:center; justify-content:center; }
   .modal-sheet{
-    width: auto;
-    max-width: 440px;
+    width: min(500px, calc(100vw - 48px));
     border-radius: 16px;
     border: 1px solid var(--border);
     transform: scale(0.96);
     transition: transform 0.18s ease;
   }
+  .modal-sheet.modal-sheet-compact{ width:min(440px, calc(100vw - 48px)); }
   .modal-overlay.open .modal-sheet{ transform: scale(1); }
   .modal-handle{ display:none; }
 }

@@ -5,6 +5,7 @@ import type {
     ItemCondition,
     ItemType
 } from "../../interfaces/Item";
+import FormSelect from "../ui/FormSelect";
 
 interface ItemFormProps {
     item: Item | null
@@ -51,6 +52,11 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
         }
     }
 
+    function changeQuantity(amount: number) {
+        const currentQuantity = Number(totalQuantity) || 0;
+        setTotalQuantity(String(Math.max(0, currentQuantity + amount)));
+    }
+
     return (
         <>
             <div className="form-group">
@@ -74,47 +80,61 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                 />
             </div>
 
-            <div className="form-group">
-                <label htmlFor="edit-type">Tipo</label>
-                <select
-                    id="edit-type"
-                    value={type}
-                    onChange={(event) => setType(event.target.value as ItemType | "")}
-                >
-                    <option value="">Selecione o tipo</option>
-                    <option value="CONSUMABLE">Consumível</option>
-                    <option value="BORROWABLE">Emprestável</option>
-                    <option value="PERMANENT">Permanente</option>
-                </select>
+            <div className="item-form-details">
+                <div className="form-group">
+                    <label htmlFor="edit-type">Tipo</label>
+                    <FormSelect
+                        id="edit-type"
+                        value={type}
+                        placeholder="Selecione o tipo"
+                        options={[
+                            { value: "CONSUMABLE", label: "Consumível" },
+                            { value: "BORROWABLE", label: "Emprestável" },
+                            { value: "PERMANENT", label: "Permanente" }
+                        ]}
+                        onChange={(value) => setType(value as ItemType)}
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="edit-total-quantity">Quantidade total</label>
+                    <div className="number-input">
+                        <input
+                            type="number"
+                            id="edit-total-quantity"
+                            placeholder="Ex: 5"
+                            min="0"
+                            value={totalQuantity}
+                            onChange={(event) => setTotalQuantity(event.target.value)}
+                        />
+                        <div className="number-stepper">
+                            <button type="button" aria-label="Aumentar quantidade" onClick={() => changeQuantity(1)}>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6" /></svg>
+                            </button>
+                            <button type="button" aria-label="Diminuir quantidade" onClick={() => changeQuantity(-1)}>
+                                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="edit-condition">Condição</label>
+                    <FormSelect
+                        id="edit-condition"
+                        value={condition}
+                        placeholder="Selecione a condição"
+                        options={[
+                            { value: "NEW", label: "Novo" },
+                            { value: "GOOD", label: "Bom" },
+                            { value: "DAMAGED", label: "Danificado" }
+                        ]}
+                        onChange={(value) => setCondition(value as ItemCondition)}
+                    />
+                </div>
             </div>
 
-            <div className="form-group">
-                <label htmlFor="edit-total-quantity">Quantidade total</label>
-                <input
-                    type="number"
-                    id="edit-total-quantity"
-                    placeholder="Ex: 5"
-                    min="0"
-                    value={totalQuantity}
-                    onChange={(event) => setTotalQuantity(event.target.value)}
-                />
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="edit-condition">Condição</label>
-                <select
-                    id="edit-condition"
-                    value={condition}
-                    onChange={(event) => setCondition(event.target.value as ItemCondition | "")}
-                >
-                    <option value="">Selecione a condição</option>
-                    <option value="NEW">Novo</option>
-                    <option value="GOOD">Bom</option>
-                    <option value="DAMAGED">Danificado</option>
-                </select>
-            </div>
-
-            <div className="modal-actions">
+            <div className={item ? "modal-actions item-form-actions" : "modal-actions"}>
                 <div className="modal-btn primary" onClick={handleSave}>Salvar</div>
                 {item && <div className="modal-btn danger" onClick={handleDelete}>Excluir item</div>}
             </div>

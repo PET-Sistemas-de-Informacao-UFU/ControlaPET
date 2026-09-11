@@ -23,6 +23,7 @@ export default function LoanRequestModal({ open, itemName, onClose, onConfirm }:
             open={open}
             title={`Emprestar ${itemName}`}
             subtitle="Informe a quantidade e o motivo do empréstimo"
+            sheetClassName="modal-sheet-compact"
             closeLabel="Cancelar"
             onClose={onClose}
             actions={<div className="modal-btn primary" onClick={handleConfirm}>Confirmar empréstimo</div>}

@@ -27,6 +27,7 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onRelatar
             title={item?.name ?? "Item"}
             subtitle={item ? `${item.stockQuantity} de ${item.totalQuantity} ${unitLabel} em estoque` : undefined}
             subtitleClassName="item-stock-summary"
+            sheetClassName="modal-sheet-compact"
             closeLabel="Fechar"
             onClose={onClose}
             actions={
