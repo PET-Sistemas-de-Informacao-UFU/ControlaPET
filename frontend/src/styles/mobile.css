@@ -468,6 +468,134 @@
   .log-body .log-text{ font-size: 13.8px; line-height: 1.4; }
   .log-body .log-text b{ font-weight: 700; }
 
+  /* ---- EMPRESTIMOS VIEW ---- */
+  .loan-summary{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:10px;
+  }
+  .loan-summary-card{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:100px;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:var(--surface);
+  }
+  .loan-summary-card > span{ color:var(--text-dim); font-size:11.5px; font-weight:600; }
+  .loan-summary-card strong{ font-size:25px; line-height:1.1; }
+  .loan-summary-card small{ color:var(--text-dim); font-size:11px; line-height:1.35; }
+  .loan-summary-card.warning{ border-color:rgba(239,91,91,0.45); }
+  .loan-summary-card.warning strong{ color:var(--red); }
+  .loan-section-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .loan-section-heading .section-label{ margin:20px 0 10px; }
+  .loan-section-heading > span{
+    margin-top:10px;
+    color:var(--text-dim);
+    font-size:12px;
+  }
+  .loan-active-list{ display:flex; flex-direction:column; gap:10px; }
+  .loan-card{
+    width:100%;
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:var(--surface);
+    color:var(--text);
+    font-family:inherit;
+    text-align:left;
+    cursor:pointer;
+    transition:border-color 0.15s, transform 0.1s;
+  }
+  .loan-card:hover{ border-color:#3a3a46; }
+  .loan-card:active{ transform:scale(0.99); }
+  .loan-card-header,
+  .loan-card-content{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .loan-card-content{ margin-top:12px; }
+  .loan-card-content > div{ min-width:0; display:flex; flex-direction:column; gap:4px; }
+  .loan-card-content strong{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:15px; }
+  .loan-card-content span{ color:var(--text-dim); font-size:12.5px; }
+  .loan-card-content svg{ width:18px; height:18px; flex-shrink:0; color:var(--text-dim); }
+  .loan-status{
+    display:inline-flex;
+    align-items:center;
+    width:max-content;
+    padding:4px 8px;
+    border-radius:999px;
+    background:rgba(79,157,250,0.14);
+    color:var(--blue);
+    font-size:11px;
+    font-weight:700;
+  }
+  .loan-status.overdue{ background:rgba(239,91,91,0.13); color:var(--red); }
+  .loan-status.completed{ background:rgba(62,207,142,0.12); color:var(--green); }
+  .loan-quantity{ color:var(--text-dim); font-size:12px; }
+  .loan-empty-state{
+    padding:20px;
+    border:1px dashed var(--border);
+    border-radius:12px;
+    color:var(--text-dim);
+    font-size:13px;
+    text-align:center;
+  }
+  .loan-empty-state.error{ border-color:rgba(239,91,91,0.45); color:var(--red); }
+  .history-heading{ margin-top:2px; }
+  .loan-history-list{ display:flex; flex-direction:column; gap:2px; }
+  .loan-history-item{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    padding:15px 4px;
+    border-bottom:1px solid var(--border);
+  }
+  .loan-history-item:last-child{ border-bottom:0; }
+  .loan-history-icon{
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    border-radius:9px;
+    font-size:18px;
+    font-weight:700;
+  }
+  .loan-history-icon.completed{ background:rgba(62,207,142,0.12); color:var(--green); }
+  .loan-history-icon.consumption{ background:rgba(242,163,60,0.13); color:var(--orange); }
+  .loan-history-item > div:last-child{ min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .loan-history-item span{ color:var(--text-dim); font-size:12px; }
+  .loan-history-item strong{ font-size:14.5px; }
+  .loan-history-item small{ overflow:hidden; color:var(--text-dim); font-size:12.5px; line-height:1.4; text-overflow:ellipsis; white-space:nowrap; }
+  .loan-modal-details{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .loan-modal-details > div{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:11px 12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface-2);
+  }
+  .loan-modal-details span{ color:var(--text-dim); font-size:12px; }
+  .loan-modal-details strong{ font-size:13px; }
+
   /* Item detail modal */
   .modal-overlay{
     position:fixed; inset:0;

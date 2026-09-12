@@ -101,6 +101,12 @@
 
   /* ---- AUDITORIA ---- */
   .audit-list{ max-width: 720px; }
+
+  /* ---- EMPRESTIMOS ---- */
+  .loan-active-list{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .loan-page-layout{
+    max-width:1000px;
+  }
   .audit-filters + .section-label{ margin-top: 26px; }
   .audit-filters{
     display:flex;
