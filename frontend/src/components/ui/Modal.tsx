@@ -21,6 +21,7 @@ export default function Modal({ open, title, subtitle, subtitleClassName, sheetC
             }}
         >
             <div className={`modal-sheet ${sheetClassName ?? ""}`}>
+                <button type="button" className="modal-close-icon" aria-label={closeLabel} onClick={onClose}>×</button>
                 <div className="modal-handle"></div>
                 <div className="modal-title">{title}</div>
                 {subtitle && <div className={`modal-sub ${subtitleClassName ?? ""}`}>{subtitle}</div>}
