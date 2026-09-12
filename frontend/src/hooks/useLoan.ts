@@ -53,6 +53,9 @@ export function useAddLoan(){
 
         onSuccess() {
             queryClient.invalidateQueries({queryKey: ['loans-data']});
+            queryClient.invalidateQueries({queryKey: ['user-loans-data']});
+            queryClient.invalidateQueries({queryKey: ['user-pending-loans-data']});
+            queryClient.invalidateQueries({queryKey: ['items-data']});
         }
     })
 }

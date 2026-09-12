@@ -1,32 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../ui/Modal";
 
 interface LoanRequestModalProps {
     open: boolean
     itemName: string
+    maxQuantity: number
+    isSubmitting: boolean
     onClose: () => void
-    onConfirm: (quantity: number, notes: string) => void
+    onConfirm: (quantity: number, expectedReturnDate: string) => void
 }
 
-export default function LoanRequestModal({ open, itemName, onClose, onConfirm }: LoanRequestModalProps) {
+export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmitting, onClose, onConfirm }: LoanRequestModalProps) {
     const [quantity, setQuantity] = useState(1);
-    const [notes, setNotes] = useState("");
+    const [expectedReturnDate, setExpectedReturnDate] = useState("");
+
+    useEffect(() => {
+        if (!open) {
+            setQuantity(1);
+            setExpectedReturnDate("");
+        }
+    }, [open]);
 
     function handleConfirm() {
-        onConfirm(quantity, notes);
-        setQuantity(1);
-        setNotes("");
+        if (!Number.isInteger(quantity) || quantity < 1 || quantity > maxQuantity || !expectedReturnDate) return;
+        onConfirm(quantity, expectedReturnDate);
     }
 
     return (
         <Modal
             open={open}
             title={`Emprestar ${itemName}`}
-            subtitle="Informe a quantidade e o motivo do empréstimo"
+            subtitle="Informe a quantidade e a data prevista para devolução"
             sheetClassName="modal-sheet-compact"
             closeLabel="Cancelar"
             onClose={onClose}
-            actions={<div className="modal-btn primary" onClick={handleConfirm}>Confirmar empréstimo</div>}
+            actions={<button type="button" className="modal-btn primary" disabled={isSubmitting} onClick={handleConfirm}>{isSubmitting ? "Registrando..." : "Confirmar empréstimo"}</button>}
         >
             <div className="form-group">
                 <label htmlFor="loan-req-qty">Quantidade</label>
@@ -34,18 +42,19 @@ export default function LoanRequestModal({ open, itemName, onClose, onConfirm }:
                     type="number"
                     id="loan-req-qty"
                     min={1}
+                    max={maxQuantity}
                     value={quantity}
                     onChange={(event) => setQuantity(Number(event.target.value))}
                 />
             </div>
             <div className="form-group">
-                <label htmlFor="loan-req-notes">Motivo / observação</label>
+                <label htmlFor="loan-req-return-date">Prazo para devolução</label>
                 <input
-                    type="text"
-                    id="loan-req-notes"
-                    placeholder="Ex: Vou usar na apresentação de projeto"
-                    value={notes}
-                    onChange={(event) => setNotes(event.target.value)}
+                    type="date"
+                    id="loan-req-return-date"
+                    min={new Date().toISOString().slice(0, 10)}
+                    value={expectedReturnDate}
+                    onChange={(event) => setExpectedReturnDate(event.target.value)}
                 />
             </div>
         </Modal>

@@ -53,6 +53,7 @@ export function useAddMovement(){
         onSuccess() {
             queryClient.invalidateQueries({queryKey: ['movements-data']});
             queryClient.invalidateQueries({queryKey: ['user-movements-data']});
+            queryClient.invalidateQueries({queryKey: ['items-data']});
         }
     })
 }

@@ -669,6 +669,7 @@
   }
   .modal-btn.primary{ background: var(--accent); border-color: var(--accent); }
   .modal-btn.danger{ color: var(--red); }
+  .modal-btn:disabled{ cursor:not-allowed; opacity:.65; }
   .modal-close{
     text-align:center;
     color: var(--text-dim);

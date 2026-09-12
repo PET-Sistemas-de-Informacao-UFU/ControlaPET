@@ -25,7 +25,7 @@ public class ItemService {
                 .type(request.type())
                 .condition(request.condition())
                 .totalQuantity(request.totalQuantity())
-                .stockQuantity(request.stockQuantity())
+                .stockQuantity(request.totalQuantity())
                 .build();
 
         Item newItem = itemRepository.save(item);
