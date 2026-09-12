@@ -5,7 +5,7 @@ import { AuditIcon, CatalogIcon, LoanIcon } from "../ui/Icons";
 
 const DESTINATIONS = [
     { path: "/catalogo", label: "Catálogo", Icon: CatalogIcon },
-    { path: "/emprestimos", label: "Meus Empréstimos", Icon: LoanIcon },
+    { path: "/movimentacoes", label: "Movimentações", Icon: LoanIcon },
     { path: "/auditoria", label: "Auditoria", Icon: AuditIcon }
 ];
 
