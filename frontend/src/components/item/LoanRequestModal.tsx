@@ -11,19 +11,43 @@ interface LoanRequestModalProps {
 }
 
 export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmitting, onClose, onConfirm }: LoanRequestModalProps) {
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState("1");
     const [expectedReturnDate, setExpectedReturnDate] = useState("");
+    const [validationMessage, setValidationMessage] = useState("");
 
     useEffect(() => {
         if (!open) {
-            setQuantity(1);
+            setQuantity("1");
             setExpectedReturnDate("");
+            setValidationMessage("");
         }
     }, [open]);
 
     function handleConfirm() {
-        if (!Number.isInteger(quantity) || quantity < 1 || quantity > maxQuantity || !expectedReturnDate) return;
-        onConfirm(quantity, expectedReturnDate);
+        const requestedQuantity = Number(quantity);
+
+        if (maxQuantity === 0) {
+            setValidationMessage("Não há unidades disponíveis para empréstimo.");
+            return;
+        }
+
+        if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+            setValidationMessage("Informe uma quantidade válida.");
+            return;
+        }
+
+        if (requestedQuantity > maxQuantity) {
+            setValidationMessage(`Há apenas ${maxQuantity} ${maxQuantity === 1 ? "unidade disponível" : "unidades disponíveis"}.`);
+            return;
+        }
+
+        if (!expectedReturnDate) {
+            setValidationMessage("Informe o prazo para devolução.");
+            return;
+        }
+
+        setValidationMessage("");
+        onConfirm(requestedQuantity, expectedReturnDate);
     }
 
     return (
@@ -44,7 +68,13 @@ export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmit
                     min={1}
                     max={maxQuantity}
                     value={quantity}
-                    onChange={(event) => setQuantity(Number(event.target.value))}
+                    onChange={(event) => {
+                        setQuantity(event.target.value);
+                        setValidationMessage("");
+                    }}
+                    onBlur={() => {
+                        if (quantity === "") setQuantity("0");
+                    }}
                 />
             </div>
             <div className="form-group">
@@ -54,9 +84,13 @@ export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmit
                     id="loan-req-return-date"
                     min={new Date().toISOString().slice(0, 10)}
                     value={expectedReturnDate}
-                    onChange={(event) => setExpectedReturnDate(event.target.value)}
+                    onChange={(event) => {
+                        setExpectedReturnDate(event.target.value);
+                        setValidationMessage("");
+                    }}
                 />
             </div>
+            {validationMessage && <p className="form-error" role="alert">{validationMessage}</p>}
         </Modal>
     );
 }

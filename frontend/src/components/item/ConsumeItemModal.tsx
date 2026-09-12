@@ -11,15 +11,36 @@ interface ConsumeItemModalProps {
 }
 
 export default function ConsumeItemModal({ open, itemName, maxQuantity, isSubmitting, onClose, onConfirm }: ConsumeItemModalProps) {
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState("1");
+    const [validationMessage, setValidationMessage] = useState("");
 
     useEffect(() => {
-        if (!open) setQuantity(1);
+        if (!open) {
+            setQuantity("1");
+            setValidationMessage("");
+        }
     }, [open]);
 
     function handleConfirm() {
-        if (!Number.isInteger(quantity) || quantity < 1 || quantity > maxQuantity) return;
-        onConfirm(quantity);
+        const requestedQuantity = Number(quantity);
+
+        if (maxQuantity === 0) {
+            setValidationMessage("Não há unidades disponíveis para consumo.");
+            return;
+        }
+
+        if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+            setValidationMessage("Informe uma quantidade válida.");
+            return;
+        }
+
+        if (requestedQuantity > maxQuantity) {
+            setValidationMessage(`Há apenas ${maxQuantity} ${maxQuantity === 1 ? "unidade disponível" : "unidades disponíveis"}.`);
+            return;
+        }
+
+        setValidationMessage("");
+        onConfirm(requestedQuantity);
     }
 
     return (
@@ -40,9 +61,16 @@ export default function ConsumeItemModal({ open, itemName, maxQuantity, isSubmit
                     min={1}
                     max={maxQuantity}
                     value={quantity}
-                    onChange={(event) => setQuantity(Number(event.target.value))}
+                    onChange={(event) => {
+                        setQuantity(event.target.value);
+                        setValidationMessage("");
+                    }}
+                    onBlur={() => {
+                        if (quantity === "") setQuantity("0");
+                    }}
                 />
             </div>
+            {validationMessage && <p className="form-error" role="alert">{validationMessage}</p>}
         </Modal>
     );
 }
