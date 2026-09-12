@@ -30,14 +30,13 @@ function getLoanStatus(status: Loan["status"]) {
     return { label: "Em andamento", className: "active" };
 }
 
-export default function Emprestimo() {
+export default function Movimentacoes() {
     const { data: loansPage, isLoading: isLoadingLoans, isError: hasLoanError } = useUserLoans();
     const { data: movementsPage, isLoading: isLoadingMovements, isError: hasMovementError } = useUserMovements();
     const returnLoan = useReturnLoan();
     const { message, showToast } = useToast();
 
     const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
-    const [returnQty, setReturnQty] = useState(1);
     const [defectModalOpen, setDefectModalOpen] = useState(false);
 
     const loans = loansPage?.content ?? [];
@@ -64,7 +63,6 @@ export default function Emprestimo() {
 
     function openLoanModal(loan: Loan) {
         setSelectedLoan(loan);
-        setReturnQty(loan.quantity);
     }
 
     function closeLoanModal() {
@@ -73,10 +71,6 @@ export default function Emprestimo() {
 
     function confirmReturn() {
         if (!selectedLoan) return;
-
-        if (returnQty !== selectedLoan.quantity) {
-            alert("Devolução parcial ainda não é suportada pelo back-end. Devolvendo a quantidade total.");
-        }
 
         returnLoan.mutate(
             { loanId: selectedLoan.id },
@@ -193,16 +187,16 @@ export default function Emprestimo() {
                 closeLabel="Fechar"
                 onClose={closeLoanModal}
                 actions={
-                    <>
+                    <div className="modal-actions-inline">
                         <div className="modal-btn primary" onClick={confirmReturn}>Confirmar devolução</div>
                         <div className="modal-btn danger" onClick={() => setDefectModalOpen(true)}>Relatar defeito</div>
-                    </>
+                    </div>
                 }
             >
                 {selectedLoan && (
                     <div className="loan-modal-details">
                         <div>
-                            <span>Quantidade emprestada</span>
+                            <span>Quantidade a devolver</span>
                             <strong>{selectedLoan.quantity} {selectedLoan.quantity === 1 ? "unidade" : "unidades"}</strong>
                         </div>
                         <div>
@@ -211,17 +205,6 @@ export default function Emprestimo() {
                         </div>
                     </div>
                 )}
-                <div className="form-group">
-                    <label htmlFor="loan-return-qty">Quantidade a devolver</label>
-                    <input
-                        type="number"
-                        id="loan-return-qty"
-                        min={1}
-                        max={selectedLoan?.quantity ?? 1}
-                        value={returnQty}
-                        onChange={(event) => setReturnQty(Number(event.target.value))}
-                    />
-                </div>
             </Modal>
 
             <DefectReportModal

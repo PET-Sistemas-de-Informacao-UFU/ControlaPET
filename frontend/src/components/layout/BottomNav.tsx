@@ -16,11 +16,11 @@ export default function BottomNav() {
             </div>
 
             <div
-                className={pathname === "/emprestimos" ? "nav-item active" : "nav-item"}
-                onClick={() => navigate("/emprestimos")}
+                className={pathname === "/movimentacoes" ? "nav-item active" : "nav-item"}
+                onClick={() => navigate("/movimentacoes")}
             >
                 <LoanIcon />
-                <span>Empréstimos</span>
+                <span>Movimentações</span>
             </div>
 
             <div

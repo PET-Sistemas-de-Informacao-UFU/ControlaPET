@@ -6,7 +6,7 @@ import { useIsDesktop } from "../../hooks/useIsDesktop";
 
 const TITLES: Record<string, string> = {
     "/catalogo": "Catálogo",
-    "/emprestimos": "Meus Empréstimos",
+    "/movimentacoes": "Movimentações",
     "/auditoria": "Auditoria"
 };
 

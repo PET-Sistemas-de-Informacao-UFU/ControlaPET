@@ -31,7 +31,7 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onRelatar
             closeLabel="Fechar"
             onClose={onClose}
             actions={
-                <>
+                <div className="modal-actions-inline">
                     {item?.type === "BORROWABLE" && (
                         <div className="modal-btn primary" onClick={onEmprestar}>
                             Registrar empréstimo
@@ -43,7 +43,7 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onRelatar
                     <div className="modal-btn danger" onClick={onRelatarDefeito}>
                         Reportar defeito
                     </div>
-                </>
+                </div>
             }
         >
             {item && (

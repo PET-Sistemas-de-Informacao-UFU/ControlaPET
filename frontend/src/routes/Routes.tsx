@@ -2,7 +2,7 @@ import { createBrowserRouter, createRoutesFromElements, Navigate, Route } from "
 import AppLayout from "../components/layout/AppLayout";
 import HomeRoute from "./HomeRoute";
 import Catalogo from "../pages/Catalogo/Index";
-import Emprestimo from "../pages/Emprestimo/Index";
+import Movimentacoes from "../pages/Movimentacoes/Index";
 import Auditoria from "../pages/Auditoria/Index";
 import Login from "../pages/Login/Index";
 import { PrivateRoute } from "./PrivateRoute";
@@ -19,7 +19,7 @@ export const routes = createBrowserRouter(
                 <Route element={<AppLayout />}>
                     <Route index path="/" element={<HomeRoute />} />
                     <Route path="/catalogo" element={<Catalogo />} />
-                    <Route path="/emprestimos" element={<Emprestimo />} />
+                    <Route path="/movimentacoes" element={<Movimentacoes />} />
                     <Route path="/auditoria" element={<Auditoria />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
