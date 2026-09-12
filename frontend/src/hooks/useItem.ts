@@ -1,18 +1,21 @@
 import { api } from "../service/api"
 import type { Item, CreateItemRequest, UpdateItemRequest } from "../interfaces/Item"
 import type { Page } from "../interfaces/Page"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
-const fetchData = async(): Promise<Page<Item>> => {
-    const response = await api.get<Page<Item>>("/items");
+const fetchData = async(name = ""): Promise<Page<Item>> => {
+    const response = await api.get<Page<Item>>("/items", {
+        params: name ? { name } : undefined
+    });
     return response.data;
 }
 
-export function useItemData(){
+export function useItemData(name = ""){
     return useQuery({
-        queryFn: fetchData,
-        queryKey: ['items-data']
+        queryFn: () => fetchData(name),
+        queryKey: ['items-data', name],
+        placeholderData: keepPreviousData
     })
 }
 

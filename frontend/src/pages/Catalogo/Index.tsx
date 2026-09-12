@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
@@ -16,7 +16,9 @@ import CatalogToolbar from "./CatalogToolbar";
 import ItemList from "./ItemList";
 
 export default function Catalogo() {
-    const { data, isLoading, isError } = useItemData();
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const { data, isLoading, isError } = useItemData(debouncedSearch);
     const addItemMutation = useAddItem();
     const updateItemMutation = useUpdateItem();
     const deleteItemMutation = useDeleteItem();
@@ -38,6 +40,11 @@ export default function Catalogo() {
     const loanItem = items.find((item) => item.id === loanItemId) ?? null;
     const consumeItem = items.find((item) => item.id === consumeItemId) ?? null;
     const defectItem = items.find((item) => item.id === defectItemId) ?? null;
+
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => setDebouncedSearch(search.trim()), 300);
+        return () => window.clearTimeout(timeoutId);
+    }, [search]);
 
     function openAddModal() {
         setEditingItemId(null);
@@ -133,16 +140,25 @@ export default function Catalogo() {
 
     return (
         <>
-            <CatalogToolbar isDesktop={isDesktop} onAdd={openAddModal} />
+            <CatalogToolbar
+                isDesktop={isDesktop}
+                search={search}
+                onAdd={openAddModal}
+                onSearchChange={setSearch}
+            />
 
             {isError && <p>Erro ao carregar os itens.</p>}
 
             {!isLoading && !isError && (
-                <ItemList
-                    items={items}
-                    onOpen={setDetailsItemId}
-                    onEdit={openEditModal}
-                />
+                items.length > 0 ? (
+                    <ItemList
+                        items={items}
+                        onOpen={setDetailsItemId}
+                        onEdit={openEditModal}
+                    />
+                ) : (
+                    <p className="catalog-empty">Nenhum item encontrado.</p>
+                )
             )}
 
             <div className="fab-add" onClick={openAddModal} title="Adicionar item">+</div>
