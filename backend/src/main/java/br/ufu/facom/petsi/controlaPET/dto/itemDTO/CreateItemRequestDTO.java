@@ -20,9 +20,6 @@ public record CreateItemRequestDTO(
         ItemCondition condition,
 
         @Min(value = 0, message = "A quantidade total não pode ser negativa.")
-        int totalQuantity,
-
-        @Min(value = 0, message = "A quantidade em estoque não pode ser negativa.")
-        int stockQuantity
+        int totalQuantity
 ) {
 }

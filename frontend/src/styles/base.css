@@ -1,0 +1,60 @@
+:root{
+  --bg: #0d0d12;
+  --surface: #16161d;
+  --surface-2: #1e1e27;
+  --header: #0a0a0e;
+  --border: #2a2a34;
+  --text: #f2f2f5;
+  --text-dim: #9a9aa5;
+  --accent: #1B64F5;
+  --accent-soft: rgba(91,79,232,0.15);
+  --green: #3ecf8e;
+  --orange: #f2a33c;
+  --red: #ef5b5b;
+  --blue: #4f9dfa;
+}
+
+*{box-sizing:border-box; margin:0; padding:0;}
+
+body{
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.app-shell{
+  display:flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-main{
+  flex:1;
+  display:flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Toast de confirmacao */
+.toast{
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+  z-index: 30;
+  animation: toast-in 0.2s ease-out;
+}
+
+@keyframes toast-in{
+  from{ opacity:0; transform: translateX(-50%) translateY(8px); }
+  to{ opacity:1; transform: translateX(-50%) translateY(0); }
+}
