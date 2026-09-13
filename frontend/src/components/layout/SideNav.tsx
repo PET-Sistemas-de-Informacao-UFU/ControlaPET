@@ -23,7 +23,7 @@ function getInitials(name?: string) {
 export default function SideNav() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
-    const { user, handleLogout } = useContext(AuthContext);
+    const { user, handleLogout, refreshUser } = useContext(AuthContext);
     const [menuOpen, setMenuOpen] = useState(false);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
     const [currentPassword, setCurrentPassword] = useState("");
@@ -31,6 +31,17 @@ export default function SideNav() {
     const [confirmation, setConfirmation] = useState("");
     const [passwordError, setPasswordError] = useState<string | null>(null);
     const [changingPassword, setChangingPassword] = useState(false);
+    const [nameModalOpen, setNameModalOpen] = useState(false);
+    const [name, setName] = useState("");
+    const [nameError, setNameError] = useState<string | null>(null);
+    const [changingName, setChangingName] = useState(false);
+
+    function openNameModal() {
+        setMenuOpen(false);
+        setName(user?.nome ?? "");
+        setNameError(null);
+        setNameModalOpen(true);
+    }
 
     function openPasswordModal() {
         setMenuOpen(false);
@@ -76,6 +87,32 @@ export default function SideNav() {
         navigate("/login", { replace: true });
     }
 
+    async function submitName(event: FormEvent) {
+        event.preventDefault();
+        const trimmedName = name.trim();
+
+        if (!trimmedName) {
+            setNameError("Informe seu nome.");
+            return;
+        }
+
+        setChangingName(true);
+        setNameError(null);
+
+        try {
+            await api.patch("/users/me/name", { name: trimmedName });
+            await refreshUser();
+            setNameModalOpen(false);
+        } catch (error: unknown) {
+            const message = typeof error === "object" && error !== null && "response" in error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+                : undefined;
+            setNameError(message ?? "Não foi possível alterar o nome.");
+        } finally {
+            setChangingName(false);
+        }
+    }
+
     return (
         <nav className="side-nav">
             <div className="side-nav-brand">
@@ -99,6 +136,7 @@ export default function SideNav() {
             <div className="side-nav-account">
                 {menuOpen && (
                     <div className="account-menu" role="menu">
+                        <button type="button" role="menuitem" onClick={openNameModal}>Alterar nome</button>
                         <button type="button" role="menuitem" onClick={openPasswordModal}>Redefinir senha</button>
                         <button type="button" className="account-menu-logout" role="menuitem" onClick={logout}>Sair da conta</button>
                     </div>
@@ -140,6 +178,27 @@ export default function SideNav() {
                         <input id="password-confirmation" type="password" autoComplete="new-password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} required />
                     </div>
                     {passwordError && <p className="password-form-error">{passwordError}</p>}
+                </form>
+            </Modal>
+
+            <Modal
+                open={nameModalOpen}
+                title="Alterar nome"
+                subtitle="Este nome será exibido na sua conta e nas movimentações."
+                closeLabel="Fechar"
+                onClose={() => !changingName && setNameModalOpen(false)}
+                actions={
+                    <button type="submit" form="change-name-form" className="modal-btn primary" disabled={changingName}>
+                        {changingName ? "Salvando..." : "Salvar nome"}
+                    </button>
+                }
+            >
+                <form id="change-name-form" className="password-form" onSubmit={submitName}>
+                    <div className="form-group">
+                        <label htmlFor="account-name">Nome</label>
+                        <input id="account-name" type="text" autoComplete="name" maxLength={100} value={name} onChange={(event) => setName(event.target.value)} required />
+                    </div>
+                    {nameError && <p className="password-form-error">{nameError}</p>}
                 </form>
             </Modal>
         </nav>

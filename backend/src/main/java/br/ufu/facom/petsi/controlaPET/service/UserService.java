@@ -2,6 +2,7 @@ package br.ufu.facom.petsi.controlaPET.service;
 
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.CreateUserRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangePasswordRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangeNameRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,11 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+    }
+
+    public void changeName(User user, ChangeNameRequestDTO request) {
+        user.setName(request.name().trim());
         userRepository.save(user);
     }
 }
