@@ -41,16 +41,67 @@
   .side-nav-item:hover{ background: var(--surface); color: var(--text); }
   .side-nav-item.active{ background: var(--accent-soft); color: var(--text); }
   .side-nav-item.active svg{ color: var(--accent); }
-  .side-nav-user{
+  .side-nav-account{
+    position:relative;
     margin-top:auto;
+  }
+  .side-nav-user{
     display:flex;
     align-items:center;
-    gap: 10px;
-    padding: 12px 10px 0;
-    border-top: 1px solid var(--border);
+    gap:9px;
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface);
     font-size: 13px;
-    color: var(--text-dim);
+    color: var(--text);
+    font-weight:600;
+    font-family:inherit;
+    text-align:left;
+    cursor:pointer;
+    transition:background .15s, border-color .15s;
   }
+  .side-nav-user:hover{ background:var(--surface-2); border-color:#3a3a46; }
+  .side-nav-user-avatar{
+    width:26px;
+    height:26px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:11px;
+    font-weight:700;
+  }
+  .account-menu{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:calc(100% + 10px);
+    padding:5px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 10px 24px rgba(0,0,0,.32);
+    z-index:5;
+  }
+  .account-menu button{
+    width:100%;
+    padding:10px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--text);
+    font:inherit;
+    font-size:13px;
+    text-align:left;
+    cursor:pointer;
+  }
+  .account-menu button:hover{ background:var(--surface-2); }
+  .account-menu .account-menu-logout{ color:var(--red); }
 
   /* ---- CABECALHO ---- */
   .app-header{

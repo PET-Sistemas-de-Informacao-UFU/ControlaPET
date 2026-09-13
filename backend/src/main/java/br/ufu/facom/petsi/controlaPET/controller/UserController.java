@@ -28,6 +28,6 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getUserDetails(@AuthenticationPrincipal User user){
-        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getEmail(), user.getName(), user.getRole()));
+        return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
     }
 }
