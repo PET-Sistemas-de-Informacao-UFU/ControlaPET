@@ -16,7 +16,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const [authenticated, setAuthenticated] = useState(() => !!readToken());
     const queryClient = useQueryClient();
 
-    const loading = false;
+    const [loading, setLoading] = useState(() => !!readToken());
 
     const handleLogout = useCallback(() => {
         setAuthenticated(false);
@@ -30,6 +30,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
         return setupInterceptors(handleLogout);
     }, [handleLogout]);
 
+    const refreshUser = useCallback(async () => {
+        try {
+            const response = await api.get<User>("/users/me");
+            setUser(response.data);
+            setAuthenticated(true);
+        } catch {
+            handleLogout();
+        } finally {
+            setLoading(false);
+        }
+    }, [handleLogout]);
+
+    useEffect(() => {
+        if (readToken()) {
+            void refreshUser();
+        } else {
+            setLoading(false);
+        }
+    }, [refreshUser]);
+
     async function handleLogin({ email, password }: LoginData) {
         try {
             const response = await api.post<AuthResponse>("/auth/login", {
@@ -39,7 +59,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
             storeTokens(response.data.token, response.data.refreshToken);
 
-            setAuthenticated(true);
+            await refreshUser();
         } catch (error) {
             console.error("Erro no login: ", error);
             throw error;
@@ -68,7 +88,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 loading,
                 handleLogin,
                 handleSignup,
-                handleLogout
+                handleLogout,
+                refreshUser
             }}
         >
             {children}

@@ -63,6 +63,9 @@
   .login-submit:hover{ opacity:0.92; }
   .login-submit:disabled{ opacity:0.6; cursor:not-allowed; }
 
+  .password-form{ margin-top:20px; }
+  .password-form-error{ color:var(--red); font-size:13px; line-height:1.4; margin:-4px 0 14px; }
+
   /* Header */
   .app-header{
     background: var(--header);

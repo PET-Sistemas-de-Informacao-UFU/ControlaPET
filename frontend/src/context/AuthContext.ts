@@ -9,6 +9,7 @@ export interface AuthContextData {
     handleLogin: (credentials: LoginData) => Promise<void>
     handleSignup: (data: SignupData) => Promise<void>
     handleLogout: () => void
+    refreshUser: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextData>({} as AuthContextData);
