@@ -1,6 +1,7 @@
 import { useContext, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { api } from "../../service/api";
 import { AuditIcon, CatalogIcon, LoanIcon } from "../ui/Icons";
 import Modal from "../ui/Modal";
 
@@ -29,15 +30,20 @@ export default function SideNav() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmation, setConfirmation] = useState("");
     const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [changingPassword, setChangingPassword] = useState(false);
 
     function openPasswordModal() {
         setMenuOpen(false);
         setPasswordError(null);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmation("");
         setPasswordModalOpen(true);
     }
 
-    function submitPassword(event: FormEvent) {
+    async function submitPassword(event: FormEvent) {
         event.preventDefault();
+        setPasswordError(null);
 
         if (newPassword.length < 6) {
             setPasswordError("A nova senha deve ter no mínimo 6 caracteres.");
@@ -49,7 +55,20 @@ export default function SideNav() {
             return;
         }
 
-        setPasswordError("A alteração de senha será conectada ao backend na próxima etapa.");
+        setChangingPassword(true);
+
+        try {
+            await api.patch("/users/me/password", { currentPassword, newPassword });
+            handleLogout();
+            navigate("/login", { replace: true });
+        } catch (error: unknown) {
+            const message = typeof error === "object" && error !== null && "response" in error
+                ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+                : undefined;
+            setPasswordError(message ?? "Não foi possível alterar a senha.");
+        } finally {
+            setChangingPassword(false);
+        }
     }
 
     function logout() {
@@ -100,10 +119,10 @@ export default function SideNav() {
                 title="Redefinir senha"
                 subtitle="Informe sua senha atual e escolha uma nova senha."
                 closeLabel="Fechar"
-                onClose={() => setPasswordModalOpen(false)}
+                onClose={() => !changingPassword && setPasswordModalOpen(false)}
                 actions={
-                    <button type="submit" form="change-password-form" className="modal-action primary">
-                        Salvar nova senha
+                    <button type="submit" form="change-password-form" className="modal-btn primary" disabled={changingPassword}>
+                        {changingPassword ? "Redefinindo..." : "Redefinir senha"}
                     </button>
                 }
             >

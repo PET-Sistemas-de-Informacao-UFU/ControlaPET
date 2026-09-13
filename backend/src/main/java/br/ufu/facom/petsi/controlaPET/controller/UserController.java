@@ -1,6 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.controller;
 
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.CreateUserRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangePasswordRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.UserResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.UserService;
@@ -29,5 +30,14 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getUserDetails(@AuthenticationPrincipal User user){
         return ResponseEntity.ok(new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), user.getRole()));
+    }
+
+    @PatchMapping("/me/password")
+    public ResponseEntity<Void> changePassword(
+            @AuthenticationPrincipal User user,
+            @Valid @RequestBody ChangePasswordRequestDTO request
+    ) {
+        userService.changePassword(user, request);
+        return ResponseEntity.noContent().build();
     }
 }
