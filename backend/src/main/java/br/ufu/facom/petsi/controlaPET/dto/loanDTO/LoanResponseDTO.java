@@ -5,6 +5,7 @@ import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.model.enums.LoanStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record LoanResponseDTO(
         Long id,
@@ -12,9 +13,9 @@ public record LoanResponseDTO(
         Long itemId,
         String itemName,
         int quantity,
-        LocalDate checkoutDate,
+        LocalDateTime checkoutDate,
         LocalDate expectedReturnDate,
-        LocalDate actualReturnDate,
+        LocalDateTime actualReturnDate,
         LoanStatus status
 ) {
 }

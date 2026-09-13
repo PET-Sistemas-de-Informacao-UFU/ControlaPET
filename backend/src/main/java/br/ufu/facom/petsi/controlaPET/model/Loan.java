@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "loans")
@@ -30,12 +31,12 @@ public class Loan {
     int quantity;
 
     @Column(nullable = false)
-    private LocalDate checkoutDate;
+    private LocalDateTime checkoutDate;
 
     @Column(nullable = false)
     private LocalDate expectedReturnDate;
 
-    private LocalDate actualReturnDate;
+    private LocalDateTime actualReturnDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

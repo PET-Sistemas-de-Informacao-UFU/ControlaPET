@@ -2,7 +2,7 @@ package br.ufu.facom.petsi.controlaPET.dto.dashboard;
 
 import br.ufu.facom.petsi.controlaPET.model.enums.MovementType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record MovementSummaryDTO(
         Long id,
@@ -10,6 +10,6 @@ public record MovementSummaryDTO(
         String itemName,
         MovementType type,
         int quantity,
-        LocalDate movementDate
+        LocalDateTime movementDate
 ) {
 }

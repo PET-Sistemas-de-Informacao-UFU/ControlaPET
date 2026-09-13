@@ -2,9 +2,40 @@ import { useState } from "react";
 import Modal from "../../components/ui/Modal";
 import { FilterIcon } from "../../components/ui/Icons";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
-import type { AuditFilter, Log } from "../../interfaces/Log";
+import { useAuditEvents } from "../../hooks/useAudit";
+import type { AuditEvent, AuditFilter, Log } from "../../interfaces/Log";
 
-const LOGS: Log[] = [];
+function formatDate(date: string) {
+    const hasTime = date.includes("T");
+
+    return new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        ...(hasTime ? { hour: "2-digit", minute: "2-digit" } : {})
+    }).format(new Date(hasTime ? date : `${date}T12:00:00`));
+}
+
+function toLog(event: AuditEvent): Log {
+    const labels = {
+        LOAN_CREATED: { tag: "Empréstimo", color: "var(--blue)", text: `registrou empréstimo de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
+        LOAN_RETURNED: { tag: "Devolução", color: "var(--green)", text: `devolveu ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
+        INBOUND: { tag: "Entrada", color: "var(--green)", text: `registrou entrada de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
+        OUTBOUND_CONSUMPTION: { tag: "Consumo", color: "var(--orange)", text: `registrou consumo de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
+        ADJUSTMENT: { tag: "Ajuste", color: "var(--orange)", text: `ajustou ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` }
+    };
+    const label = labels[event.type];
+
+    return {
+        id: `${event.type}-${event.sourceId}-${event.eventDate}`,
+        tag: label.tag,
+        time: formatDate(event.eventDate),
+        date: event.eventDate,
+        who: event.userName,
+        text: label.text,
+        color: label.color
+    };
+}
 
 export default function Auditoria() {
     const isDesktop = useIsDesktop();
@@ -12,13 +43,8 @@ export default function Auditoria() {
     const [searchOpen, setSearchOpen] = useState(false);
     const [dateInput, setDateInput] = useState("");
     const [nameInput, setNameInput] = useState("");
-
-    const filtered = LOGS.filter((log) => {
-        const matchesDate = !filter.date || log.date === filter.date;
-        const matchesName = !filter.name || log.who.toLowerCase().includes(filter.name.toLowerCase());
-
-        return matchesDate && matchesName;
-    });
+    const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useAuditEvents(filter);
+    const logs = data?.pages.flatMap((page) => page.content).map(toLog) ?? [];
 
     function openSearchModal() {
         setDateInput(filter.date ?? "");
@@ -77,11 +103,15 @@ export default function Auditoria() {
                 </div>
             )}
 
-            <div className="section-label">Movimentações</div>
+            <div className="section-label">Histórico de atividades</div>
 
             <div className="audit-list">
-                {filtered.length ? filtered.map((log, index) => (
-                    <div className="log-item" key={index}>
+                {isLoading ? (
+                    <div className="catalog-empty">Carregando atividades...</div>
+                ) : isError ? (
+                    <div className="catalog-empty">Erro ao carregar as atividades.</div>
+                ) : logs.length ? logs.map((log) => (
+                    <div className="log-item" key={log.id}>
                         <div className="log-dotline">
                             <div className="log-dot" style={{ background: log.color }}></div>
                             <div className="log-thread"></div>
@@ -92,11 +122,17 @@ export default function Auditoria() {
                         </div>
                     </div>
                 )) : (
-                    <div style={{ padding: "20px", textAlign: "center", color: "#888" }}>
-                        Nenhuma movimentação encontrada.
-                    </div>
+                    <div className="catalog-empty">Nenhuma atividade encontrada.</div>
                 )}
             </div>
+
+            {!isLoading && !isError && hasNextPage && (
+                <div className="audit-load-more">
+                    <button type="button" className="header-btn ghost" disabled={isFetchingNextPage} onClick={() => fetchNextPage()}>
+                        {isFetchingNextPage ? "Carregando..." : "Carregar mais"}
+                    </button>
+                </div>
+            )}
 
             {!isDesktop && (
                 <Modal

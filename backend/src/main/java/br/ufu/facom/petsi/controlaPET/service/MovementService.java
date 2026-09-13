@@ -16,7 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +42,7 @@ public class MovementService {
                 .item(item)
                 .movementType(MovementType.OUTBOUND_CONSUMPTION)
                 .quantity(request.quantity())
-                .movementDate(LocalDate.now())
+                .movementDate(LocalDateTime.now())
                 .build();
 
         itemRepository.save(item);
@@ -85,7 +85,7 @@ public class MovementService {
                 .movementType(request.type())
                 .notes(request.notes())
                 .quantity(request.quantity())
-                .movementDate(LocalDate.now())
+                .movementDate(LocalDateTime.now())
                 .build();
 
         itemRepository.save(item);

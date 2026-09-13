@@ -16,11 +16,13 @@ type FeedItem =
 function formatDate(date?: string | null) {
     if (!date) return "—";
 
+    const formattedDate = date.includes("T") ? new Date(date) : new Date(`${date}T12:00:00`);
+
     return new Intl.DateTimeFormat("pt-BR", {
         day: "2-digit",
         month: "short",
         year: "numeric"
-    }).format(new Date(`${date}T12:00:00`));
+    }).format(formattedDate);
 }
 
 function getLoanStatus(status: Loan["status"]) {
