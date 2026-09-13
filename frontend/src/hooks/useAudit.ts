@@ -1,13 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import type { AuditEvent, AuditFilter } from "../interfaces/Log";
 import type { Page } from "../interfaces/Page";
 import { api } from "../service/api";
 
-async function fetchAuditEvents(filter: AuditFilter): Promise<Page<AuditEvent>> {
+async function fetchAuditEvents(filter: AuditFilter, page: number): Promise<Page<AuditEvent>> {
     const response = await api.get<Page<AuditEvent>>("/audit", {
         params: {
             ...(filter.date ? { date: filter.date } : {}),
-            ...(filter.name ? { userName: filter.name } : {})
+            ...(filter.name ? { userName: filter.name } : {}),
+            page,
+            size: 20
         }
     });
 
@@ -15,8 +17,12 @@ async function fetchAuditEvents(filter: AuditFilter): Promise<Page<AuditEvent>> 
 }
 
 export function useAuditEvents(filter: AuditFilter) {
-    return useQuery({
+    return useInfiniteQuery({
         queryKey: ["audit-events", filter],
-        queryFn: () => fetchAuditEvents(filter)
+        initialPageParam: 0,
+        queryFn: ({ pageParam }) => fetchAuditEvents(filter, pageParam),
+        getNextPageParam: (lastPage) => (
+            lastPage.number + 1 < lastPage.totalPages ? lastPage.number + 1 : undefined
+        )
     });
 }

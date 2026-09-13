@@ -43,8 +43,8 @@ export default function Auditoria() {
     const [searchOpen, setSearchOpen] = useState(false);
     const [dateInput, setDateInput] = useState("");
     const [nameInput, setNameInput] = useState("");
-    const { data, isLoading, isError } = useAuditEvents(filter);
-    const logs = (data?.content ?? []).map(toLog);
+    const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useAuditEvents(filter);
+    const logs = data?.pages.flatMap((page) => page.content).map(toLog) ?? [];
 
     function openSearchModal() {
         setDateInput(filter.date ?? "");
@@ -125,6 +125,14 @@ export default function Auditoria() {
                     <div className="catalog-empty">Nenhuma atividade encontrada.</div>
                 )}
             </div>
+
+            {!isLoading && !isError && hasNextPage && (
+                <div className="audit-load-more">
+                    <button type="button" className="header-btn ghost" disabled={isFetchingNextPage} onClick={() => fetchNextPage()}>
+                        {isFetchingNextPage ? "Carregando..." : "Carregar mais"}
+                    </button>
+                </div>
+            )}
 
             {!isDesktop && (
                 <Modal
