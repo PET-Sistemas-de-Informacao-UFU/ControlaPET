@@ -2,7 +2,7 @@ package br.ufu.facom.petsi.controlaPET.dto.audit;
 
 import br.ufu.facom.petsi.controlaPET.model.enums.AuditEventType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record AuditEventResponseDTO(
         Long sourceId,
@@ -11,6 +11,6 @@ public record AuditEventResponseDTO(
         Long itemId,
         String itemName,
         int quantity,
-        LocalDate eventDate
+        LocalDateTime eventDate
 ) {
 }

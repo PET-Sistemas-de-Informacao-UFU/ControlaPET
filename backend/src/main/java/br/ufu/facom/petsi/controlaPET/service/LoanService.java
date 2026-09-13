@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -45,7 +46,7 @@ public class LoanService {
                 .user(user)
                 .item(item)
                 .quantity(request.quantity())
-                .checkoutDate(LocalDate.now())
+                .checkoutDate(LocalDateTime.now())
                 .expectedReturnDate(request.expectedReturnDate())
                 .status(LoanStatus.ACTIVE)
                 .build();
@@ -108,7 +109,7 @@ public class LoanService {
         if(!user.getId().equals(loan.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN))
             throw new AccessDeniedException("Loan não pertence ao usuário");
 
-        loan.setActualReturnDate(LocalDate.now());
+        loan.setActualReturnDate(LocalDateTime.now());
         loan.setStatus(LoanStatus.COMPLETED);
 
         loan.getItem().setStockQuantity(loan.getItem().getStockQuantity()+loan.getQuantity());

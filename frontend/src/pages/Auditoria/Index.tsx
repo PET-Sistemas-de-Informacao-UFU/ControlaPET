@@ -6,11 +6,14 @@ import { useAuditEvents } from "../../hooks/useAudit";
 import type { AuditEvent, AuditFilter, Log } from "../../interfaces/Log";
 
 function formatDate(date: string) {
+    const hasTime = date.includes("T");
+
     return new Intl.DateTimeFormat("pt-BR", {
         day: "2-digit",
         month: "short",
-        year: "numeric"
-    }).format(new Date(`${date}T00:00:00`));
+        year: "numeric",
+        ...(hasTime ? { hour: "2-digit", minute: "2-digit" } : {})
+    }).format(new Date(hasTime ? date : `${date}T12:00:00`));
 }
 
 function toLog(event: AuditEvent): Log {

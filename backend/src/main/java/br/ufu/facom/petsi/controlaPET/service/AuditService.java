@@ -53,7 +53,7 @@ public class AuditService {
 
         String normalizedUserName = userName == null ? null : userName.trim().toLowerCase();
         List<AuditEventResponseDTO> filteredEvents = events.stream()
-                .filter(event -> date == null || event.eventDate().equals(date))
+                .filter(event -> date == null || event.eventDate().toLocalDate().equals(date))
                 .filter(event -> normalizedUserName == null || normalizedUserName.isBlank()
                         || event.userName().toLowerCase().contains(normalizedUserName))
                 .sorted(Comparator.comparing(AuditEventResponseDTO::eventDate).reversed())
