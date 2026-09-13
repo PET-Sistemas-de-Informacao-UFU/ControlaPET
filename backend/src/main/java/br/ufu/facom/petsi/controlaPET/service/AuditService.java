@@ -26,7 +26,7 @@ public class AuditService {
     private final MovementRepository movementRepository;
 
     @Transactional(readOnly = true)
-    public Page<AuditEventResponseDTO> getEvents(LocalDate date, String userName, Pageable pageable) {
+    public Page<AuditEventResponseDTO> getEvents(LocalDate startDate, LocalDate endDate, String userName, Pageable pageable) {
         List<AuditEventResponseDTO> events = new ArrayList<>();
 
         for (Loan loan : loanRepository.findAll()) {
@@ -53,7 +53,8 @@ public class AuditService {
 
         String normalizedUserName = userName == null ? null : userName.trim().toLowerCase();
         List<AuditEventResponseDTO> filteredEvents = events.stream()
-                .filter(event -> date == null || event.eventDate().toLocalDate().equals(date))
+                .filter(event -> startDate == null || !event.eventDate().toLocalDate().isBefore(startDate))
+                .filter(event -> endDate == null || !event.eventDate().toLocalDate().isAfter(endDate))
                 .filter(event -> normalizedUserName == null || normalizedUserName.isBlank()
                         || event.userName().toLowerCase().contains(normalizedUserName))
                 .sorted(Comparator.comparing(AuditEventResponseDTO::eventDate).reversed())

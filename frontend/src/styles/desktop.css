@@ -18,7 +18,7 @@
   }
   .side-nav-brand{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     gap: 10px;
     padding: 0 10px 22px;
     font-size: 16px;
@@ -110,14 +110,17 @@
   .audit-filters + .section-label{ margin-top: 26px; }
   .audit-filters{
     display:flex;
+    flex-wrap:wrap;
     gap: 10px;
-    align-items:flex-end;
+    align-items:center;
     margin-bottom: 4px;
-    max-width: 720px;
+    max-width: 960px;
   }
   .audit-filters .form-group{ margin-bottom:0; }
-  .audit-filters .form-group input{ min-width: 190px; }
-  .audit-filters .header-btn{ padding: 11px 18px; }
+  .audit-filters .form-group input,
+  .audit-filters .date-range-picker{ min-width: 230px; }
+  .audit-filters .form-group input{ height:44px; }
+  .audit-filters .header-btn{ margin-top:21px; padding: 11px 18px; }
   .header-btn.ghost{
     background: var(--surface);
     color: var(--text);

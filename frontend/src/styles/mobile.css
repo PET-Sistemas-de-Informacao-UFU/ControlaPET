@@ -204,6 +204,90 @@
     outline: none;
     border-color: var(--accent);
   }
+  .date-range-picker{ position:relative; }
+  .date-range-trigger{
+    width:100%;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font:inherit;
+    font-size:14px;
+    text-align:left;
+    cursor:pointer;
+  }
+  .date-range-trigger:hover,
+  .date-range-trigger:focus-visible{ border-color:var(--accent); outline:none; }
+  .date-range-trigger.has-value{ color:var(--text); }
+  .date-range-trigger svg{ width:17px; height:17px; flex-shrink:0; color:var(--accent); }
+  .date-range-popover{
+    position:absolute;
+    z-index:25;
+    top:calc(100% + 8px);
+    left:0;
+    width:min(310px, calc(100vw - 72px));
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface);
+    box-shadow:0 14px 30px rgba(0,0,0,.38);
+  }
+  .date-range-header{ display:grid; grid-template-columns:32px 1fr 32px; align-items:center; margin-bottom:12px; }
+  .date-range-header strong{ font-size:13px; text-align:center; text-transform:capitalize; }
+  .date-range-header button,
+  .date-range-actions button{
+    border:0;
+    background:transparent;
+    color:var(--text-dim);
+    font:inherit;
+    cursor:pointer;
+  }
+  .date-range-header button{ height:30px; border-radius:7px; color:var(--text); font-size:23px; line-height:1; }
+  .date-range-header button:hover{ background:var(--surface-2); }
+  .date-range-weekdays,
+  .date-range-days{ display:grid; grid-template-columns:repeat(7, 1fr); gap:3px; text-align:center; }
+  .date-range-days{ gap:0; }
+  .date-range-weekdays{ margin-bottom:5px; color:var(--text-dim); font-size:10px; font-weight:600; }
+  .date-range-day{ height:32px; border:0; border-radius:0; background:transparent; color:var(--text); font:inherit; font-size:12px; cursor:pointer; }
+  .date-range-day:hover{ background:var(--surface-2); }
+  .date-range-day.today{ color:var(--accent); font-weight:700; }
+  .date-range-day.in-range{
+    border-radius:0;
+    background:linear-gradient(#174fae, #174fae) center / 100% 28px no-repeat;
+    color:var(--text);
+  }
+  .date-range-day.range-row-start{ border-radius:35% 0 0 35%; }
+  .date-range-day.range-row-end{ border-radius:0 35% 35% 0; }
+  .date-range-day.selected{ position:relative; color:#fff; font-weight:700; }
+  .date-range-day.selected::before{
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:50%;
+    left:50%;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:var(--blue);
+    transform:translate(-50%, -50%);
+  }
+  .date-range-day.selected span{ position:relative; z-index:1; }
+  .date-range-day.single-date{
+    background:transparent;
+  }
+  .date-range-day.range-start{
+    background:linear-gradient(#174fae, #174fae) right center / 50% 28px no-repeat;
+  }
+  .date-range-day.range-end{
+    background:linear-gradient(#174fae, #174fae) left center / 50% 28px no-repeat;
+  }
+  .date-range-actions{ display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
+  .date-range-actions button{ color:var(--accent); font-size:12px; font-weight:700; padding:3px 2px; }
   .number-input{ position:relative; }
   .number-input input{
     padding-right:38px;

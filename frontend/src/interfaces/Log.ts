@@ -21,6 +21,7 @@ export interface AuditEvent {
 }
 
 export interface AuditFilter {
-    date: string | null
+    startDate: string | null
+    endDate: string | null
     name: string | null
 }

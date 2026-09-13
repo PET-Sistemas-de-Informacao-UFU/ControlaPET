@@ -6,7 +6,8 @@ import { api } from "../service/api";
 async function fetchAuditEvents(filter: AuditFilter, page: number): Promise<Page<AuditEvent>> {
     const response = await api.get<Page<AuditEvent>>("/audit", {
         params: {
-            ...(filter.date ? { date: filter.date } : {}),
+            ...(filter.startDate ? { startDate: filter.startDate } : {}),
+            ...(filter.endDate ? { endDate: filter.endDate } : {}),
             ...(filter.name ? { userName: filter.name } : {}),
             page,
             size: 20

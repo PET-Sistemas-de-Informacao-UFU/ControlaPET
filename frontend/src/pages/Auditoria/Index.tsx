@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Modal from "../../components/ui/Modal";
+import DateRangePicker from "../../components/ui/DateRangePicker";
 import { FilterIcon } from "../../components/ui/Icons";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
 import { useAuditEvents } from "../../hooks/useAudit";
@@ -39,27 +40,34 @@ function toLog(event: AuditEvent): Log {
 
 export default function Auditoria() {
     const isDesktop = useIsDesktop();
-    const [filter, setFilter] = useState<AuditFilter>({ date: null, name: null });
+    const [filter, setFilter] = useState<AuditFilter>({ startDate: null, endDate: null, name: null });
     const [searchOpen, setSearchOpen] = useState(false);
-    const [dateInput, setDateInput] = useState("");
+    const [startDateInput, setStartDateInput] = useState("");
+    const [endDateInput, setEndDateInput] = useState("");
     const [nameInput, setNameInput] = useState("");
     const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useAuditEvents(filter);
     const logs = data?.pages.flatMap((page) => page.content).map(toLog) ?? [];
 
     function openSearchModal() {
-        setDateInput(filter.date ?? "");
+        setStartDateInput(filter.startDate ?? "");
+        setEndDateInput(filter.endDate ?? "");
         setNameInput(filter.name ?? "");
         setSearchOpen(true);
     }
 
     function applyFilter() {
-        setFilter({ date: dateInput || null, name: nameInput.trim() || null });
+        setFilter({
+            startDate: startDateInput || null,
+            endDate: endDateInput || null,
+            name: nameInput.trim() || null
+        });
         setSearchOpen(false);
     }
 
     function clearFilter() {
-        setFilter({ date: null, name: null });
-        setDateInput("");
+        setFilter({ startDate: null, endDate: null, name: null });
+        setStartDateInput("");
+        setEndDateInput("");
         setNameInput("");
         setSearchOpen(false);
     }
@@ -67,12 +75,15 @@ export default function Auditoria() {
     const fields = (
         <>
             <div className="form-group">
-                <label htmlFor="audit-search-date">Data</label>
-                <input
-                    type="date"
-                    id="audit-search-date"
-                    value={dateInput}
-                    onChange={(event) => setDateInput(event.target.value)}
+                <label htmlFor="audit-search-date-range">Período</label>
+                <DateRangePicker
+                    id="audit-search-date-range"
+                    startDate={startDateInput}
+                    endDate={endDateInput}
+                    onChange={(startDate, endDate) => {
+                        setStartDateInput(startDate);
+                        setEndDateInput(endDate);
+                    }}
                 />
             </div>
 

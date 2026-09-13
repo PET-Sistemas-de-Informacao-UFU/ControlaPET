@@ -26,10 +26,11 @@ public class AuditController {
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<AuditEventResponseDTO>> getEvents(
-            @RequestParam(required = false) LocalDate date,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String userName,
             @PageableDefault(size = 20, sort = "eventDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(auditService.getEvents(date, userName, pageable));
+        return ResponseEntity.ok(auditService.getEvents(startDate, endDate, userName, pageable));
     }
 }
