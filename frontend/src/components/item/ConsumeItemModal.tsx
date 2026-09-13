@@ -1,24 +1,22 @@
 import { useEffect, useState } from "react";
 import Modal from "../ui/Modal";
 
-interface LoanRequestModalProps {
+interface ConsumeItemModalProps {
     open: boolean
     itemName: string
     maxQuantity: number
     isSubmitting: boolean
     onClose: () => void
-    onConfirm: (quantity: number, expectedReturnDate: string) => void
+    onConfirm: (quantity: number) => void
 }
 
-export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmitting, onClose, onConfirm }: LoanRequestModalProps) {
+export default function ConsumeItemModal({ open, itemName, maxQuantity, isSubmitting, onClose, onConfirm }: ConsumeItemModalProps) {
     const [quantity, setQuantity] = useState("1");
-    const [expectedReturnDate, setExpectedReturnDate] = useState("");
     const [validationMessage, setValidationMessage] = useState("");
 
     useEffect(() => {
         if (!open) {
             setQuantity("1");
-            setExpectedReturnDate("");
             setValidationMessage("");
         }
     }, [open]);
@@ -27,7 +25,7 @@ export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmit
         const requestedQuantity = Number(quantity);
 
         if (maxQuantity === 0) {
-            setValidationMessage("Não há unidades disponíveis para empréstimo.");
+            setValidationMessage("Não há unidades disponíveis para consumo.");
             return;
         }
 
@@ -41,30 +39,25 @@ export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmit
             return;
         }
 
-        if (!expectedReturnDate) {
-            setValidationMessage("Informe o prazo para devolução.");
-            return;
-        }
-
         setValidationMessage("");
-        onConfirm(requestedQuantity, expectedReturnDate);
+        onConfirm(requestedQuantity);
     }
 
     return (
         <Modal
             open={open}
-            title={`Emprestar ${itemName}`}
-            subtitle="Informe a quantidade e a data prevista para devolução"
+            title={`Consumir ${itemName}`}
+            subtitle="Informe a quantidade que será consumida"
             sheetClassName="modal-sheet-compact"
             closeLabel="Cancelar"
             onClose={onClose}
-            actions={<button type="button" className="modal-btn primary" disabled={isSubmitting} onClick={handleConfirm}>{isSubmitting ? "Registrando..." : "Confirmar empréstimo"}</button>}
+            actions={<button type="button" className="modal-btn primary" disabled={isSubmitting} onClick={handleConfirm}>{isSubmitting ? "Registrando..." : "Confirmar consumo"}</button>}
         >
             <div className="form-group">
-                <label htmlFor="loan-req-qty">Quantidade</label>
+                <label htmlFor="consume-req-qty">Quantidade</label>
                 <input
                     type="number"
-                    id="loan-req-qty"
+                    id="consume-req-qty"
                     min={1}
                     max={maxQuantity}
                     value={quantity}
@@ -74,19 +67,6 @@ export default function LoanRequestModal({ open, itemName, maxQuantity, isSubmit
                     }}
                     onBlur={() => {
                         if (quantity === "") setQuantity("0");
-                    }}
-                />
-            </div>
-            <div className="form-group">
-                <label htmlFor="loan-req-return-date">Prazo para devolução</label>
-                <input
-                    type="date"
-                    id="loan-req-return-date"
-                    min={new Date().toISOString().slice(0, 10)}
-                    value={expectedReturnDate}
-                    onChange={(event) => {
-                        setExpectedReturnDate(event.target.value);
-                        setValidationMessage("");
                     }}
                 />
             </div>

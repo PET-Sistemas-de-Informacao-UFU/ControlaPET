@@ -117,6 +117,16 @@
     margin-bottom: 18px;
   }
   .search-bar svg{ width:16px; height:16px; flex-shrink:0; opacity:0.8; }
+  .search-bar input{
+    width:100%;
+    border:0;
+    outline:0;
+    background:transparent;
+    color:var(--text);
+    font:inherit;
+  }
+  .search-bar input::placeholder{ color:var(--text-dim); opacity:1; }
+  .catalog-empty{ color:var(--text-dim); font-size:14px; text-align:center; padding:32px 16px; }
 
   /* ---- CATALOGO VIEW ---- */
   .item-card{
@@ -669,6 +679,8 @@
   }
   .modal-btn.primary{ background: var(--accent); border-color: var(--accent); }
   .modal-btn.danger{ color: var(--red); }
+  .modal-btn:disabled{ cursor:not-allowed; opacity:.65; }
+  .form-error{ color:var(--red); font-size:13px; line-height:1.35; margin-top:-2px; }
   .modal-close{
     text-align:center;
     color: var(--text-dim);
