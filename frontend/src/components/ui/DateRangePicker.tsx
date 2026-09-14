@@ -48,7 +48,8 @@ export default function DateRangePicker({ id, startDate, endDate, onChange }: Da
     const monthStart = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
     const daysInMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 0).getDate();
     const days = Array.from({ length: monthStart.getDay() + daysInMonth }, (_, index) => index - monthStart.getDay() + 1);
-    const monthLabel = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(visibleMonth);
+    const formattedMonth = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric" }).format(visibleMonth);
+    const monthLabel = `${formattedMonth.charAt(0).toUpperCase()}${formattedMonth.slice(1)}`;
     const label = startDate
         ? `${formatDate(startDate)}${endDate && endDate !== startDate ? ` — ${formatDate(endDate)}` : endDate ? "" : " · selecione o fim"}`
         : "Selecionar período";

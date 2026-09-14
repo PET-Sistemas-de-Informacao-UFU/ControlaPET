@@ -190,8 +190,8 @@ export default function Movimentacoes() {
                 onClose={closeLoanModal}
                 actions={
                     <div className="modal-actions-inline">
-                        <div className="modal-btn primary" onClick={confirmReturn}>Confirmar devolução</div>
                         <div className="modal-btn danger" onClick={() => setDefectModalOpen(true)}>Relatar defeito</div>
+                        <div className="modal-btn primary" onClick={confirmReturn}>Confirmar devolução</div>
                     </div>
                 }
             >

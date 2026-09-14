@@ -60,6 +60,7 @@
   }
   .app-header h1{ font-size: 22px; }
   .app-header .icon-btn{ display:none; }
+  .header-spacer{ display:none; }
 
   .content{ padding:clamp(24px, 2vw, 30px) clamp(32px, 2.5vw, 48px) clamp(32px, 2.5vw, 40px); }
 
@@ -82,6 +83,50 @@
   }
   .item-card{ margin-bottom: 0; }
   .fab-add{ display:none; }
+
+  .item-form-details{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  .item-form-details .form-group:first-child{ grid-column:auto; }
+  .number-input{ position:relative; }
+  .number-input input{
+    padding-right:38px;
+    appearance:textfield;
+  }
+  .number-input input::-webkit-inner-spin-button,
+  .number-input input::-webkit-outer-spin-button{ appearance:none; margin:0; }
+  .number-stepper{
+    position:absolute;
+    top:1px;
+    right:1px;
+    bottom:1px;
+    width:32px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border-left:1px solid var(--border);
+    border-radius:0 9px 9px 0;
+  }
+  .number-stepper button{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition:background 0.15s, color 0.15s;
+  }
+  .number-stepper button + button{ border-top:1px solid var(--border); }
+  .number-stepper button:hover{ background:var(--surface); color:var(--text); }
+  .number-stepper svg{
+    width:14px;
+    height:14px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2.5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
 
   .header-btn{
     display:flex;
