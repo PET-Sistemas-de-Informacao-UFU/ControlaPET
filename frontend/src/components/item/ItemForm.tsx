@@ -97,6 +97,21 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                 </div>
 
                 <div className="form-group">
+                    <label htmlFor="edit-condition">Condição</label>
+                    <FormSelect
+                        id="edit-condition"
+                        value={condition}
+                        placeholder="Selecione a condição"
+                        options={[
+                            { value: "NEW", label: "Novo" },
+                            { value: "GOOD", label: "Bom" },
+                            { value: "DAMAGED", label: "Danificado" }
+                        ]}
+                        onChange={(value) => setCondition(value as ItemCondition)}
+                    />
+                </div>
+
+                <div className="form-group">
                     <label htmlFor="edit-total-quantity">Quantidade total</label>
                     <div className="number-input">
                         <input
@@ -117,26 +132,11 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                         </div>
                     </div>
                 </div>
-
-                <div className="form-group">
-                    <label htmlFor="edit-condition">Condição</label>
-                    <FormSelect
-                        id="edit-condition"
-                        value={condition}
-                        placeholder="Selecione a condição"
-                        options={[
-                            { value: "NEW", label: "Novo" },
-                            { value: "GOOD", label: "Bom" },
-                            { value: "DAMAGED", label: "Danificado" }
-                        ]}
-                        onChange={(value) => setCondition(value as ItemCondition)}
-                    />
-                </div>
             </div>
 
             <div className={item ? "modal-actions item-form-actions" : "modal-actions"}>
-                <div className="modal-btn primary" onClick={handleSave}>Salvar</div>
                 {item && <div className="modal-btn danger" onClick={handleDelete}>Excluir item</div>}
+                <div className="modal-btn primary" onClick={handleSave}>Salvar</div>
             </div>
         </>
     );

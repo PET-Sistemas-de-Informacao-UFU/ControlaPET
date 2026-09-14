@@ -18,7 +18,7 @@
   }
   .side-nav-brand{
     display:flex;
-    align-items:center;
+    align-items:flex-start;
     gap: 10px;
     padding: 0 10px 22px;
     font-size: 16px;
@@ -105,14 +105,15 @@
 
   /* ---- CABECALHO ---- */
   .app-header{
-    padding: 20px 32px;
+    padding: clamp(20px, 1.5vw, 24px) clamp(32px, 2.5vw, 48px);
     justify-content: flex-start;
     gap: 16px;
   }
   .app-header h1{ font-size: 22px; }
   .app-header .icon-btn{ display:none; }
+  .header-spacer{ display:none; }
 
-  .content{ padding: 24px 32px 32px; }
+  .content{ padding:clamp(24px, 2vw, 30px) clamp(32px, 2.5vw, 48px) clamp(32px, 2.5vw, 40px); }
 
   /* ---- BUSCA ---- */
   .search-bar{ max-width: 420px; margin-bottom: 0; }
@@ -128,11 +129,55 @@
   /* ---- CATALOGO ---- */
   .catalog-grid{
     display:grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
+    grid-template-columns:repeat(auto-fill, minmax(clamp(280px, 18vw, 330px), 1fr));
+    gap:clamp(12px, 1vw, 16px);
   }
   .item-card{ margin-bottom: 0; }
   .fab-add{ display:none; }
+
+  .item-form-details{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
+  .item-form-details .form-group:first-child{ grid-column:auto; }
+  .number-input{ position:relative; }
+  .number-input input{
+    padding-right:38px;
+    appearance:textfield;
+  }
+  .number-input input::-webkit-inner-spin-button,
+  .number-input input::-webkit-outer-spin-button{ appearance:none; margin:0; }
+  .number-stepper{
+    position:absolute;
+    top:1px;
+    right:1px;
+    bottom:1px;
+    width:32px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border-left:1px solid var(--border);
+    border-radius:0 9px 9px 0;
+  }
+  .number-stepper button{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    background:transparent;
+    color:var(--text-dim);
+    cursor:pointer;
+    transition:background 0.15s, color 0.15s;
+  }
+  .number-stepper button + button{ border-top:1px solid var(--border); }
+  .number-stepper button:hover{ background:var(--surface); color:var(--text); }
+  .number-stepper svg{
+    width:14px;
+    height:14px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2.5;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+  }
 
   .header-btn{
     display:flex;
@@ -151,24 +196,27 @@
   .header-btn:hover{ opacity: 0.9; }
 
   /* ---- AUDITORIA ---- */
-  .audit-list{ max-width: 720px; }
+  .audit-list{ width:min(100%, clamp(720px, 58vw, 920px)); }
 
   /* ---- EMPRESTIMOS ---- */
   .loan-active-list{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); }
   .loan-page-layout{
-    max-width:1000px;
+    width:100%;
   }
   .audit-filters + .section-label{ margin-top: 26px; }
   .audit-filters{
     display:flex;
+    flex-wrap:wrap;
     gap: 10px;
-    align-items:flex-end;
+    align-items:center;
     margin-bottom: 4px;
-    max-width: 720px;
+    width:min(100%, clamp(960px, 70vw, 1180px));
   }
   .audit-filters .form-group{ margin-bottom:0; }
-  .audit-filters .form-group input{ min-width: 190px; }
-  .audit-filters .header-btn{ padding: 11px 18px; }
+  .audit-filters .form-group input,
+  .audit-filters .date-range-picker{ min-width: 230px; }
+  .audit-filters .form-group input{ height:44px; }
+  .audit-filters .header-btn{ margin-top:21px; padding: 11px 18px; }
   .header-btn.ghost{
     background: var(--surface);
     color: var(--text);
@@ -208,4 +256,8 @@
     cursor:pointer;
   }
   .modal-close-icon:hover{ background:var(--surface-2); color:var(--text); }
+}
+
+@media (min-width: 1600px){
+  .loan-active-list{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
 }

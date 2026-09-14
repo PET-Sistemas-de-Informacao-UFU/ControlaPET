@@ -29,8 +29,6 @@ export default function Modal({ open, title, subtitle, subtitleClassName, sheetC
                 {children}
 
                 {actions && <div className="modal-actions">{actions}</div>}
-
-                <div className="modal-close" onClick={onClose}>{closeLabel}</div>
             </div>
         </div>
     );

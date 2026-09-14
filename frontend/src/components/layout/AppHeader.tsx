@@ -1,21 +1,21 @@
-import { HomeIcon } from "../ui/Icons";
+import { useNavigate } from "react-router-dom";
 
 interface AppHeaderProps {
     title: string;
 }
 
 export default function AppHeader({ title }: AppHeaderProps) {
+    const navigate = useNavigate();
+
     return (
         <div className="app-header">
-            <div className="icon-btn" title="Início">
-                <HomeIcon />
-            </div>
+            <button type="button" className="icon-btn" aria-label="Ir para o catálogo" onClick={() => navigate("/catalogo")}>
+                <img src="/logoPET.png" alt="Logo do PET-SI" className="LogoPET" />
+            </button>
 
             <h1>{title}</h1>
 
-            <div className="icon-btn" title="Perfil">
-                <img src="/logoPET.png" alt="Logo do PET-SI" className="LogoPET" />
-            </div>
+            <div className="header-spacer" aria-hidden="true" />
         </div>
     );
 }

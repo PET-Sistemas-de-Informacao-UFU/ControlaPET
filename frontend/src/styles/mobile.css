@@ -93,10 +93,18 @@
   .icon-btn:hover{ background: var(--surface-2); }
   .icon-btn svg{ width:20px; height:20px; }
   .icon-btn img.LogoPET{
-    width: 50px;
-    height: 50px;
+    width:34px;
+    height:34px;
     object-fit: contain;
   }
+  .app-header .icon-btn{
+    padding:0;
+    border:0;
+    background:transparent;
+    -webkit-tap-highlight-color:transparent;
+    transition:none;
+  }
+  .header-spacer{ width:34px; height:34px; }
 
   /* Main content */
   .content{
@@ -129,6 +137,13 @@
     font:inherit;
   }
   .search-bar input::placeholder{ color:var(--text-dim); opacity:1; }
+  .search-bar input[type="search"]::-webkit-search-cancel-button{
+    appearance:none;
+    width:18px;
+    height:18px;
+    cursor:pointer;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 6 12 12M18 6 6 18'/%3E%3C/svg%3E") center / 16px no-repeat;
+  }
   .catalog-empty{ color:var(--text-dim); font-size:14px; text-align:center; padding:32px 16px; }
 
   /* ---- CATALOGO VIEW ---- */
@@ -182,9 +197,10 @@
   .form-group{ margin-bottom: 16px; }
   .item-form-details{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr));
+    grid-template-columns:repeat(2, minmax(0, 1fr));
     gap:12px;
   }
+  .item-form-details .form-group:first-child{ grid-column:1 / -1; }
   .form-group label{
     display:block;
     font-size: 12.5px;
@@ -207,47 +223,106 @@
     outline: none;
     border-color: var(--accent);
   }
-  .number-input{ position:relative; }
+  .date-range-picker{ position:relative; }
+  .date-range-trigger{
+    width:100%;
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font:inherit;
+    font-size:14px;
+    text-align:left;
+    cursor:pointer;
+  }
+  .date-range-trigger:hover,
+  .date-range-trigger:focus-visible{ border-color:var(--accent); outline:none; }
+  .date-range-trigger.has-value{ color:var(--text); }
+  .date-range-trigger svg{ width:17px; height:17px; flex-shrink:0; color:var(--accent); }
+  .date-range-popover{
+    position:absolute;
+    z-index:25;
+    top:calc(100% + 8px);
+    left:0;
+    width:min(310px, calc(100vw - 72px));
+    padding:14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface);
+    box-shadow:0 14px 30px rgba(0,0,0,.38);
+  }
+  @media (max-width:1023px){
+    .modal-sheet .date-range-popover{
+      position:fixed;
+      top:50%;
+      left:50%;
+      width:min(310px, calc(100vw - 32px));
+      transform:translate(-50%, -50%);
+    }
+  }
+  .date-range-header{ display:grid; grid-template-columns:32px 1fr 32px; align-items:center; margin-bottom:12px; }
+  .date-range-header strong{ font-size:13px; text-align:center; }
+  .date-range-header button,
+  .date-range-actions button{
+    border:0;
+    background:transparent;
+    color:var(--text-dim);
+    font:inherit;
+    cursor:pointer;
+  }
+  .date-range-header button{ height:30px; border-radius:7px; color:var(--text); font-size:23px; line-height:1; }
+  .date-range-header button:hover{ background:var(--surface-2); }
+  .date-range-weekdays,
+  .date-range-days{ display:grid; grid-template-columns:repeat(7, 1fr); gap:3px; text-align:center; }
+  .date-range-days{ gap:0; }
+  .date-range-weekdays{ margin-bottom:5px; color:var(--text-dim); font-size:10px; font-weight:600; }
+  .date-range-day{ height:32px; border:0; border-radius:0; background:transparent; color:var(--text); font:inherit; font-size:12px; cursor:pointer; }
+  .date-range-day:hover{ background:var(--surface-2); }
+  .date-range-day.today{ color:var(--accent); font-weight:700; }
+  .date-range-day.in-range{
+    border-radius:0;
+    background:linear-gradient(#174fae, #174fae) center / 100% 28px no-repeat;
+    color:var(--text);
+  }
+  .date-range-day.range-row-start{ border-radius:35% 0 0 35%; }
+  .date-range-day.range-row-end{ border-radius:0 35% 35% 0; }
+  .date-range-day.selected{ position:relative; color:#fff; font-weight:700; }
+  .date-range-day.selected::before{
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:50%;
+    left:50%;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:var(--blue);
+    transform:translate(-50%, -50%);
+  }
+  .date-range-day.selected span{ position:relative; z-index:1; }
+  .date-range-day.single-date{
+    background:transparent;
+  }
+  .date-range-day.range-start{
+    background:linear-gradient(#174fae, #174fae) right center / 50% 28px no-repeat;
+  }
+  .date-range-day.range-end{
+    background:linear-gradient(#174fae, #174fae) left center / 50% 28px no-repeat;
+  }
+  .date-range-actions{ display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
+  .date-range-actions button{ color:var(--accent); font-size:12px; font-weight:700; padding:3px 2px; }
   .number-input input{
-    padding-right:38px;
+    padding-right:14px;
     appearance:textfield;
   }
   .number-input input::-webkit-inner-spin-button,
   .number-input input::-webkit-outer-spin-button{ appearance:none; margin:0; }
-  .number-stepper{
-    position:absolute;
-    top:1px;
-    right:1px;
-    bottom:1px;
-    width:32px;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    border-left:1px solid var(--border);
-    border-radius:0 9px 9px 0;
-  }
-  .number-stepper button{
-    flex:1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border:0;
-    background:transparent;
-    color:var(--text-dim);
-    cursor:pointer;
-    transition:background 0.15s, color 0.15s;
-  }
-  .number-stepper button + button{ border-top:1px solid var(--border); }
-  .number-stepper button:hover{ background:var(--surface); color:var(--text); }
-  .number-stepper svg{
-    width:14px;
-    height:14px;
-    fill:none;
-    stroke:currentColor;
-    stroke-width:2.5;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-  }
+  .number-stepper{ display:none; }
   .form-select{ position:relative; }
   .form-select-trigger{
     width:100%;
@@ -481,6 +556,24 @@
   .log-body .log-text{ font-size: 14.5px; line-height: 1.45; }
   .log-body .log-text b{ font-weight: 700; }
   .audit-load-more{ display:flex; justify-content:center; padding:4px 0 20px; }
+  @media (max-width:1023px){
+    .audit-load-more .header-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:13px;
+      border:1px solid var(--border);
+      border-radius:12px;
+      background:var(--surface-2);
+      color:var(--text);
+      font:inherit;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+    }
+    .audit-load-more .header-btn:disabled{ cursor:not-allowed; opacity:.65; }
+  }
 
   /* ---- EMPRESTIMOS VIEW ---- */
   .loan-summary{
@@ -685,14 +778,6 @@
   .modal-btn.danger{ color: var(--red); }
   .modal-btn:disabled{ cursor:not-allowed; opacity:.65; }
   .form-error{ color:var(--red); font-size:13px; line-height:1.35; margin-top:-2px; }
-  .modal-close{
-    text-align:center;
-    color: var(--text-dim);
-    font-size: 13px;
-    margin-top: 16px;
-    cursor:pointer;
-  }
-
   /* Bottom nav */
   .bottom-nav{
     position:absolute;

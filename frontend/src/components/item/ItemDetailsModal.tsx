@@ -33,6 +33,9 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumi
             onClose={onClose}
             actions={
                 <div className="modal-actions-inline">
+                    <div className="modal-btn danger" onClick={onRelatarDefeito}>
+                        Reportar defeito
+                    </div>
                     {item?.type === "BORROWABLE" && (
                         <div className="modal-btn primary" onClick={onEmprestar}>
                             Registrar empréstimo
@@ -41,9 +44,6 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumi
                     {item?.type === "CONSUMABLE" && (
                         <div className="modal-btn primary" onClick={onConsumir}>Registrar consumo</div>
                     )}
-                    <div className="modal-btn danger" onClick={onRelatarDefeito}>
-                        Reportar defeito
-                    </div>
                 </div>
             }
         >
