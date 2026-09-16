@@ -111,7 +111,7 @@
   }
   .app-header h1{ font-size: 22px; }
   .app-header .icon-btn{ display:none; }
-  .header-spacer{ display:none; }
+  .app-header .account-control.header{ display:none; }
 
   .content{ padding:clamp(24px, 2vw, 30px) clamp(32px, 2.5vw, 48px) clamp(32px, 2.5vw, 40px); }
 

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import AccountMenu from "./AccountMenu";
 
 interface AppHeaderProps {
     title: string;
@@ -15,7 +16,7 @@ export default function AppHeader({ title }: AppHeaderProps) {
 
             <h1>{title}</h1>
 
-            <div className="header-spacer" aria-hidden="true" />
+            <AccountMenu variant="header" />
         </div>
     );
 }

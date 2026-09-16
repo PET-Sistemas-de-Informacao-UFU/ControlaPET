@@ -118,7 +118,56 @@
     -webkit-tap-highlight-color:transparent;
     transition:none;
   }
-  .header-spacer{ width:34px; height:34px; }
+  .account-control.header{ position:relative; }
+  .header-user{
+    width:34px;
+    height:34px;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:var(--accent-soft);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .header-user .side-nav-user-avatar{
+    width:28px;
+    height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    color:var(--accent);
+    font-size:11px;
+    font-weight:700;
+  }
+  .account-control.header .account-menu{
+    position:absolute;
+    top:calc(100% + 10px);
+    right:0;
+    width:max-content;
+    padding:4px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 10px 24px rgba(0,0,0,.32);
+    z-index:20;
+  }
+  .account-control.header .account-menu button{
+    display:block;
+    width:auto;
+    padding:10px 8px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--text);
+    font:inherit;
+    font-size:16px;
+    text-align:left;
+    white-space:nowrap;
+  }
+  .account-control.header .account-menu .account-menu-logout{ color:var(--red); }
 
   /* Main content */
   .content{
@@ -299,6 +348,8 @@
     outline: none;
     border-color: var(--accent);
   }
+  .account-form .form-group label{ font-size:14px; }
+  .account-form .form-group input{ font-size:18px; }
   .date-range-picker{ position:relative; }
   .date-range-trigger{
     width:100%;
