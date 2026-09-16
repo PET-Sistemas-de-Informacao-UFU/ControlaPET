@@ -76,6 +76,7 @@ public class AuthService {
         throw new IllegalArgumentException("Refresh token inválido ou expirado");
     }
 
+    @Transactional
     public void requestPasswordReset(ForgotPasswordRequestDTO request, String ipAddress) {
         String email = request.email().trim().toLowerCase();
         if (!passwordResetRateLimiter.tryAcquire(email, ipAddress)) {
@@ -83,22 +84,36 @@ public class AuthService {
         }
 
         userRepository.findByEmail(email).filter(User::isActive).ifPresent(user -> {
-            String token = generateToken();
-            PasswordResetToken resetToken = PasswordResetToken.builder()
-                    .tokenHash(hashToken(token))
-                    .user(user)
-                    .expiresAt(LocalDateTime.now().plusMinutes(30))
-                    .used(false)
-                    .build();
-
-            passwordResetTokenRepository.save(resetToken);
-            emailService.sendPasswordReset(user.getEmail(), frontendUrl + "/redefinir-senha?token=" + token);
-            passwordResetAuditRepository.save(PasswordResetAudit.builder()
-                    .user(user)
-                    .eventType("REQUESTED")
-                    .requestIp(ipAddress)
-                    .build());
+            sendPasswordResetEmail(user, ipAddress, "REQUESTED", false);
         });
+    }
+
+    public void sendInitialPasswordSetup(User user) {
+        sendPasswordResetEmail(user, null, "INITIAL_SETUP", true);
+    }
+
+    private void sendPasswordResetEmail(User user, String ipAddress, String eventType, boolean initialSetup) {
+        passwordResetTokenRepository.invalidateUnusedTokensByUser(user);
+        String token = generateToken();
+        PasswordResetToken resetToken = PasswordResetToken.builder()
+                .tokenHash(hashToken(token))
+                .user(user)
+                .expiresAt(initialSetup ? LocalDateTime.of(9999, 12, 31, 23, 59, 59) : LocalDateTime.now().plusMinutes(30))
+                .used(false)
+                .build();
+
+        passwordResetTokenRepository.save(resetToken);
+        String resetUrl = frontendUrl + "/redefinir-senha?token=" + token;
+        if (initialSetup) {
+            emailService.sendInitialPasswordSetup(user.getEmail(), resetUrl);
+        } else {
+            emailService.sendPasswordReset(user.getEmail(), resetUrl);
+        }
+        passwordResetAuditRepository.save(PasswordResetAudit.builder()
+                .user(user)
+                .eventType(eventType)
+                .requestIp(ipAddress)
+                .build());
     }
 
     @Transactional
@@ -106,7 +121,7 @@ public class AuthService {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hashToken(request.token()))
                 .orElseThrow(() -> new IllegalArgumentException("Link de redefinição inválido ou expirado."));
 
-        if (resetToken.isUsed() || resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+        if (resetToken.isUsed() || (resetToken.getExpiresAt() != null && resetToken.getExpiresAt().isBefore(LocalDateTime.now()))) {
             throw new IllegalArgumentException("Link de redefinição inválido ou expirado.");
         }
 

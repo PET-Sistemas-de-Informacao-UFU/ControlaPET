@@ -8,6 +8,7 @@ import br.ufu.facom.petsi.controlaPET.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,21 +20,29 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
+    @Transactional
     public void createUser(CreateUserRequestDTO request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) {
+        User existingUser = userRepository.findByEmail(request.email().trim()).orElse(null);
+        if (existingUser != null) {
+            if (existingUser.getPasswordChangedAt() == null) {
+                authService.sendInitialPasswordSetup(existingUser);
+                return;
+            }
             throw new IllegalArgumentException("E-mail já cadastrado");
         }
 
         User user = User.builder()
                 .name(request.name())
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
+                .email(request.email().trim())
+                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .role(request.role())
                 .active(true)
                 .build();
 
         userRepository.save(user);
+        authService.sendInitialPasswordSetup(user);
     }
 
     public List<User> getAllUsers() {

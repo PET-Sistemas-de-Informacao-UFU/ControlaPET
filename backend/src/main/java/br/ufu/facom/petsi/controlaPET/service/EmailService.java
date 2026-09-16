@@ -25,4 +25,16 @@ public class EmailService {
                 + "\n\nSe você não solicitou a redefinição, ignore este e-mail.");
         mailSender.send(message);
     }
+
+    public void sendInitialPasswordSetup(String recipient, String resetUrl) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from);
+        message.setTo(recipient);
+        message.setSubject("Defina sua senha - ControlaPET");
+        message.setText("Sua conta no ControlaPET foi criada.\n\n"
+                + "Use o link abaixo para definir sua senha e fazer o primeiro acesso:\n"
+                + resetUrl
+                + "\n\nSe você não reconhece esta conta, ignore este e-mail.");
+        mailSender.send(message);
+    }
 }

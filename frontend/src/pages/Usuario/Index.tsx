@@ -35,7 +35,6 @@ export default function Usuarios() {
     const [modalOpen, setModalOpen] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [role, setRole] = useState<UserRole>("MEMBER");
     const [error, setError] = useState<string | null>(null);
     const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -49,7 +48,6 @@ export default function Usuarios() {
     function openCreateModal() {
         setName("");
         setEmail("");
-        setPassword("");
         setRole("MEMBER");
         setError(null);
         setModalOpen(true);
@@ -59,7 +57,7 @@ export default function Usuarios() {
         event.preventDefault();
         setError(null);
 
-        const data: CreateUserRequest = { name: name.trim(), email: email.trim(), password, role };
+        const data: CreateUserRequest = { name: name.trim(), email: email.trim(), role };
         createUser.mutate(data, {
             onSuccess: () => setModalOpen(false),
             onError: (requestError) => {
@@ -146,7 +144,7 @@ export default function Usuarios() {
             <Modal
                 open={modalOpen}
                 title="Novo usuário"
-                subtitle="Crie uma conta para acessar o sistema."
+                subtitle="Um link para definir a senha será enviado ao e-mail informado."
                 closeLabel="Fechar"
                 onClose={() => !createUser.isPending && setModalOpen(false)}
                 actions={<button type="submit" form="create-user-form" className="modal-btn primary" disabled={createUser.isPending}>{createUser.isPending ? "Criando..." : "Criar usuário"}</button>}
@@ -154,7 +152,6 @@ export default function Usuarios() {
                 <form id="create-user-form" className="password-form" onSubmit={submit}>
                     <div className="form-group"><label htmlFor="user-name">Nome</label><input id="user-name" value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" maxLength={100} required /></div>
                     <div className="form-group"><label htmlFor="user-email">E-mail</label><input id="user-email" type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" required /></div>
-                    <div className="form-group"><label htmlFor="user-password">Senha inicial</label><input id="user-password" type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="new-password" minLength={6} required /></div>
                     <div className="form-group"><label htmlFor="user-role">Perfil</label><FormSelect id="user-role" value={role} placeholder="Selecione o perfil" options={ROLES} onChange={(value) => setRole(value as UserRole)} /></div>
                     {error && <p className="password-form-error">{error}</p>}
                 </form>
