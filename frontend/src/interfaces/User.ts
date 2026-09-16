@@ -5,4 +5,12 @@ export interface User {
     nome: string
     email: string
     role: UserRole
+    active: boolean
+}
+
+export interface CreateUserRequest {
+    name: string
+    email: string
+    password: string
+    role: UserRole
 }

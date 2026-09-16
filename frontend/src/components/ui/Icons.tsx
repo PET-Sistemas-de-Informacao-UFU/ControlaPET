@@ -85,3 +85,13 @@ export function LoanIcon() {
         </svg>
     );
 }
+
+export function UsersIcon() {
+    return (
+        <svg {...strokeProps}>
+            <circle cx="9" cy="8" r="3" />
+            <path d="M3.5 21v-1.5a5.5 5.5 0 0 1 11 0V21" />
+            <path d="M16 5.5a3 3 0 0 1 0 5.8M20.5 21v-1.5a5.5 5.5 0 0 0-3.5-5.1" />
+        </svg>
+    );
+}

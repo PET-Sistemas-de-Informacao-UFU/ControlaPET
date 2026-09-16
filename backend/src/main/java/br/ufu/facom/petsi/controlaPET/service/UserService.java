@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -32,6 +35,10 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll(org.springframework.data.domain.Sort.by("name"));
+    }
+
     public void changePassword(User user, ChangePasswordRequestDTO request) {
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
             throw new IllegalArgumentException("A senha atual está incorreta");
@@ -43,6 +50,55 @@ public class UserService {
 
     public void changeName(User user, ChangeNameRequestDTO request) {
         user.setName(request.name().trim());
+        userRepository.save(user);
+    }
+
+    public void changeRole(User authenticatedUser, UUID userId, br.ufu.facom.petsi.controlaPET.model.enums.UserRole role) {
+        if (authenticatedUser.getId().equals(userId)) {
+            throw new IllegalArgumentException("Não é possível alterar o próprio perfil.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
+    public void changeStatus(User authenticatedUser, UUID userId, boolean active) {
+        if (authenticatedUser.getId().equals(userId) && !active) {
+            throw new IllegalArgumentException("Não é possível desativar a própria conta.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        user.setActive(active);
+        userRepository.save(user);
+    }
+
+    public void updateUser(User authenticatedUser, UUID userId, br.ufu.facom.petsi.controlaPET.dto.userDTO.UpdateUserRequestDTO request) {
+        if (authenticatedUser.getId().equals(userId)) {
+            throw new IllegalArgumentException("Altere os dados da própria conta pelo menu de usuário.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        userRepository.findByEmail(request.email().trim())
+                .filter(foundUser -> !foundUser.getId().equals(userId))
+                .ifPresent(foundUser -> { throw new IllegalArgumentException("E-mail já cadastrado"); });
+
+        user.setName(request.name().trim());
+        user.setEmail(request.email().trim());
+        userRepository.save(user);
+    }
+
+    public void resetPassword(User authenticatedUser, UUID userId, String newPassword) {
+        if (authenticatedUser.getId().equals(userId)) {
+            throw new IllegalArgumentException("Redefina a própria senha pelo menu de usuário.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+        user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
 }

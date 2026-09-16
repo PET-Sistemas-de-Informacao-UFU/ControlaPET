@@ -2,7 +2,7 @@ import { useContext, useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { api } from "../../service/api";
-import { AuditIcon, CatalogIcon, LoanIcon } from "../ui/Icons";
+import { AuditIcon, CatalogIcon, LoanIcon, UsersIcon } from "../ui/Icons";
 import Modal from "../ui/Modal";
 
 const DESTINATIONS = [
@@ -121,7 +121,7 @@ export default function SideNav() {
             </div>
 
             <div className="side-nav-items">
-                {DESTINATIONS.map(({ path, label, Icon }) => (
+                {[...DESTINATIONS, ...(user?.role === "ADMIN" ? [{ path: "/usuarios", label: "Usuários", Icon: UsersIcon }] : [])].map(({ path, label, Icon }) => (
                     <div
                         key={path}
                         className={pathname === path ? "side-nav-item active" : "side-nav-item"}

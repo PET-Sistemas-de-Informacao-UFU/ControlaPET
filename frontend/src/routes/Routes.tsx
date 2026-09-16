@@ -4,6 +4,7 @@ import HomeRoute from "./HomeRoute";
 import Catalogo from "../pages/Catalogo/Index";
 import Movimentacoes from "../pages/Movimentacoes/Index";
 import Auditoria from "../pages/Auditoria/Index";
+import Usuarios from "../pages/Usuario/Index";
 import Login from "../pages/Login/Index";
 import { PrivateRoute } from "./PrivateRoute";
 import { PublicRoute } from "./PublicRoute";
@@ -21,6 +22,7 @@ export const routes = createBrowserRouter(
                     <Route path="/catalogo" element={<Catalogo />} />
                     <Route path="/movimentacoes" element={<Movimentacoes />} />
                     <Route path="/auditoria" element={<Auditoria />} />
+                    <Route path="/usuarios" element={<Usuarios />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
             </Route>
