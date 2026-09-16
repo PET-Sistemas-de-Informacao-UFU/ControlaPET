@@ -94,19 +94,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void resetPassword(User authenticatedUser, UUID userId, String newPassword) {
-        if (authenticatedUser.getId().equals(userId)) {
-            throw new IllegalArgumentException("Redefina a própria senha pelo menu de usuário.");
-        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
-        user.setPassword(passwordEncoder.encode(newPassword));
-        user.setPasswordChangedAt(LocalDateTime.now());
-        incrementSessionVersion(user);
-        userRepository.save(user);
-    }
-
     private void incrementSessionVersion(User user) {
         user.setSessionVersion(user.getSessionVersion() == null ? 1L : user.getSessionVersion() + 1);
     }

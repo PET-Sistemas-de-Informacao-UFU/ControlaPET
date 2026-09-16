@@ -6,7 +6,6 @@ import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangeNameRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangeUserRoleRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangeUserStatusRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.UpdateUserRequestDTO;
-import br.ufu.facom.petsi.controlaPET.dto.userDTO.AdminChangePasswordRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.UserResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.UserService;
@@ -96,17 +95,6 @@ public class UserController {
             @Valid @RequestBody UpdateUserRequestDTO request
     ) {
         userService.updateUser(authenticatedUser, userId, request);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/{userId}/password")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<Void> resetPassword(
-            @AuthenticationPrincipal User authenticatedUser,
-            @PathVariable java.util.UUID userId,
-            @Valid @RequestBody AdminChangePasswordRequestDTO request
-    ) {
-        userService.resetPassword(authenticatedUser, userId, request.newPassword());
         return ResponseEntity.noContent().build();
     }
 

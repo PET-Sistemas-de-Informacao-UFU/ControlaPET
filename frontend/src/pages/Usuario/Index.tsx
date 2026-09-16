@@ -2,7 +2,7 @@ import { useContext, useState, type FormEvent } from "react";
 import { isAxiosError } from "axios";
 import { Navigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
-import { useChangeUserRole, useChangeUserStatus, useCreateUser, useResetUserPassword, useUpdateUser, useUsers } from "../../hooks/useUser";
+import { useChangeUserRole, useChangeUserStatus, useCreateUser, useUpdateUser, useUsers } from "../../hooks/useUser";
 import type { CreateUserRequest, User, UserRole } from "../../interfaces/User";
 import Modal from "../../components/ui/Modal";
 import FormSelect from "../../components/ui/FormSelect";
@@ -32,7 +32,6 @@ export default function Usuarios() {
     const changeUserRole = useChangeUserRole();
     const changeUserStatus = useChangeUserStatus();
     const updateUser = useUpdateUser();
-    const resetUserPassword = useResetUserPassword();
     const [modalOpen, setModalOpen] = useState(false);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -42,7 +41,6 @@ export default function Usuarios() {
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [editingName, setEditingName] = useState("");
     const [editingEmail, setEditingEmail] = useState("");
-    const [editingPassword, setEditingPassword] = useState("");
     const [editingRole, setEditingRole] = useState<UserRole>("MEMBER");
     const [editError, setEditError] = useState<string | null>(null);
 
@@ -77,7 +75,6 @@ export default function Usuarios() {
         setEditingUser(user);
         setEditingName(user.nome);
         setEditingEmail(user.email);
-        setEditingPassword("");
         setEditingRole(user.role);
         setEditError(null);
     }
@@ -85,11 +82,6 @@ export default function Usuarios() {
     async function submitEdit(event: FormEvent) {
         event.preventDefault();
         if (!editingUser) return;
-
-        if (editingPassword && editingPassword.length < 6) {
-            setEditError("A nova senha deve ter no mínimo 6 caracteres.");
-            return;
-        }
 
         setEditError(null);
         try {
@@ -99,9 +91,6 @@ export default function Usuarios() {
             });
             if (editingRole !== editingUser.role) {
                 await changeUserRole.mutateAsync({ userId: editingUser.id, role: editingRole });
-            }
-            if (editingPassword) {
-                await resetUserPassword.mutateAsync({ userId: editingUser.id, newPassword: editingPassword });
             }
             setEditingUser(null);
         } catch (requestError) {
@@ -177,20 +166,19 @@ export default function Usuarios() {
                 subtitle={editingUser ? `${editingUser.active ? "Conta ativa" : "Conta inativa"} · ${editingUser.email}` : undefined}
                 sheetClassName="modal-sheet-compact"
                 closeLabel="Fechar"
-                onClose={() => !updateUser.isPending && !resetUserPassword.isPending && !changeUserRole.isPending && !changeUserStatus.isPending && setEditingUser(null)}
+                onClose={() => !updateUser.isPending && !changeUserRole.isPending && !changeUserStatus.isPending && setEditingUser(null)}
                 actions={
                     <div className="modal-actions-inline">
-                        <button type="button" className={editingUser?.active ? "modal-btn danger" : "modal-btn"} onClick={changeEditingUserStatus} disabled={changeUserStatus.isPending || updateUser.isPending || resetUserPassword.isPending || changeUserRole.isPending}>
+                        <button type="button" className={editingUser?.active ? "modal-btn danger" : "modal-btn"} onClick={changeEditingUserStatus} disabled={changeUserStatus.isPending || updateUser.isPending || changeUserRole.isPending}>
                             {changeUserStatus.isPending ? "Salvando..." : editingUser?.active ? "Desativar" : "Reativar"}
                         </button>
-                        <button type="submit" form="edit-user-form" className="modal-btn primary" disabled={updateUser.isPending || resetUserPassword.isPending || changeUserRole.isPending || changeUserStatus.isPending}>{updateUser.isPending || resetUserPassword.isPending || changeUserRole.isPending ? "Salvando..." : "Confirmar"}</button>
+                        <button type="submit" form="edit-user-form" className="modal-btn primary" disabled={updateUser.isPending || changeUserRole.isPending || changeUserStatus.isPending}>{updateUser.isPending || changeUserRole.isPending ? "Salvando..." : "Confirmar"}</button>
                     </div>
                 }
             >
                 <form id="edit-user-form" className="password-form" onSubmit={submitEdit}>
                     <div className="form-group"><label htmlFor="edit-user-name">Nome</label><input id="edit-user-name" value={editingName} onChange={(event) => setEditingName(event.target.value)} autoComplete="name" maxLength={100} required /></div>
                     <div className="form-group"><label htmlFor="edit-user-email">E-mail</label><input id="edit-user-email" type="email" value={editingEmail} onChange={(event) => setEditingEmail(event.target.value)} autoComplete="email" required /></div>
-                    <div className="form-group"><label htmlFor="edit-user-password">Nova senha <span className="optional-label">(opcional)</span></label><input id="edit-user-password" type="password" value={editingPassword} onChange={(event) => setEditingPassword(event.target.value)} autoComplete="new-password" minLength={6} /></div>
                     <div className="form-group"><label htmlFor="edit-user-role">Perfil</label><FormSelect id="edit-user-role" value={editingRole} placeholder="Selecione o perfil" options={ROLES} onChange={(value) => setEditingRole(value as UserRole)} /></div>
                     {editError && <p className="password-form-error">{editError}</p>}
                 </form>

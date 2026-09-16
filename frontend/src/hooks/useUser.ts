@@ -23,10 +23,6 @@ async function updateUser(userId: string, data: Pick<CreateUserRequest, "name" |
     await api.patch(`/users/${userId}`, data);
 }
 
-async function resetUserPassword(userId: string, newPassword: string): Promise<void> {
-    await api.patch(`/users/${userId}/password`, { newPassword });
-}
-
 export function useUsers(enabled: boolean) {
     return useQuery({ queryKey: ["users"], queryFn: fetchUsers, enabled });
 }
@@ -64,11 +60,5 @@ export function useUpdateUser() {
     return useMutation({
         mutationFn: ({ userId, data }: { userId: string; data: Pick<CreateUserRequest, "name" | "email"> }) => updateUser(userId, data),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] })
-    });
-}
-
-export function useResetUserPassword() {
-    return useMutation({
-        mutationFn: ({ userId, newPassword }: { userId: string; newPassword: string }) => resetUserPassword(userId, newPassword)
     });
 }
