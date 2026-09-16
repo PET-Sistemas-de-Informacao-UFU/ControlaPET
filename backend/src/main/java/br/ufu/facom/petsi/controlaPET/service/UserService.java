@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +46,8 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setPasswordChangedAt(LocalDateTime.now());
+        incrementSessionVersion(user);
         userRepository.save(user);
     }
 
@@ -99,6 +102,12 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangedAt(LocalDateTime.now());
+        incrementSessionVersion(user);
         userRepository.save(user);
+    }
+
+    private void incrementSessionVersion(User user) {
+        user.setSessionVersion(user.getSessionVersion() == null ? 1L : user.getSessionVersion() + 1);
     }
 }
