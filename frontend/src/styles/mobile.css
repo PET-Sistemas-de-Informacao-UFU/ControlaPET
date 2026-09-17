@@ -38,6 +38,7 @@
     width:100%;
     text-align:left;
   }
+  .login-form .form-group:first-child{ margin-bottom:8px; }
   .login-error{
     color: var(--red);
     font-size: 13px;
@@ -65,7 +66,7 @@
   .forgot-password-link{
     display:block;
     width:max-content;
-    margin:-4px 0 18px auto;
+    margin:16px auto -10px;
     border:0;
     background:transparent;
     color:var(--accent);
@@ -156,14 +157,16 @@
   }
   .account-control.header .account-menu button{
     display:block;
-    width:auto;
+    width:100%;
     padding:10px 8px;
     border:0;
     border-radius:7px;
     background:transparent;
     color:var(--text);
-    font:inherit;
-    font-size:16px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size:14px;
+    font-weight:600;
+    line-height:1.35;
     text-align:left;
     white-space:nowrap;
   }
@@ -246,6 +249,20 @@
   }
   .users-description{ color:var(--text-dim); font-size:13px; line-height:1.4; }
   .users-count{ margin-top:5px; color:var(--text); font-size:12px; font-weight:600; }
+  .header-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    border:0;
+    border-radius:10px;
+    background:var(--accent);
+    color:#fff;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+  }
   .users-toolbar .header-btn{ flex-shrink:0; padding:10px 12px; font-size:13px; }
   .users-list{ display:grid; gap:10px; }
   .user-card{
