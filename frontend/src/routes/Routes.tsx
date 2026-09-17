@@ -10,6 +10,7 @@ import EsqueciSenha from "../pages/EsqueciSenha/Index";
 import RedefinirSenha from "../pages/RedefinirSenha/Index";
 import { PrivateRoute } from "./PrivateRoute";
 import { PublicRoute } from "./PublicRoute";
+import { AdminRoute } from "./AdminRoute";
 
 export const routes = createBrowserRouter(
     createRoutesFromElements(
@@ -25,8 +26,10 @@ export const routes = createBrowserRouter(
                     <Route index path="/" element={<HomeRoute />} />
                     <Route path="/catalogo" element={<Catalogo />} />
                     <Route path="/movimentacoes" element={<Movimentacoes />} />
-                    <Route path="/auditoria" element={<Auditoria />} />
-                    <Route path="/usuarios" element={<Usuarios />} />
+                    <Route element={<AdminRoute />}>
+                        <Route path="/auditoria" element={<Auditoria />} />
+                        <Route path="/usuarios" element={<Usuarios />} />
+                    </Route>
                     <Route path="*" element={<Navigate to="/" replace />} />
                 </Route>
             </Route>

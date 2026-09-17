@@ -5,9 +5,10 @@ interface ItemCardProps {
     item: Item
     onOpen: () => void
     onEdit: () => void
+    canManageItems: boolean
 }
 
-export default function ItemCard({ item, onOpen, onEdit }: ItemCardProps) {
+export default function ItemCard({ item, onOpen, onEdit, canManageItems }: ItemCardProps) {
     const typeInitial = item.type.charAt(0);
     const unitLabel = item.totalQuantity === 1 ? "unidade" : "unidades";
 
@@ -22,15 +23,17 @@ export default function ItemCard({ item, onOpen, onEdit }: ItemCardProps) {
                 </div>
             </div>
 
-            <div
-                className="item-edit-btn"
-                onClick={(event) => {
-                    event.stopPropagation();
-                    onEdit();
-                }}
-            >
-                <EditIcon />
-            </div>
+            {canManageItems && (
+                <div
+                    className="item-edit-btn"
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        onEdit();
+                    }}
+                >
+                    <EditIcon />
+                </div>
+            )}
 
             <div className="item-arrow" onClick={onOpen}>
                 <ChevronIcon />

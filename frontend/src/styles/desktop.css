@@ -201,7 +201,6 @@
     gap:clamp(12px, 1vw, 16px);
   }
   .item-card{ margin-bottom: 0; }
-  .fab-add{ display:none; }
 
   .item-form-details{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
   .item-form-details .form-group:first-child{ grid-column:auto; }

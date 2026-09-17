@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
@@ -14,8 +14,11 @@ import { useConsumeItem } from "../../hooks/useMovement";
 import { isAxiosError } from "axios";
 import CatalogToolbar from "./CatalogToolbar";
 import ItemList from "./ItemList";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Catalogo() {
+    const { user } = useContext(AuthContext);
+    const canManageItems = user?.role === "ADMIN";
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const { data, isLoading, isError } = useItemData(debouncedSearch);
@@ -47,18 +50,21 @@ export default function Catalogo() {
     }, [search]);
 
     function openAddModal() {
+        if (!canManageItems) return;
         setEditingItemId(null);
         setFormKey((current) => current + 1);
         setFormOpen(true);
     }
 
     function openEditModal(itemId: number) {
+        if (!canManageItems) return;
         setEditingItemId(itemId);
         setFormKey((current) => current + 1);
         setFormOpen(true);
     }
 
     function handleSave(data: CreateItemRequest) {
+        if (!canManageItems) return;
         if (editingItemId === null) {
             addItemMutation.mutate(data, {
                 onSuccess: () => setFormOpen(false)
@@ -72,7 +78,7 @@ export default function Catalogo() {
     }
 
     function handleDelete() {
-        if (editingItemId === null) return;
+        if (!canManageItems || editingItemId === null) return;
 
         deleteItemMutation.mutate(editingItemId, {
             onSuccess: () => setFormOpen(false)
@@ -142,6 +148,7 @@ export default function Catalogo() {
         <>
             <CatalogToolbar
                 isDesktop={isDesktop}
+                canManageItems={canManageItems}
                 search={search}
                 onAdd={openAddModal}
                 onSearchChange={setSearch}
@@ -155,13 +162,12 @@ export default function Catalogo() {
                         items={items}
                         onOpen={setDetailsItemId}
                         onEdit={openEditModal}
+                        canManageItems={canManageItems}
                     />
                 ) : (
                     <p className="catalog-empty">Nenhum item encontrado.</p>
                 )
             )}
-
-            <div className="fab-add" onClick={openAddModal} title="Adicionar item">+</div>
 
             <ItemDetailsModal
                 item={selectedItem}
