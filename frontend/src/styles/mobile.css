@@ -62,6 +62,20 @@
   }
   .login-submit:hover{ opacity:0.92; }
   .login-submit:disabled{ opacity:0.6; cursor:not-allowed; }
+  .forgot-password-link{
+    display:block;
+    width:max-content;
+    margin:-4px 0 18px auto;
+    border:0;
+    background:transparent;
+    color:var(--accent);
+    font:inherit;
+    font-size:12.5px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .password-recovery-link{ margin:18px auto 0; }
 
   .password-form{ margin-top:20px; }
   .password-form-error{ color:var(--red); font-size:13px; line-height:1.4; margin:-4px 0 14px; }
@@ -104,7 +118,56 @@
     -webkit-tap-highlight-color:transparent;
     transition:none;
   }
-  .header-spacer{ width:34px; height:34px; }
+  .account-control.header{ position:relative; }
+  .header-user{
+    width:34px;
+    height:34px;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:var(--accent-soft);
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .header-user .side-nav-user-avatar{
+    width:28px;
+    height:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    color:var(--accent);
+    font-size:11px;
+    font-weight:700;
+  }
+  .account-control.header .account-menu{
+    position:absolute;
+    top:calc(100% + 10px);
+    right:0;
+    width:max-content;
+    padding:4px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    box-shadow:0 10px 24px rgba(0,0,0,.32);
+    z-index:20;
+  }
+  .account-control.header .account-menu button{
+    display:block;
+    width:auto;
+    padding:10px 8px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--text);
+    font:inherit;
+    font-size:16px;
+    text-align:left;
+    white-space:nowrap;
+  }
+  .account-control.header .account-menu .account-menu-logout{ color:var(--red); }
 
   /* Main content */
   .content{
@@ -145,6 +208,68 @@
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 6 12 12M18 6 6 18'/%3E%3C/svg%3E") center / 16px no-repeat;
   }
   .catalog-empty{ color:var(--text-dim); font-size:14px; text-align:center; padding:32px 16px; }
+
+  /* ---- USUÁRIOS ---- */
+  .users-toolbar{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:18px;
+  }
+  .users-description{ color:var(--text-dim); font-size:13px; line-height:1.4; }
+  .users-count{ margin-top:5px; color:var(--text); font-size:12px; font-weight:600; }
+  .users-toolbar .header-btn{ flex-shrink:0; padding:10px 12px; font-size:13px; }
+  .users-list{ display:grid; gap:10px; }
+  .user-card{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:13px;
+    border:1px solid var(--border);
+    border-radius:13px;
+    background:var(--surface);
+  }
+  .user-card-avatar{
+    width:38px;
+    height:38px;
+    display:flex;
+    flex-shrink:0;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:var(--accent-soft);
+    color:var(--accent);
+    font-size:13px;
+    font-weight:700;
+  }
+  .user-card-info{ min-width:0; flex:1; display:flex; flex-direction:column; gap:3px; }
+  .user-card-info strong{ overflow:hidden; font-size:14px; text-overflow:ellipsis; white-space:nowrap; }
+  .user-card-info span{ overflow:hidden; color:var(--text-dim); font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+  .user-role{
+    flex-shrink:0;
+    padding:5px 8px;
+    border-radius:999px;
+    background:var(--surface-2);
+    color:var(--text-dim);
+    font-size:11px;
+    font-weight:700;
+  }
+  .user-role.admin{ background:var(--accent-soft); color:var(--accent); }
+  .user-card.inactive{ opacity:.65; }
+  .user-edit-button{
+    flex-shrink:0;
+    padding:7px 9px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--surface-2);
+    color:var(--text);
+    font:inherit;
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .users-feedback{ padding:30px 0; color:var(--text-dim); font-size:14px; text-align:center; }
 
   /* ---- CATALOGO VIEW ---- */
   .item-card{
@@ -223,6 +348,8 @@
     outline: none;
     border-color: var(--accent);
   }
+  .account-form .form-group label{ font-size:14px; }
+  .account-form .form-group input{ font-size:18px; }
   .date-range-picker{ position:relative; }
   .date-range-trigger{
     width:100%;

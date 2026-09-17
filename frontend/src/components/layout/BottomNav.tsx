@@ -1,9 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuditIcon, CatalogIcon, LoanIcon } from "../ui/Icons";
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
+import { AuditIcon, CatalogIcon, LoanIcon, UsersIcon } from "../ui/Icons";
 
 export default function BottomNav() {
     const navigate = useNavigate();
     const { pathname } = useLocation();
+    const { user } = useContext(AuthContext);
 
     return (
         <div className="bottom-nav">
@@ -30,6 +33,16 @@ export default function BottomNav() {
                 <AuditIcon />
                 <span>Auditoria</span>
             </div>
+
+            {user?.role === "ADMIN" && (
+                <div
+                    className={pathname === "/usuarios" ? "nav-item active" : "nav-item"}
+                    onClick={() => navigate("/usuarios")}
+                >
+                    <UsersIcon />
+                    <span>Usuários</span>
+                </div>
+            )}
         </div>
     );
 }

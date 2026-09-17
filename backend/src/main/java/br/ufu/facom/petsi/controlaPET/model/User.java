@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -41,6 +42,10 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private boolean active;
+
+    private LocalDateTime passwordChangedAt;
+
+    private Long sessionVersion;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

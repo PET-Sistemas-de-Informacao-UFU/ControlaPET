@@ -46,6 +46,10 @@ export default function Login() {
                         />
                     </div>
 
+                    <button type="button" className="forgot-password-link" onClick={() => navigate("/esqueci-senha")}>
+                        Esqueci minha senha
+                    </button>
+
                     <div className="form-group">
                         <label htmlFor="login-password">Senha</label>
                         <input
