@@ -704,9 +704,14 @@
   .log-body .log-time{ font-size: 12.5px; color: var(--text-dim); margin-bottom: 4px; }
   .log-body .log-text{ font-size: 14.5px; line-height: 1.45; }
   .log-body .log-text b{ font-weight: 700; }
-  .audit-load-more{ display:flex; justify-content:center; padding:4px 0 20px; }
+  .audit-load-more,
+  .catalog-load-more,
+  .movement-load-more{ display:flex; justify-content:center; padding:4px 0 20px; }
+  .catalog-load-more{ padding-top:22px; padding-bottom:8px; }
   @media (max-width:1023px){
-    .audit-load-more .header-btn{
+    .audit-load-more .header-btn,
+    .catalog-load-more .header-btn,
+    .movement-load-more .header-btn{
       width:100%;
       display:flex;
       align-items:center;
@@ -721,7 +726,9 @@
       font-weight:600;
       cursor:pointer;
     }
-    .audit-load-more .header-btn:disabled{ cursor:not-allowed; opacity:.65; }
+    .audit-load-more .header-btn:disabled,
+    .catalog-load-more .header-btn:disabled,
+    .movement-load-more .header-btn:disabled{ cursor:not-allowed; opacity:.65; }
   }
 
   /* ---- EMPRESTIMOS VIEW ---- */

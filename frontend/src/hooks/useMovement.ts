@@ -1,7 +1,8 @@
 import type { ConsumeItem, CreateMovementRequest, Movement } from "../interfaces/Movement";
 import type { Page } from "../interfaces/Page";
 import { api } from "../service/api";
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import type { UserMovementHistory } from "../interfaces/Movement";
 
 const fetchData = async(): Promise<Page<Movement>> => {
     const response = await api.get<Page<Movement>>("/movements");
@@ -25,6 +26,22 @@ export function useUserMovements(){
         queryFn: fetchUserMovements,
         queryKey: ['user-movements-data']
     })
+}
+
+const fetchUserMovementHistory = async(page: number): Promise<Page<UserMovementHistory>> => {
+    const response = await api.get<Page<UserMovementHistory>>("/movements/me/history", { params: { page, size: 20 } });
+    return response.data;
+}
+
+export function useUserMovementHistory() {
+    return useInfiniteQuery({
+        queryKey: ['user-movement-history'],
+        initialPageParam: 0,
+        queryFn: ({ pageParam }) => fetchUserMovementHistory(pageParam),
+        getNextPageParam: (lastPage) => (
+            lastPage.number + 1 < lastPage.totalPages ? lastPage.number + 1 : undefined
+        )
+    });
 }
 
 const fetchItemMovement = async(itemId: number): Promise<Page<Movement>> => {
@@ -53,6 +70,7 @@ export function useAddMovement(){
         onSuccess() {
             queryClient.invalidateQueries({queryKey: ['movements-data']});
             queryClient.invalidateQueries({queryKey: ['user-movements-data']});
+            queryClient.invalidateQueries({queryKey: ['user-movement-history']});
             queryClient.invalidateQueries({queryKey: ['items-data']});
         }
     })
@@ -72,6 +90,7 @@ export function useConsumeItem(){
         onSuccess() {
             queryClient.invalidateQueries({queryKey: ['movements-data']});
             queryClient.invalidateQueries({queryKey: ['user-movements-data']});
+            queryClient.invalidateQueries({queryKey: ['user-movement-history']});
         }
     })
 }

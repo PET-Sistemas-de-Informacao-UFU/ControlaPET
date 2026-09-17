@@ -4,14 +4,9 @@ import { ChevronIcon } from "../../components/ui/Icons";
 import Modal from "../../components/ui/Modal";
 import Toast from "../../components/ui/Toast";
 import { useReturnLoan, useUserLoans } from "../../hooks/useLoan";
-import { useUserMovements } from "../../hooks/useMovement";
+import { useUserMovementHistory } from "../../hooks/useMovement";
 import { useToast } from "../../hooks/useToast";
 import type { Loan } from "../../interfaces/Loan";
-import type { Movement } from "../../interfaces/Movement";
-
-type FeedItem =
-    | { kind: "loan"; loan: Loan; date: string | null }
-    | { kind: "movement"; movement: Movement; date: string };
 
 function formatDate(date?: string | null) {
     if (!date) return "—";
@@ -34,7 +29,14 @@ function getLoanStatus(status: Loan["status"]) {
 
 export default function Movimentacoes() {
     const { data: loansPage, isLoading: isLoadingLoans, isError: hasLoanError } = useUserLoans();
-    const { data: movementsPage, isLoading: isLoadingMovements, isError: hasMovementError } = useUserMovements();
+    const {
+        data: historyData,
+        isLoading: isLoadingHistory,
+        isError: hasHistoryError,
+        hasNextPage,
+        isFetchingNextPage,
+        fetchNextPage
+    } = useUserMovementHistory();
     const returnLoan = useReturnLoan();
     const { message, showToast } = useToast();
 
@@ -42,7 +44,7 @@ export default function Movimentacoes() {
     const [defectModalOpen, setDefectModalOpen] = useState(false);
 
     const loans = loansPage?.content ?? [];
-    const consumos = (movementsPage?.content ?? []).filter((movement) => movement.type === "OUTBOUND_CONSUMPTION");
+    const historico = historyData?.pages.flatMap((page) => page.content) ?? [];
     const activeLoans = loans
         .filter((loan) => loan.status === "ACTIVE" || loan.status === "OVERDUE")
         .sort((first, second) => {
@@ -53,15 +55,8 @@ export default function Movimentacoes() {
         });
     const overdueLoans = activeLoans.filter((loan) => loan.status === "OVERDUE");
     const completedLoans = loans.filter((loan) => loan.status === "COMPLETED");
-    const isLoading = isLoadingLoans || isLoadingMovements;
-    const hasError = hasLoanError || hasMovementError;
-
-    const historico: FeedItem[] = [
-        ...loans
-            .filter((loan) => loan.status === "COMPLETED")
-            .map((loan) => ({ kind: "loan" as const, loan, date: loan.actualReturnDate })),
-        ...consumos.map((movement) => ({ kind: "movement" as const, movement, date: movement.movementDate }))
-    ].sort((first, second) => (second.date ?? "").localeCompare(first.date ?? ""));
+    const isLoading = isLoadingLoans || isLoadingHistory;
+    const hasError = hasLoanError || hasHistoryError;
 
     function openLoanModal(loan: Loan) {
         setSelectedLoan(loan);
@@ -154,30 +149,38 @@ export default function Movimentacoes() {
                     {!isLoading && !hasError && (
                         <div className="loan-history-list">
                             {historico.length ? historico.map((entry) => {
-                                if (entry.kind === "loan") {
+                                if (entry.type === "LOAN_RETURNED") {
                                     return (
-                                        <div className="loan-history-item" key={`loan-${entry.loan.id}`}>
+                                        <div className="loan-history-item" key={`${entry.type}-${entry.sourceId}-${entry.eventDate}`}>
                                             <div className="loan-history-icon completed">↵</div>
                                             <div>
-                                                <span>Devolvido em {formatDate(entry.loan.actualReturnDate)}</span>
-                                                <strong>{entry.loan.itemName}</strong>
-                                                <small>{entry.loan.quantity} {entry.loan.quantity === 1 ? "unidade" : "unidades"}</small>
+                                                <span>Devolvido em {formatDate(entry.eventDate)}</span>
+                                                <strong>{entry.itemName}</strong>
+                                                <small>{entry.quantity} {entry.quantity === 1 ? "unidade" : "unidades"}</small>
                                             </div>
                                         </div>
                                     );
                                 }
 
                                 return (
-                                    <div className="loan-history-item" key={`movement-${entry.movement.id}`}>
+                                    <div className="loan-history-item" key={`${entry.type}-${entry.sourceId}-${entry.eventDate}`}>
                                         <div className="loan-history-icon consumption">−</div>
                                         <div>
-                                            <span>Consumo em {formatDate(entry.movement.movementDate)}</span>
-                                            <strong>{entry.movement.itemName}</strong>
-                                            <small>{entry.movement.quantity} {entry.movement.quantity === 1 ? "unidade utilizada" : "unidades utilizadas"}{entry.movement.notes ? ` · ${entry.movement.notes}` : ""}</small>
+                                            <span>Consumo em {formatDate(entry.eventDate)}</span>
+                                            <strong>{entry.itemName}</strong>
+                                            <small>{entry.quantity} {entry.quantity === 1 ? "unidade utilizada" : "unidades utilizadas"}{entry.notes ? ` · ${entry.notes}` : ""}</small>
                                         </div>
                                     </div>
                                 );
                             }) : <div className="loan-empty-state">Nenhum registro no histórico.</div>}
+                        </div>
+                    )}
+
+                    {!isLoading && !hasError && hasNextPage && (
+                        <div className="movement-load-more">
+                            <button type="button" className="header-btn ghost" disabled={isFetchingNextPage} onClick={() => fetchNextPage()}>
+                                {isFetchingNextPage ? "Carregando..." : "Carregar mais"}
+                            </button>
                         </div>
                     )}
             </div>
