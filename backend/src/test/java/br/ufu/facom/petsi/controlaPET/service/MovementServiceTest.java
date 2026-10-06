@@ -1,11 +1,13 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.ConsumeItemRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.CreateMovementRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.Item;
 import br.ufu.facom.petsi.controlaPET.model.Movement;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.model.enums.ItemCondition;
 import br.ufu.facom.petsi.controlaPET.model.enums.ItemType;
+import br.ufu.facom.petsi.controlaPET.model.enums.MovementType;
 import br.ufu.facom.petsi.controlaPET.model.enums.UserRole;
 import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import br.ufu.facom.petsi.controlaPET.repository.LoanRepository;
@@ -82,6 +84,53 @@ class MovementServiceTest {
                 () -> movementService.createConsumeMovement(user(), new ConsumeItemRequestDTO(10L, 1)));
 
         assertEquals("Sem estoque o suficiente ou tipo não consumível", exception.getMessage());
+        verify(itemRepository, never()).save(any(Item.class));
+        verify(movementRepository, never()).save(any(Movement.class));
+    }
+
+    @Test
+    void addsStockOnInboundMovement() {
+        Item item = item(ItemType.CONSUMABLE, 5, 3);
+        when(itemRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(item));
+        when(movementRepository.save(any(Movement.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        movementService.createMovement(user(), new CreateMovementRequestDTO(
+                10L, 2, "Reposição", MovementType.INBOUND
+        ));
+
+        assertEquals(7, item.getTotalQuantity());
+        assertEquals(5, item.getStockQuantity());
+        verify(itemRepository).save(item);
+    }
+
+    @Test
+    void adjustmentDecreasesStockAndTotalQuantity() {
+        Item item = item(ItemType.CONSUMABLE, 5, 5);
+        when(itemRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(item));
+        when(movementRepository.save(any(Movement.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        movementService.createMovement(user(), new CreateMovementRequestDTO(
+                10L, 2, "Item avariado", MovementType.ADJUSTMENT
+        ));
+
+        assertEquals(3, item.getTotalQuantity());
+        assertEquals(3, item.getStockQuantity());
+        verify(itemRepository).save(item);
+    }
+
+    @Test
+    void rejectsAdjustmentWhenStockIsInsufficient() {
+        Item item = item(ItemType.CONSUMABLE, 1, 1);
+        when(itemRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(item));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> movementService.createMovement(user(), new CreateMovementRequestDTO(
+                        10L, 2, "Ajuste", MovementType.ADJUSTMENT
+                )));
+
+        assertEquals("Sem estoque o suficiente", exception.getMessage());
+        assertEquals(1, item.getTotalQuantity());
+        assertEquals(1, item.getStockQuantity());
         verify(itemRepository, never()).save(any(Item.class));
         verify(movementRepository, never()).save(any(Movement.class));
     }
