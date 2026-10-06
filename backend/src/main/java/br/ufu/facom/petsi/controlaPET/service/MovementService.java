@@ -35,7 +35,7 @@ public class MovementService {
 
     @Transactional
     public MovementResponseDTO createConsumeMovement(User user, ConsumeItemRequestDTO request) {
-        Item item = itemRepository.findById(request.itemId())
+        Item item = itemRepository.findByIdForUpdate(request.itemId())
                 .orElseThrow(() -> new IllegalArgumentException(("Item não encontrado")));
 
         if(item.getStockQuantity()- request.quantity()<0 || !item.getType().equals(ItemType.CONSUMABLE)){
@@ -70,7 +70,7 @@ public class MovementService {
 
     @Transactional
     public MovementResponseDTO createMovement(User user, CreateMovementRequestDTO request) {
-        Item item = itemRepository.findById(request.itemId())
+        Item item = itemRepository.findByIdForUpdate(request.itemId())
                 .orElseThrow(() -> new IllegalArgumentException(("Item não encontrado")));
 
 

@@ -86,7 +86,7 @@ public class ItemService {
 
     @Transactional
     public ItemResponseDTO updateItem(Long id, UpdateItemRequestDTO request) {
-        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        Item item = itemRepository.findByIdForUpdate(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
 
         if (request.name() != null) {
             item.setName(request.name());
