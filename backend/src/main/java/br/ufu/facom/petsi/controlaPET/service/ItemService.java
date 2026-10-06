@@ -25,7 +25,7 @@ public class ItemService {
                 .type(request.type())
                 .condition(request.condition())
                 .totalQuantity(request.totalQuantity())
-                .stockQuantity(request.stockQuantity())
+                .stockQuantity(request.totalQuantity())
                 .build();
 
         Item newItem = itemRepository.save(item);
@@ -48,7 +48,7 @@ public class ItemService {
         Page<Item> itemPage;
 
         if(name!=null && !name.trim().isEmpty())
-            itemPage = itemRepository.findByNameContainingIgnoreCase(name, pageable);
+            itemPage = itemRepository.findByNameContainingIgnoringAccents(name, pageable);
         else
             itemPage = itemRepository.findAll(pageable);
 
@@ -86,7 +86,7 @@ public class ItemService {
 
     @Transactional
     public ItemResponseDTO updateItem(Long id, UpdateItemRequestDTO request) {
-        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        Item item = itemRepository.findByIdForUpdate(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
 
         if (request.name() != null) {
             item.setName(request.name());

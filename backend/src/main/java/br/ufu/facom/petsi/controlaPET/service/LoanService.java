@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.security.access.AccessDeniedException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -29,7 +30,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponseDTO createLoan(User user, CreateLoanRequestDTO request) {
-        Item item = itemRepository.findById(request.itemId())
+        Item item = itemRepository.findByIdForUpdate(request.itemId())
                 .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
 
         if(item.getStockQuantity()==0 || !item.getType().equals(ItemType.BORROWABLE))
@@ -45,7 +46,7 @@ public class LoanService {
                 .user(user)
                 .item(item)
                 .quantity(request.quantity())
-                .checkoutDate(LocalDate.now())
+                .checkoutDate(LocalDateTime.now())
                 .expectedReturnDate(request.expectedReturnDate())
                 .status(LoanStatus.ACTIVE)
                 .build();
@@ -99,7 +100,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponseDTO returnLoan(User user, Long id) {
-        Loan loan = loanRepository.findById(id)
+        Loan loan = loanRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new IllegalArgumentException("Loan não encontrado"));
 
         if(loan.getStatus().equals(LoanStatus.COMPLETED))
@@ -108,12 +109,14 @@ public class LoanService {
         if(!user.getId().equals(loan.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN))
             throw new AccessDeniedException("Loan não pertence ao usuário");
 
-        loan.setActualReturnDate(LocalDate.now());
+        loan.setActualReturnDate(LocalDateTime.now());
         loan.setStatus(LoanStatus.COMPLETED);
 
-        loan.getItem().setStockQuantity(loan.getItem().getStockQuantity()+loan.getQuantity());
+        Item item = itemRepository.findByIdForUpdate(loan.getItem().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        item.setStockQuantity(item.getStockQuantity() + loan.getQuantity());
 
-        itemRepository.save(loan.getItem());
+        itemRepository.save(item);
         Loan newLoan = loanRepository.save(loan);
 
         return new LoanResponseDTO(

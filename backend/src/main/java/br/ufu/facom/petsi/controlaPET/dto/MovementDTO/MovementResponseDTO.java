@@ -4,7 +4,7 @@ import br.ufu.facom.petsi.controlaPET.model.Item;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.model.enums.MovementType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public record MovementResponseDTO(
         Long id,
@@ -14,6 +14,6 @@ public record MovementResponseDTO(
         MovementType type,
         String notes,
         int quantity,
-        LocalDate movementDate
+        LocalDateTime movementDate
 ) {
 }
