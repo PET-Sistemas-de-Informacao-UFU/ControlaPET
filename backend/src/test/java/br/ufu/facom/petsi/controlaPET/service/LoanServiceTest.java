@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -24,7 +25,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -113,6 +113,51 @@ class LoanServiceTest {
         verify(loanRepository).save(loan);
     }
 
+    @Test
+    void rejectsReturnByAnotherMember() {
+        Item item = item(10L, ItemType.BORROWABLE, 1, 0);
+        Loan loan = activeLoan(item, user());
+        when(loanRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(loan));
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+                () -> loanService.returnLoan(user(), 20L));
+
+        assertEquals("Loan não pertence ao usuário", exception.getMessage());
+        assertEquals(LoanStatus.ACTIVE, loan.getStatus());
+        assertEquals(0, item.getStockQuantity());
+        verify(itemRepository, never()).findByIdForUpdate(any());
+        verify(loanRepository, never()).save(any(Loan.class));
+    }
+
+    @Test
+    void allowsAdminToReturnLoanOwnedByAnotherUser() {
+        Item item = item(10L, ItemType.BORROWABLE, 1, 0);
+        Loan loan = activeLoan(item, user());
+        User admin = user(UserRole.ADMIN);
+        when(loanRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(loan));
+        when(itemRepository.findByIdForUpdate(10L)).thenReturn(Optional.of(item));
+        when(loanRepository.save(any(Loan.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        loanService.returnLoan(admin, 20L);
+
+        assertEquals(LoanStatus.COMPLETED, loan.getStatus());
+        assertEquals(1, item.getStockQuantity());
+        verify(itemRepository).save(item);
+        verify(loanRepository).save(loan);
+    }
+
+    private Loan activeLoan(Item item, User owner) {
+        return Loan.builder()
+                .id(20L)
+                .user(owner)
+                .item(item)
+                .quantity(1)
+                .checkoutDate(java.time.LocalDateTime.now().minusDays(1))
+                .expectedReturnDate(LocalDate.now())
+                .status(LoanStatus.ACTIVE)
+                .build();
+    }
+
     private Item item(Long id, ItemType type, int totalQuantity, int stockQuantity) {
         return Item.builder()
                 .id(id)
@@ -126,12 +171,16 @@ class LoanServiceTest {
     }
 
     private User user() {
+        return user(UserRole.MEMBER);
+    }
+
+    private User user(UserRole role) {
         return User.builder()
                 .id(UUID.randomUUID())
                 .name("Usuário de teste")
                 .email("usuario@teste.com")
                 .password("senha")
-                .role(UserRole.MEMBER)
+                .role(role)
                 .active(true)
                 .build();
     }
