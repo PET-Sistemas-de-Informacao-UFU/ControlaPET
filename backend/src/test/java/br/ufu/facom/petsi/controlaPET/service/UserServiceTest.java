@@ -1,6 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.UpdateUserRequestDTO;
+import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangePasswordRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.model.enums.UserRole;
 import br.ufu.facom.petsi.controlaPET.repository.UserRepository;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -87,6 +89,33 @@ class UserServiceTest {
                 ));
 
         assertEquals("E-mail já cadastrado", exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void changesPasswordAndInvalidatesPreviousSessions() {
+        User member = user(UserRole.MEMBER, "membro@teste.com");
+        member.setSessionVersion(4L);
+        when(passwordEncoder.matches("senha atual", "senha")).thenReturn(true);
+        when(passwordEncoder.encode("nova senha")).thenReturn("senha codificada");
+
+        userService.changePassword(member, new ChangePasswordRequestDTO("senha atual", "nova senha"));
+
+        assertEquals("senha codificada", member.getPassword());
+        assertEquals(5L, member.getSessionVersion());
+        assertNotNull(member.getPasswordChangedAt());
+        verify(userRepository).save(member);
+    }
+
+    @Test
+    void rejectsPasswordChangeWhenCurrentPasswordIsInvalid() {
+        User member = user(UserRole.MEMBER, "membro@teste.com");
+        when(passwordEncoder.matches("senha errada", "senha")).thenReturn(false);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> userService.changePassword(member, new ChangePasswordRequestDTO("senha errada", "nova senha")));
+
+        assertEquals("A senha atual está incorreta", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
 
