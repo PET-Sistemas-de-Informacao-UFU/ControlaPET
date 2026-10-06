@@ -3,6 +3,7 @@ package br.ufu.facom.petsi.controlaPET.controller;
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.ConsumeItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.CreateMovementRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.MovementResponseDTO;
+import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.UserMovementHistoryResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.User;
 import br.ufu.facom.petsi.controlaPET.service.MovementService;
 import jakarta.validation.Valid;
@@ -67,6 +68,14 @@ public class MovementController {
 
         Page<MovementResponseDTO> response = movementService.getAllUserMovements(user, pageable);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/history")
+    public ResponseEntity<Page<UserMovementHistoryResponseDTO>> getUserHistory(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return ResponseEntity.ok(movementService.getUserHistory(user, pageable));
     }
 
     @GetMapping("/item/{id}")

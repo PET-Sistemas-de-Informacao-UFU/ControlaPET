@@ -38,6 +38,7 @@
     width:100%;
     text-align:left;
   }
+  .login-form .form-group:first-child{ margin-bottom:8px; }
   .login-error{
     color: var(--red);
     font-size: 13px;
@@ -65,7 +66,7 @@
   .forgot-password-link{
     display:block;
     width:max-content;
-    margin:-4px 0 18px auto;
+    margin:16px auto -10px;
     border:0;
     background:transparent;
     color:var(--accent);
@@ -156,14 +157,16 @@
   }
   .account-control.header .account-menu button{
     display:block;
-    width:auto;
+    width:100%;
     padding:10px 8px;
     border:0;
     border-radius:7px;
     background:transparent;
     color:var(--text);
-    font:inherit;
-    font-size:16px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size:14px;
+    font-weight:600;
+    line-height:1.35;
     text-align:left;
     white-space:nowrap;
   }
@@ -207,6 +210,33 @@
     cursor:pointer;
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 6 12 12M18 6 6 18'/%3E%3C/svg%3E") center / 16px no-repeat;
   }
+  .catalog-toolbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .catalog-toolbar .search-bar{
+    flex:1;
+    min-width:0;
+    margin-bottom:0;
+  }
+  .catalog-add-btn{
+    width:48px;
+    height:48px;
+    flex-shrink:0;
+    border:0;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff;
+    font-family:inherit;
+    font-size:25px;
+    font-weight:400;
+    line-height:1;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(91,79,232,.5);
+  }
+  .catalog-add-btn:active{ transform:scale(.95); }
   .catalog-empty{ color:var(--text-dim); font-size:14px; text-align:center; padding:32px 16px; }
 
   /* ---- USUÁRIOS ---- */
@@ -219,6 +249,20 @@
   }
   .users-description{ color:var(--text-dim); font-size:13px; line-height:1.4; }
   .users-count{ margin-top:5px; color:var(--text); font-size:12px; font-weight:600; }
+  .header-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    border:0;
+    border-radius:10px;
+    background:var(--accent);
+    color:#fff;
+    font-family:inherit;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+  }
   .users-toolbar .header-btn{ flex-shrink:0; padding:10px 12px; font-size:13px; }
   .users-list{ display:grid; gap:10px; }
   .user-card{
@@ -550,28 +594,6 @@
   }
   .form-group textarea::-webkit-scrollbar-thumb:hover{ background:#666676; }
 
-  /* Botão flutuante de adicionar item */
-  .fab-add{
-    position: absolute;
-    bottom: 100px;
-    right: 20px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent);
-    color: #fff;
-    font-size: 26px;
-    font-weight: 400;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    box-shadow: 0 6px 18px rgba(91,79,232,0.5);
-    z-index: 15;
-    line-height: 1;
-  }
-  .fab-add:active{ transform: scale(0.95); }
-
   .section-label{
     font-size: 11.5px;
     text-transform: uppercase;
@@ -682,9 +704,14 @@
   .log-body .log-time{ font-size: 12.5px; color: var(--text-dim); margin-bottom: 4px; }
   .log-body .log-text{ font-size: 14.5px; line-height: 1.45; }
   .log-body .log-text b{ font-weight: 700; }
-  .audit-load-more{ display:flex; justify-content:center; padding:4px 0 20px; }
+  .audit-load-more,
+  .catalog-load-more,
+  .movement-load-more{ display:flex; justify-content:center; padding:4px 0 20px; }
+  .catalog-load-more{ padding-top:22px; padding-bottom:8px; }
   @media (max-width:1023px){
-    .audit-load-more .header-btn{
+    .audit-load-more .header-btn,
+    .catalog-load-more .header-btn,
+    .movement-load-more .header-btn{
       width:100%;
       display:flex;
       align-items:center;
@@ -699,7 +726,9 @@
       font-weight:600;
       cursor:pointer;
     }
-    .audit-load-more .header-btn:disabled{ cursor:not-allowed; opacity:.65; }
+    .audit-load-more .header-btn:disabled,
+    .catalog-load-more .header-btn:disabled,
+    .movement-load-more .header-btn:disabled{ cursor:not-allowed; opacity:.65; }
   }
 
   /* ---- EMPRESTIMOS VIEW ---- */

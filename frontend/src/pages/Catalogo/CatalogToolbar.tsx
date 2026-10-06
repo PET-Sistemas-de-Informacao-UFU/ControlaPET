@@ -2,12 +2,13 @@ import { SearchIcon } from "../../components/ui/Icons";
 
 interface CatalogToolbarProps {
     isDesktop: boolean
+    canManageItems: boolean
     search: string
     onAdd: () => void
     onSearchChange: (value: string) => void
 }
 
-export default function CatalogToolbar({ isDesktop, search, onAdd, onSearchChange }: CatalogToolbarProps) {
+export default function CatalogToolbar({ isDesktop, canManageItems, search, onAdd, onSearchChange }: CatalogToolbarProps) {
     return (
         <>
             <div className="catalog-toolbar">
@@ -22,9 +23,15 @@ export default function CatalogToolbar({ isDesktop, search, onAdd, onSearchChang
                     />
                 </label>
 
-                {isDesktop && (
+                {isDesktop && canManageItems && (
                     <button type="button" className="header-btn" onClick={onAdd}>
                         + Novo item
+                    </button>
+                )}
+
+                {!isDesktop && canManageItems && (
+                    <button type="button" className="catalog-add-btn" onClick={onAdd} aria-label="Adicionar item">
+                        +
                     </button>
                 )}
             </div>

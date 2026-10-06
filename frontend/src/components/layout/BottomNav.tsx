@@ -26,22 +26,24 @@ export default function BottomNav() {
                 <span>Movimentações</span>
             </div>
 
-            <div
-                className={pathname === "/auditoria" ? "nav-item active" : "nav-item"}
-                onClick={() => navigate("/auditoria")}
-            >
-                <AuditIcon />
-                <span>Auditoria</span>
-            </div>
-
             {user?.role === "ADMIN" && (
-                <div
-                    className={pathname === "/usuarios" ? "nav-item active" : "nav-item"}
-                    onClick={() => navigate("/usuarios")}
-                >
-                    <UsersIcon />
-                    <span>Usuários</span>
-                </div>
+                <>
+                    <div
+                        className={pathname === "/auditoria" ? "nav-item active" : "nav-item"}
+                        onClick={() => navigate("/auditoria")}
+                    >
+                        <AuditIcon />
+                        <span>Auditoria</span>
+                    </div>
+
+                    <div
+                        className={pathname === "/usuarios" ? "nav-item active" : "nav-item"}
+                        onClick={() => navigate("/usuarios")}
+                    >
+                        <UsersIcon />
+                        <span>Usuários</span>
+                    </div>
+                </>
             )}
         </div>
     );

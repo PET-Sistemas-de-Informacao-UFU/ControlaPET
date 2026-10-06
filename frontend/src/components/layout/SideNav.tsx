@@ -4,10 +4,9 @@ import { AuthContext } from "../../context/AuthContext";
 import { AuditIcon, CatalogIcon, LoanIcon, UsersIcon } from "../ui/Icons";
 import AccountMenu from "./AccountMenu";
 
-const DESTINATIONS = [
+const MEMBER_DESTINATIONS = [
     { path: "/catalogo", label: "Catálogo", Icon: CatalogIcon },
-    { path: "/movimentacoes", label: "Movimentações", Icon: LoanIcon },
-    { path: "/auditoria", label: "Auditoria", Icon: AuditIcon }
+    { path: "/movimentacoes", label: "Movimentações", Icon: LoanIcon }
 ];
 
 export default function SideNav() {
@@ -23,7 +22,10 @@ export default function SideNav() {
             </div>
 
             <div className="side-nav-items">
-                {[...DESTINATIONS, ...(user?.role === "ADMIN" ? [{ path: "/usuarios", label: "Usuários", Icon: UsersIcon }] : [])].map(({ path, label, Icon }) => (
+                {[...MEMBER_DESTINATIONS, ...(user?.role === "ADMIN" ? [
+                    { path: "/auditoria", label: "Auditoria", Icon: AuditIcon },
+                    { path: "/usuarios", label: "Usuários", Icon: UsersIcon }
+                ] : [])].map(({ path, label, Icon }) => (
                     <div key={path} className={pathname === path ? "side-nav-item active" : "side-nav-item"} onClick={() => navigate(path)}>
                         <Icon />
                         <span>{label}</span>

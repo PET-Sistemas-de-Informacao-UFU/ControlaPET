@@ -30,7 +30,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponseDTO createLoan(User user, CreateLoanRequestDTO request) {
-        Item item = itemRepository.findById(request.itemId())
+        Item item = itemRepository.findByIdForUpdate(request.itemId())
                 .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
 
         if(item.getStockQuantity()==0 || !item.getType().equals(ItemType.BORROWABLE))
@@ -100,7 +100,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponseDTO returnLoan(User user, Long id) {
-        Loan loan = loanRepository.findById(id)
+        Loan loan = loanRepository.findByIdForUpdate(id)
                 .orElseThrow(() -> new IllegalArgumentException("Loan não encontrado"));
 
         if(loan.getStatus().equals(LoanStatus.COMPLETED))
@@ -112,9 +112,11 @@ public class LoanService {
         loan.setActualReturnDate(LocalDateTime.now());
         loan.setStatus(LoanStatus.COMPLETED);
 
-        loan.getItem().setStockQuantity(loan.getItem().getStockQuantity()+loan.getQuantity());
+        Item item = itemRepository.findByIdForUpdate(loan.getItem().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        item.setStockQuantity(item.getStockQuantity() + loan.getQuantity());
 
-        itemRepository.save(loan.getItem());
+        itemRepository.save(item);
         Loan newLoan = loanRepository.save(loan);
 
         return new LoanResponseDTO(
