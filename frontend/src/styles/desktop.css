@@ -68,7 +68,7 @@
     cursor:pointer;
     transition:background .15s, border-color .15s;
   }
-  .side-nav-user:hover{ background:var(--surface-2); border-color:#3a3a46; }
+  .side-nav-user:hover{ background:var(--surface-2); border-color:#7775b4; }
   .side-nav-user-avatar{
     width:26px;
     height:26px;
@@ -155,7 +155,7 @@
     min-width:0;
     padding:14px;
     border:1px solid var(--border);
-    border-radius:13px;
+    border-radius:4px;
     background:var(--surface);
   }
   .user-card-avatar{
@@ -301,7 +301,7 @@
   .modal-sheet{
     position:relative;
     width: min(500px, calc(100vw - 48px));
-    border-radius: 16px;
+    border-radius: 6px;
     border: 1px solid var(--border);
     transform: scale(0.96);
     transition: transform 0.18s ease;

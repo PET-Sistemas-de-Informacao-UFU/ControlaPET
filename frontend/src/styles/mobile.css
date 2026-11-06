@@ -12,7 +12,7 @@
     max-width: 360px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 6px;
     padding: 32px 28px;
     display:flex;
     flex-direction: column;
@@ -271,7 +271,7 @@
     gap:11px;
     padding:13px;
     border:1px solid var(--border);
-    border-radius:13px;
+    border-radius:4px;
     background:var(--surface);
   }
   .user-card-avatar{
@@ -451,7 +451,7 @@
   .date-range-day.today{ color:var(--accent-text); font-weight:700; }
   .date-range-day.in-range{
     border-radius:0;
-    background:linear-gradient(#174fae, #174fae) center / 100% 28px no-repeat;
+    background:linear-gradient(var(--accent), var(--accent)) center / 100% 28px no-repeat;
     color:var(--text);
   }
   .date-range-day.range-row-start{ border-radius:35% 0 0 35%; }
@@ -474,10 +474,10 @@
     background:transparent;
   }
   .date-range-day.range-start{
-    background:linear-gradient(#174fae, #174fae) right center / 50% 28px no-repeat;
+    background:linear-gradient(var(--accent), var(--accent)) right center / 50% 28px no-repeat;
   }
   .date-range-day.range-end{
-    background:linear-gradient(#174fae, #174fae) left center / 50% 28px no-repeat;
+    background:linear-gradient(var(--accent), var(--accent)) left center / 50% 28px no-repeat;
   }
   .date-range-actions{ display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
   .date-range-actions button{ color:var(--accent-text); font-size:12px; font-weight:700; padding:3px 2px; }
@@ -738,7 +738,7 @@
     min-height:100px;
     padding:14px;
     border:1px solid var(--border);
-    border-radius:14px;
+    border-radius:4px;
     background:var(--surface);
   }
   .loan-summary-card > span{ color:var(--text-dim); font-size:11.5px; font-weight:600; }
@@ -763,7 +763,7 @@
     width:100%;
     padding:14px;
     border:1px solid var(--border);
-    border-radius:14px;
+    border-radius:4px;
     background:var(--surface);
     color:var(--text);
     font-family:inherit;
@@ -771,7 +771,7 @@
     cursor:pointer;
     transition:border-color 0.15s, transform 0.1s;
   }
-  .loan-card:hover{ border-color:#3a3a46; }
+  .loan-card:hover{ border-color:#7775b4; }
   .loan-card:active{ transform:scale(0.99); }
   .loan-card-header,
   .loan-card-content{
@@ -866,7 +866,7 @@
   .modal-sheet{
     width:100%;
     background: var(--surface);
-    border-radius: 22px 22px 0 0;
+    border-radius: 10px 10px 0 0;
     padding: 22px 20px 28px;
     border-top: 1px solid var(--border);
     transform: translateY(100%);
