@@ -116,7 +116,6 @@
     padding:0;
     border:0;
     background:transparent;
-    -webkit-tap-highlight-color:transparent;
     transition:none;
   }
   .account-control.header{ position:relative; }

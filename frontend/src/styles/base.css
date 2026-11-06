@@ -25,6 +25,10 @@ body{
 
 :focus-visible{ outline:2px solid #aebdf9; outline-offset:3px; }
 
+@media (pointer: coarse){
+  *{ -webkit-tap-highlight-color:transparent; }
+}
+
 .app-shell{
   display:flex;
   flex-direction: column;
