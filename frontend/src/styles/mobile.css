@@ -325,12 +325,12 @@
     align-items:center;
     gap: 12px;
     margin-bottom: 10px;
-    border-left: 3px solid #568d91;
+    border-left: 3px solid #688ab4;
     transition: border-color 0.15s, background 0.15s;
   }
-  .item-card:hover{ background:var(--surface-2); border-color:#65868b; }
+  .item-card:hover{ background:var(--surface-2); border-color:#7892b1; }
   .item-info{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:12px 0; border:0; background:transparent; color:var(--text); font:inherit; text-align:left; cursor:pointer; }
-  .item-category{ color:#a9cbc7; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .item-category{ color:#b2c9e5; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
   .item-info .name{ font-size: 14.5px; font-weight: 600; }
   .item-info .qty{ font-size: 12.5px; color: var(--text-dim); }
   .item-arrow{
