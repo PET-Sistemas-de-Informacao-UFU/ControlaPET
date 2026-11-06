@@ -86,7 +86,7 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                     <FormSelect
                         id="edit-type"
                         value={type}
-                        placeholder="Selecione o tipo"
+                        placeholder="Selecione"
                         options={[
                             { value: "CONSUMABLE", label: "Consumível" },
                             { value: "BORROWABLE", label: "Emprestável" },
@@ -101,7 +101,7 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                     <FormSelect
                         id="edit-condition"
                         value={condition}
-                        placeholder="Selecione a condição"
+                        placeholder="Selecione"
                         options={[
                             { value: "NEW", label: "Novo" },
                             { value: "GOOD", label: "Bom" },
@@ -112,7 +112,7 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="edit-total-quantity">Quantidade total</label>
+                    <label htmlFor="edit-total-quantity">Quantidade</label>
                     <div className="number-input">
                         <input
                             type="number"

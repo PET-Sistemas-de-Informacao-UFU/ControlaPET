@@ -31,7 +31,7 @@ export default function CatalogToolbar({ isDesktop, canManageItems, search, onAd
 
                 {!isDesktop && canManageItems && (
                     <button type="button" className="catalog-add-btn" onClick={onAdd} aria-label="Adicionar item">
-                        +
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
                     </button>
                 )}
             </div>

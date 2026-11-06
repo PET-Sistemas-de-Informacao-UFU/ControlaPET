@@ -26,10 +26,10 @@ export default function SideNav() {
                     { path: "/auditoria", label: "Auditoria", Icon: AuditIcon },
                     { path: "/usuarios", label: "Usuários", Icon: UsersIcon }
                 ] : [])].map(({ path, label, Icon }) => (
-                    <div key={path} className={pathname === path ? "side-nav-item active" : "side-nav-item"} onClick={() => navigate(path)}>
+                    <button type="button" key={path} className={pathname === path ? "side-nav-item active" : "side-nav-item"} aria-current={pathname === path ? "page" : undefined} onClick={() => navigate(path)}>
                         <Icon />
                         <span>{label}</span>
-                    </div>
+                    </button>
                 ))}
             </div>
 

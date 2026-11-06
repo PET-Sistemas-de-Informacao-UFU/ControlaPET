@@ -1,15 +1,16 @@
 :root{
-  --bg: #0d0d12;
-  --surface: #16161d;
-  --surface-2: #1e1e27;
-  --header: #0a0a0e;
-  --border: #2a2a34;
-  --text: #f2f2f5;
-  --text-dim: #9a9aa5;
-  --accent: #1B64F5;
-  --accent-soft: rgba(91,79,232,0.15);
+  --bg: #121316;
+  --surface: #1b1c21;
+  --surface-2: #26272e;
+  --header: #0d0e11;
+  --border: #373840;
+  --text: #f5f5fa;
+  --text-dim: #b8b9c2;
+  --accent: #4a4893;
+  --accent-text: #aebdf9;
+  --accent-soft: rgba(174,189,249,0.16);
   --green: #3ecf8e;
-  --orange: #f2a33c;
+  --orange: #eba35a;
   --red: #ef5b5b;
   --blue: #4f9dfa;
 }
@@ -19,7 +20,13 @@
 body{
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+:focus-visible{ outline:2px solid #aebdf9; outline-offset:3px; }
+
+@media (pointer: coarse){
+  *{ -webkit-tap-highlight-color:transparent; }
 }
 
 .app-shell{

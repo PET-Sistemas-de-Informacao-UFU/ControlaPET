@@ -16,9 +16,19 @@ export function useLoanData(){
 }
 
 
-const fetchUserLoans = async(): Promise<Page<Loan>> => {
-    const response = await api.get<Page<Loan>>("/loans/me");
-    return response.data;
+const fetchUserLoans = async(): Promise<Loan[]> => {
+    const loans: Loan[] = [];
+    let page = 0;
+    let totalPages: number;
+
+    do {
+        const response = await api.get<Page<Loan>>("/loans/me", { params: { page, size: 100 } });
+        loans.push(...response.data.content);
+        totalPages = response.data.totalPages;
+        page += 1;
+    } while (page < totalPages);
+
+    return loans;
 }
 
 export function useUserLoans(){
