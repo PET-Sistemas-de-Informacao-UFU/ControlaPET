@@ -9,35 +9,33 @@ interface ItemCardProps {
 }
 
 export default function ItemCard({ item, onOpen, onEdit, canManageItems }: ItemCardProps) {
-    const typeInitial = item.type.charAt(0);
+    const typeLabel = { CONSUMABLE: "Consumo", BORROWABLE: "Empréstimo", PERMANENT: "Permanente" }[item.type];
     const unitLabel = item.totalQuantity === 1 ? "unidade" : "unidades";
 
     return (
         <div className="item-card">
-            <div className="item-thumb" onClick={onOpen}>{typeInitial}</div>
-
-            <div className="item-info" onClick={onOpen}>
-                <div className="name">{item.name}</div>
-                <div className="qty item-stock-summary">
+            <button type="button" className="item-info" onClick={onOpen}>
+                <span className="item-category">{typeLabel}</span>
+                <span className="name">{item.name}</span>
+                <span className="qty item-stock-summary">
                     {item.stockQuantity} de {item.totalQuantity} {unitLabel} em estoque
-                </div>
-            </div>
+                </span>
+            </button>
 
             {canManageItems && (
-                <div
+                <button
+                    type="button"
                     className="item-edit-btn"
-                    onClick={(event) => {
-                        event.stopPropagation();
-                        onEdit();
-                    }}
+                    aria-label={`Editar ${item.name}`}
+                    onClick={onEdit}
                 >
                     <EditIcon />
-                </div>
+                </button>
             )}
 
-            <div className="item-arrow" onClick={onOpen}>
+            <span className="item-arrow" aria-hidden="true">
                 <ChevronIcon />
-            </div>
+            </span>
         </div>
     );
 }
