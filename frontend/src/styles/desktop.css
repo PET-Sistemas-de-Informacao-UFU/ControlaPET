@@ -208,8 +208,6 @@
   }
   .item-card{ margin-bottom: 0; }
 
-  .item-form-details{ grid-template-columns:repeat(3, minmax(0, 1fr)); }
-  .item-form-details .form-group:first-child{ grid-column:auto; }
   .number-input{ position:relative; }
   .number-input input{
     padding-right:38px;
