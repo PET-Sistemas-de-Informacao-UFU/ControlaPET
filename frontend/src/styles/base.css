@@ -1,13 +1,13 @@
 :root{
-  --bg: #0d0d12;
-  --surface: #16161d;
-  --surface-2: #1e1e27;
-  --header: #0a0a0e;
-  --border: #2a2a34;
-  --text: #f2f2f5;
-  --text-dim: #9a9aa5;
-  --accent: #1B64F5;
-  --accent-soft: rgba(91,79,232,0.15);
+  --bg: #10191c;
+  --surface: #192428;
+  --surface-2: #243237;
+  --header: #0c1518;
+  --border: #344449;
+  --text: #f2f3ed;
+  --text-dim: #bac7c4;
+  --accent: #4386e8;
+  --accent-soft: rgba(67,134,232,0.18);
   --green: #3ecf8e;
   --orange: #f2a33c;
   --red: #ef5b5b;
@@ -19,8 +19,10 @@
 body{
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Segoe UI', system-ui, sans-serif;
 }
+
+:focus-visible{ outline:2px solid #91bbff; outline-offset:3px; }
 
 .app-shell{
   display:flex;
