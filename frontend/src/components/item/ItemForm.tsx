@@ -112,7 +112,7 @@ export default function ItemForm({ item, onSave, onDelete }: ItemFormProps) {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="edit-total-quantity">Quantidade total</label>
+                    <label htmlFor="edit-total-quantity">Quantidade</label>
                     <div className="number-input">
                         <input
                             type="number"
