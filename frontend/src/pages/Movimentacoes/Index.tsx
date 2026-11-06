@@ -28,7 +28,7 @@ function getLoanStatus(status: Loan["status"]) {
 }
 
 export default function Movimentacoes() {
-    const { data: loansPage, isLoading: isLoadingLoans, isError: hasLoanError } = useUserLoans();
+    const { data: loans = [], isLoading: isLoadingLoans, isError: hasLoanError } = useUserLoans();
     const {
         data: historyData,
         isLoading: isLoadingHistory,
@@ -43,7 +43,6 @@ export default function Movimentacoes() {
     const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
     const [defectModalOpen, setDefectModalOpen] = useState(false);
 
-    const loans = loansPage?.content ?? [];
     const historico = historyData?.pages.flatMap((page) => page.content) ?? [];
     const activeLoans = loans
         .filter((loan) => loan.status === "ACTIVE" || loan.status === "OVERDUE")
@@ -92,17 +91,17 @@ export default function Movimentacoes() {
                     <div className="loan-summary" aria-label="Resumo de empréstimos">
                         <div className={overdueLoans.length ? "loan-summary-card warning" : "loan-summary-card"}>
                             <span>Atrasados</span>
-                            <strong>{overdueLoans.length}</strong>
-                            <small>{overdueLoans.length ? "Regularize assim que possível" : "Tudo em dia"}</small>
+                            <strong>{isLoadingLoans || hasLoanError ? "—" : overdueLoans.length}</strong>
+                            <small>{isLoadingLoans || hasLoanError ? "Dados indisponíveis" : overdueLoans.length ? "Regularize assim que possível" : "Tudo em dia"}</small>
                         </div>
                         <div className="loan-summary-card">
                             <span>Em uso</span>
-                            <strong>{activeLoans.length}</strong>
+                            <strong>{isLoadingLoans || hasLoanError ? "—" : activeLoans.length}</strong>
                             <small>Empréstimos ativos</small>
                         </div>
                         <div className="loan-summary-card">
                             <span>Concluídos</span>
-                            <strong>{completedLoans.length}</strong>
+                            <strong>{isLoadingLoans || hasLoanError ? "—" : completedLoans.length}</strong>
                             <small>{completedLoans.length === 1 ? "Empréstimo devolvido" : "Empréstimos devolvidos"}</small>
                         </div>
                     </div>
