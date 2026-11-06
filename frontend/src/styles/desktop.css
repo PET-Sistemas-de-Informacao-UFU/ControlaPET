@@ -49,7 +49,7 @@
   .side-nav-item svg{ width:19px; height:19px; }
   .side-nav-item:hover{ background: var(--surface); color: var(--text); }
   .side-nav-item.active{ background: var(--accent-soft); color: var(--text); border-left-color:var(--accent); }
-  .side-nav-item.active svg{ color: var(--accent); }
+  .side-nav-item.active svg{ color:var(--accent-text); }
   .side-nav-account{
     position:relative;
     margin-top:auto;
@@ -81,7 +81,7 @@
     justify-content:center;
     border-radius:50%;
     background:var(--accent-soft);
-    color:var(--accent);
+    color:var(--accent-text);
     font-size:11px;
     font-weight:700;
   }
@@ -170,7 +170,7 @@
     justify-content:center;
     border-radius:50%;
     background:var(--accent-soft);
-    color:var(--accent);
+    color:var(--accent-text);
     font-size:13px;
     font-weight:700;
   }
@@ -186,7 +186,7 @@
     font-size:11px;
     font-weight:700;
   }
-  .user-role.admin{ background:var(--accent-soft); color:var(--accent); }
+  .user-role.admin{ background:var(--accent-soft); color:var(--accent-text); }
   .user-card.inactive{ opacity:.65; }
   .user-edit-button{
     flex-shrink:0;

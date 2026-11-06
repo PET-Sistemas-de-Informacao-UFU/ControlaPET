@@ -1,15 +1,16 @@
 :root{
-  --bg: #111720;
-  --surface: #1b2430;
-  --surface-2: #283443;
-  --header: #0c121a;
-  --border: #354252;
-  --text: #f2f3f5;
-  --text-dim: #bdc7d2;
-  --accent: #4386e8;
-  --accent-soft: rgba(67,134,232,0.18);
+  --bg: #0c0a2e;
+  --surface: #191556;
+  --surface-2: #201b72;
+  --header: #090723;
+  --border: #4a4893;
+  --text: #f5f5fa;
+  --text-dim: #d0d9fc;
+  --accent: #4a4893;
+  --accent-text: #aebdf9;
+  --accent-soft: rgba(174,189,249,0.16);
   --green: #3ecf8e;
-  --orange: #f2a33c;
+  --orange: #eba35a;
   --red: #ef5b5b;
   --blue: #4f9dfa;
 }
@@ -22,7 +23,7 @@ body{
   font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-:focus-visible{ outline:2px solid #91bbff; outline-offset:3px; }
+:focus-visible{ outline:2px solid #aebdf9; outline-offset:3px; }
 
 .app-shell{
   display:flex;

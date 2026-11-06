@@ -69,7 +69,7 @@
     margin:16px auto -10px;
     border:0;
     background:transparent;
-    color:var(--accent);
+    color:var(--accent-text);
     font:inherit;
     font-size:12.5px;
     font-weight:700;
@@ -139,7 +139,7 @@
     align-items:center;
     justify-content:center;
     border-radius:50%;
-    color:var(--accent);
+    color:var(--accent-text);
     font-size:11px;
     font-weight:700;
   }
@@ -283,7 +283,7 @@
     justify-content:center;
     border-radius:50%;
     background:var(--accent-soft);
-    color:var(--accent);
+    color:var(--accent-text);
     font-size:13px;
     font-weight:700;
   }
@@ -299,7 +299,7 @@
     font-size:11px;
     font-weight:700;
   }
-  .user-role.admin{ background:var(--accent-soft); color:var(--accent); }
+  .user-role.admin{ background:var(--accent-soft); color:var(--accent-text); }
   .user-card.inactive{ opacity:.65; }
   .user-edit-button{
     flex-shrink:0;
@@ -325,12 +325,12 @@
     align-items:center;
     gap: 12px;
     margin-bottom: 10px;
-    border-left: 3px solid #688ab4;
+    border-left: 3px solid #aebdf9;
     transition: border-color 0.15s, background 0.15s;
   }
-  .item-card:hover{ background:var(--surface-2); border-color:#7892b1; }
+  .item-card:hover{ background:var(--surface-2); border-color:#aebdf9; }
   .item-info{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:12px 0; border:0; background:transparent; color:var(--text); font:inherit; text-align:left; cursor:pointer; }
-  .item-category{ color:#b2c9e5; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+  .item-category{ color:#d0d9fc; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
   .item-info .name{ font-size: 14.5px; font-weight: 600; }
   .item-info .qty{ font-size: 12.5px; color: var(--text-dim); }
   .item-arrow{
@@ -408,7 +408,7 @@
   .date-range-trigger:hover,
   .date-range-trigger:focus-visible{ border-color:var(--accent); outline:none; }
   .date-range-trigger.has-value{ color:var(--text); }
-  .date-range-trigger svg{ width:17px; height:17px; flex-shrink:0; color:var(--accent); }
+  .date-range-trigger svg{ width:17px; height:17px; flex-shrink:0; color:var(--accent-text); }
   .date-range-popover{
     position:absolute;
     z-index:25;
@@ -448,7 +448,7 @@
   .date-range-weekdays{ margin-bottom:5px; color:var(--text-dim); font-size:10px; font-weight:600; }
   .date-range-day{ height:32px; border:0; border-radius:0; background:transparent; color:var(--text); font:inherit; font-size:12px; cursor:pointer; }
   .date-range-day:hover{ background:var(--surface-2); }
-  .date-range-day.today{ color:var(--accent); font-weight:700; }
+  .date-range-day.today{ color:var(--accent-text); font-weight:700; }
   .date-range-day.in-range{
     border-radius:0;
     background:linear-gradient(#174fae, #174fae) center / 100% 28px no-repeat;
@@ -480,7 +480,7 @@
     background:linear-gradient(#174fae, #174fae) left center / 50% 28px no-repeat;
   }
   .date-range-actions{ display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; border-top:1px solid var(--border); }
-  .date-range-actions button{ color:var(--accent); font-size:12px; font-weight:700; padding:3px 2px; }
+  .date-range-actions button{ color:var(--accent-text); font-size:12px; font-weight:700; padding:3px 2px; }
   .number-input input{
     padding-right:14px;
     appearance:textfield;
@@ -950,7 +950,7 @@
   }
   .nav-item svg{ width:22px; height:22px; }
   .nav-item.active{ color: var(--text); }
-  .nav-item.active svg{ color: var(--accent); }
+  .nav-item.active svg{ color:var(--accent-text); }
   .nav-scan{
     width: 56px; height:56px;
     border-radius: 50%;
