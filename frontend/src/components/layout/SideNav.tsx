@@ -18,7 +18,7 @@ export default function SideNav() {
         <nav className="side-nav">
             <div className="side-nav-brand">
                 <img src="/logoPET.png" alt="Logo do PET-SI" />
-                <span className="side-nav-brand-copy"><strong>ControlaPET</strong><small>PET Sistemas de Informação · UFU</small></span>
+                <span>ControlaPET</span>
             </div>
 
             <div className="side-nav-items">
