@@ -1,13 +1,23 @@
 import { api } from "../service/api"
-import type { Item, CreateItemRequest, UpdateItemRequest } from "../interfaces/Item"
+import type { Item, ItemType, ItemCondition, CreateItemRequest, UpdateItemRequest } from "../interfaces/Item"
 import type { Page } from "../interfaces/Page"
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 
-const fetchData = async(name: string, page: number): Promise<Page<Item>> => {
+export interface ItemFilters {
+    name: string
+    type: ItemType | ""
+    condition: ItemCondition | ""
+    available: "" | "true" | "false"
+}
+
+const fetchData = async(filters: ItemFilters, page: number): Promise<Page<Item>> => {
     const response = await api.get<Page<Item>>("/items", {
         params: {
-            ...(name ? { name } : {}),
+            ...(filters.name ? { name: filters.name } : {}),
+            ...(filters.type ? { type: filters.type } : {}),
+            ...(filters.condition ? { condition: filters.condition } : {}),
+            ...(filters.available ? { available: filters.available } : {}),
             page,
             size: 20
         }
@@ -15,10 +25,10 @@ const fetchData = async(name: string, page: number): Promise<Page<Item>> => {
     return response.data;
 }
 
-export function useItemData(name = ""){
+export function useItemData(filters: ItemFilters){
     return useInfiniteQuery({
-        queryFn: ({ pageParam }) => fetchData(name, pageParam),
-        queryKey: ['items-data', name],
+        queryFn: ({ pageParam }) => fetchData(filters, pageParam),
+        queryKey: ['items-data', filters],
         initialPageParam: 0,
         getNextPageParam: (lastPage) => (
             lastPage.number + 1 < lastPage.totalPages ? lastPage.number + 1 : undefined

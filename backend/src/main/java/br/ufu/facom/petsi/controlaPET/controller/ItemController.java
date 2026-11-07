@@ -4,6 +4,8 @@ import br.ufu.facom.petsi.controlaPET.dto.itemDTO.CreateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.ItemResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.UpdateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.service.ItemService;
+import br.ufu.facom.petsi.controlaPET.model.enums.ItemType;
+import br.ufu.facom.petsi.controlaPET.model.enums.ItemCondition;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,8 +33,11 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<Page<ItemResponseDTO>> getAllItems(
             @RequestParam(required = false) String name,
+            @RequestParam(required = false) ItemType type,
+            @RequestParam(required = false) ItemCondition condition,
+            @RequestParam(required = false) Boolean available,
             @PageableDefault(size = 20, sort = "name") Pageable pageable){
-        Page<ItemResponseDTO> response = itemService.getAllItems(name, pageable);
+        Page<ItemResponseDTO> response = itemService.getAllItems(name, type, condition, available, pageable);
         return ResponseEntity.ok(response);
     }
 
