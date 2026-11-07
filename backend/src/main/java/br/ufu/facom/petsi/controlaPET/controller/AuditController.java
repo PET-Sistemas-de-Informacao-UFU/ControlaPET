@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/audit")
@@ -31,7 +32,7 @@ public class AuditController {
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String userName,
             @RequestParam(required = false) String itemName,
-            @RequestParam(required = false) AuditEventType type,
+            @RequestParam(required = false) List<AuditEventType> type,
             @PageableDefault(size = 20, sort = "eventDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         return ResponseEntity.ok(auditService.getEvents(startDate, endDate, userName, itemName, type, pageable));

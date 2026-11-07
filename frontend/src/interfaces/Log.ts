@@ -25,5 +25,5 @@ export interface AuditFilter {
     endDate: string | null
     name: string | null
     itemName: string | null
-    type: AuditEventType | null
+    type: AuditEventType | "LOAN_ALL" | null
 }

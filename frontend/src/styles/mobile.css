@@ -246,6 +246,10 @@
   }
   .movement-filters .date-range-picker{ flex:0 1 230px; }
   .movement-filters .date-range-trigger{ min-height:41px; }
+  .catalog-toolbar.audit-toolbar{ flex-wrap:wrap; }
+  .audit-toolbar .search-bar{ flex:1 1 180px; }
+  .audit-toolbar .date-range-picker{ flex:0 1 230px; }
+  .audit-toolbar .date-range-trigger{ min-height:41px; }
   .catalog-filters label{
     display:flex;
     align-items:center;

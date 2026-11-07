@@ -31,7 +31,7 @@ public class AuditService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AuditEventResponseDTO> getEvents(LocalDate startDate, LocalDate endDate, String userName, String itemName, AuditEventType type, Pageable pageable) {
+    public Page<AuditEventResponseDTO> getEvents(LocalDate startDate, LocalDate endDate, String userName, String itemName, List<AuditEventType> type, Pageable pageable) {
         List<AuditEventResponseDTO> events = new ArrayList<>();
 
         for (Loan loan : loanRepository.findAll()) {
@@ -65,7 +65,7 @@ public class AuditService {
                         || event.userName().toLowerCase().contains(normalizedUserName))
                 .filter(event -> normalizedItemName == null || normalizedItemName.isBlank()
                         || event.itemName().toLowerCase().contains(normalizedItemName))
-                .filter(event -> type == null || event.type() == type)
+                .filter(event -> type == null || type.isEmpty() || type.contains(event.type()))
                 .sorted(Comparator.comparing(AuditEventResponseDTO::eventDate).reversed())
                 .toList();
 
