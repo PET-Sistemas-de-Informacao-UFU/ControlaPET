@@ -7,6 +7,9 @@ import { useReturnLoan, useUserLoans } from "../../hooks/useLoan";
 import { useUserMovementHistory } from "../../hooks/useMovement";
 import { useToast } from "../../hooks/useToast";
 import type { Loan } from "../../interfaces/Loan";
+import CatalogFilter from "../Catalogo/CatalogFilter";
+import DateRangePicker from "../../components/ui/DateRangePicker";
+import { SearchIcon } from "../../components/ui/Icons";
 
 function formatDate(date?: string | null) {
     if (!date) return "—";
@@ -28,6 +31,11 @@ function getLoanStatus(status: Loan["status"]) {
 }
 
 export default function Movimentacoes() {
+    const [itemName, setItemName] = useState("");
+    const [statusFilter, setStatusFilter] = useState("");
+    const [historyType, setHistoryType] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const { data: loans = [], isLoading: isLoadingLoans, isError: hasLoanError } = useUserLoans();
     const {
         data: historyData,
@@ -36,7 +44,7 @@ export default function Movimentacoes() {
         hasNextPage,
         isFetchingNextPage,
         fetchNextPage
-    } = useUserMovementHistory();
+    } = useUserMovementHistory({ itemName: itemName.trim(), type: historyType, startDate, endDate });
     const returnLoan = useReturnLoan();
     const { message, showToast } = useToast();
 
@@ -54,6 +62,11 @@ export default function Movimentacoes() {
         });
     const overdueLoans = activeLoans.filter((loan) => loan.status === "OVERDUE");
     const completedLoans = loans.filter((loan) => loan.status === "COMPLETED");
+    const filteredLoans = activeLoans.filter((loan) => {
+        const date = loan.checkoutDate.slice(0, 10);
+        return (!itemName.trim() || loan.itemName.toLocaleLowerCase("pt-BR").includes(itemName.trim().toLocaleLowerCase("pt-BR"))) &&
+            (!statusFilter || loan.status === statusFilter) && (!startDate || date >= startDate) && (!endDate || date <= endDate);
+    });
     const isLoading = isLoadingLoans || isLoadingHistory;
     const hasError = hasLoanError || hasHistoryError;
 
@@ -106,9 +119,22 @@ export default function Movimentacoes() {
                         </div>
                     </div>
 
+                    <div className="catalog-toolbar movement-filters">
+                        <label className="search-bar"><SearchIcon /><input type="search" aria-label="Buscar item nas movimentações" placeholder="Buscar item..." value={itemName} onChange={(event) => setItemName(event.target.value)} /></label>
+                        <div className="catalog-filters" aria-label="Filtros de movimentações">
+                            <CatalogFilter label="Empréstimos" value={statusFilter} onChange={setStatusFilter} options={[
+                                { value: "", label: "Todos os empréstimos" }, { value: "ACTIVE", label: "Em andamento" }, { value: "OVERDUE", label: "Atrasado" },
+                            ]} />
+                            <CatalogFilter label="Histórico" value={historyType} onChange={setHistoryType} options={[
+                                { value: "", label: "Todo o histórico" }, { value: "LOAN_RETURNED", label: "Devolução" }, { value: "OUTBOUND_CONSUMPTION", label: "Consumo" },
+                            ]} />
+                        </div>
+                        <DateRangePicker id="movement-date-range" startDate={startDate} endDate={endDate} onChange={(start, end) => { setStartDate(start); setEndDate(end); }} />
+                    </div>
+
                     <div className="loan-section-heading">
                         <div className="section-label">Em andamento</div>
-                        {activeLoans.length > 0 && <span>{activeLoans.length} {activeLoans.length === 1 ? "item" : "itens"}</span>}
+                        {filteredLoans.length > 0 && <span>{filteredLoans.length} {filteredLoans.length === 1 ? "item" : "itens"}</span>}
                     </div>
 
                     {isLoading && <div className="loan-empty-state">Carregando empréstimos...</div>}
@@ -116,7 +142,7 @@ export default function Movimentacoes() {
 
                     {!isLoading && !hasError && (
                         <div className="loan-active-list">
-                            {activeLoans.length ? activeLoans.map((loan) => {
+                            {filteredLoans.length ? filteredLoans.map((loan) => {
                                 const status = getLoanStatus(loan.status);
 
                                 return (
@@ -136,7 +162,7 @@ export default function Movimentacoes() {
                                         </div>
                                     </button>
                                 );
-                            }) : <div className="loan-empty-state">Você não possui empréstimos em andamento.</div>}
+                            }) : <div className="loan-empty-state">Nenhum empréstimo em andamento encontrado.</div>}
                         </div>
                     )}
 
