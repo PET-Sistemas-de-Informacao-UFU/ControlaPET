@@ -153,6 +153,10 @@ public class MovementService {
         List<UserMovementHistoryResponseDTO> history = new java.util.ArrayList<>();
 
         for (Loan loan : loanRepository.findAllByUser(user, Pageable.unpaged()).getContent()) {
+            history.add(new UserMovementHistoryResponseDTO(
+                    loan.getId(), "LOAN_CREATED", loan.getItem().getName(), loan.getQuantity(),
+                    null, loan.getCheckoutDate()
+            ));
             if (loan.getStatus() == LoanStatus.COMPLETED && loan.getActualReturnDate() != null) {
                 history.add(new UserMovementHistoryResponseDTO(
                         loan.getId(), "LOAN_RETURNED", loan.getItem().getName(), loan.getQuantity(),
