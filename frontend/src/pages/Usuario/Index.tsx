@@ -46,7 +46,7 @@ export default function Usuarios() {
     const [editError, setEditError] = useState<string | null>(null);
     const [search, setSearch] = useState("");
     const [roleFilter, setRoleFilter] = useState("");
-    const [activeFilter, setActiveFilter] = useState("");
+    const [activeFilter, setActiveFilter] = useState("true");
     const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
     const filteredUsers = users.filter((user) =>
         (!normalizedSearch || `${user.nome} ${user.email}`.toLocaleLowerCase("pt-BR").includes(normalizedSearch)) &&
