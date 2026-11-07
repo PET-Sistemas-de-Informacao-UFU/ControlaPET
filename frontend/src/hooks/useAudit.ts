@@ -9,6 +9,8 @@ async function fetchAuditEvents(filter: AuditFilter, page: number): Promise<Page
             ...(filter.startDate ? { startDate: filter.startDate } : {}),
             ...(filter.endDate ? { endDate: filter.endDate } : {}),
             ...(filter.name ? { userName: filter.name } : {}),
+            ...(filter.itemName ? { itemName: filter.itemName } : {}),
+            ...(filter.type ? { type: filter.type } : {}),
             page,
             size: 20
         }

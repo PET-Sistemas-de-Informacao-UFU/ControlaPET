@@ -4,7 +4,8 @@ import DateRangePicker from "../../components/ui/DateRangePicker";
 import { FilterIcon } from "../../components/ui/Icons";
 import { useIsDesktop } from "../../hooks/useIsDesktop";
 import { useAuditEvents } from "../../hooks/useAudit";
-import type { AuditEvent, AuditFilter, Log } from "../../interfaces/Log";
+import type { AuditEvent, AuditEventType, AuditFilter, Log } from "../../interfaces/Log";
+import CatalogFilter from "../Catalogo/CatalogFilter";
 
 function formatDate(date: string) {
     const hasTime = date.includes("T");
@@ -40,11 +41,13 @@ function toLog(event: AuditEvent): Log {
 
 export default function Auditoria() {
     const isDesktop = useIsDesktop();
-    const [filter, setFilter] = useState<AuditFilter>({ startDate: null, endDate: null, name: null });
+    const [filter, setFilter] = useState<AuditFilter>({ startDate: null, endDate: null, name: null, itemName: null, type: null });
     const [searchOpen, setSearchOpen] = useState(false);
     const [startDateInput, setStartDateInput] = useState("");
     const [endDateInput, setEndDateInput] = useState("");
     const [nameInput, setNameInput] = useState("");
+    const [itemInput, setItemInput] = useState("");
+    const [typeInput, setTypeInput] = useState("");
     const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useAuditEvents(filter);
     const logs = data?.pages.flatMap((page) => page.content).map(toLog) ?? [];
 
@@ -52,6 +55,8 @@ export default function Auditoria() {
         setStartDateInput(filter.startDate ?? "");
         setEndDateInput(filter.endDate ?? "");
         setNameInput(filter.name ?? "");
+        setItemInput(filter.itemName ?? "");
+        setTypeInput(filter.type ?? "");
         setSearchOpen(true);
     }
 
@@ -59,16 +64,20 @@ export default function Auditoria() {
         setFilter({
             startDate: startDateInput || null,
             endDate: endDateInput || null,
-            name: nameInput.trim() || null
+            name: nameInput.trim() || null,
+            itemName: itemInput.trim() || null,
+            type: (typeInput as AuditEventType) || null
         });
         setSearchOpen(false);
     }
 
     function clearFilter() {
-        setFilter({ startDate: null, endDate: null, name: null });
+        setFilter({ startDate: null, endDate: null, name: null, itemName: null, type: null });
         setStartDateInput("");
         setEndDateInput("");
         setNameInput("");
+        setItemInput("");
+        setTypeInput("");
         setSearchOpen(false);
     }
 
@@ -85,6 +94,18 @@ export default function Auditoria() {
                         setEndDateInput(endDate);
                     }}
                 />
+            </div>
+            <div className="form-group">
+                <label htmlFor="audit-search-item">Item</label>
+                <input id="audit-search-item" type="text" placeholder="Nome do item" value={itemInput} onChange={(event) => setItemInput(event.target.value)} />
+            </div>
+            <div className="form-group">
+                <label>Atividade</label>
+                <CatalogFilter label="Atividade" value={typeInput} onChange={setTypeInput} options={[
+                    { value: "", label: "Todas as atividades" }, { value: "LOAN_CREATED", label: "Empréstimo" },
+                    { value: "LOAN_RETURNED", label: "Devolução" }, { value: "INBOUND", label: "Entrada" },
+                    { value: "OUTBOUND_CONSUMPTION", label: "Consumo" }, { value: "ADJUSTMENT", label: "Ajuste" },
+                ]} />
             </div>
 
             <div className="form-group">

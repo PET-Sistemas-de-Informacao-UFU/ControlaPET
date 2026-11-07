@@ -27,6 +27,11 @@ public class AuditService {
 
     @Transactional(readOnly = true)
     public Page<AuditEventResponseDTO> getEvents(LocalDate startDate, LocalDate endDate, String userName, Pageable pageable) {
+        return getEvents(startDate, endDate, userName, null, null, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AuditEventResponseDTO> getEvents(LocalDate startDate, LocalDate endDate, String userName, String itemName, AuditEventType type, Pageable pageable) {
         List<AuditEventResponseDTO> events = new ArrayList<>();
 
         for (Loan loan : loanRepository.findAll()) {
@@ -52,11 +57,15 @@ public class AuditService {
         }
 
         String normalizedUserName = userName == null ? null : userName.trim().toLowerCase();
+        String normalizedItemName = itemName == null ? null : itemName.trim().toLowerCase();
         List<AuditEventResponseDTO> filteredEvents = events.stream()
                 .filter(event -> startDate == null || !event.eventDate().toLocalDate().isBefore(startDate))
                 .filter(event -> endDate == null || !event.eventDate().toLocalDate().isAfter(endDate))
                 .filter(event -> normalizedUserName == null || normalizedUserName.isBlank()
                         || event.userName().toLowerCase().contains(normalizedUserName))
+                .filter(event -> normalizedItemName == null || normalizedItemName.isBlank()
+                        || event.itemName().toLowerCase().contains(normalizedItemName))
+                .filter(event -> type == null || event.type() == type)
                 .sorted(Comparator.comparing(AuditEventResponseDTO::eventDate).reversed())
                 .toList();
 

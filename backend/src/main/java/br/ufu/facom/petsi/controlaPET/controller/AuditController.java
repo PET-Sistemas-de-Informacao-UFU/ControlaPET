@@ -2,6 +2,7 @@ package br.ufu.facom.petsi.controlaPET.controller;
 
 import br.ufu.facom.petsi.controlaPET.dto.audit.AuditEventResponseDTO;
 import br.ufu.facom.petsi.controlaPET.service.AuditService;
+import br.ufu.facom.petsi.controlaPET.model.enums.AuditEventType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,8 +30,10 @@ public class AuditController {
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate,
             @RequestParam(required = false) String userName,
+            @RequestParam(required = false) String itemName,
+            @RequestParam(required = false) AuditEventType type,
             @PageableDefault(size = 20, sort = "eventDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return ResponseEntity.ok(auditService.getEvents(startDate, endDate, userName, pageable));
+        return ResponseEntity.ok(auditService.getEvents(startDate, endDate, userName, itemName, type, pageable));
     }
 }
