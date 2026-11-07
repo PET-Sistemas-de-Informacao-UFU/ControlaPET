@@ -6,6 +6,8 @@ import { useChangeUserRole, useChangeUserStatus, useCreateUser, useUpdateUser, u
 import type { CreateUserRequest, User, UserRole } from "../../interfaces/User";
 import Modal from "../../components/ui/Modal";
 import FormSelect from "../../components/ui/FormSelect";
+import CatalogFilter from "../Catalogo/CatalogFilter";
+import { SearchIcon } from "../../components/ui/Icons";
 
 const ROLES = [
     { value: "MEMBER", label: "Membro" },
@@ -42,6 +44,15 @@ export default function Usuarios() {
     const [editingEmail, setEditingEmail] = useState("");
     const [editingRole, setEditingRole] = useState<UserRole>("MEMBER");
     const [editError, setEditError] = useState<string | null>(null);
+    const [search, setSearch] = useState("");
+    const [roleFilter, setRoleFilter] = useState("");
+    const [activeFilter, setActiveFilter] = useState("");
+    const normalizedSearch = search.trim().toLocaleLowerCase("pt-BR");
+    const filteredUsers = users.filter((user) =>
+        (!normalizedSearch || `${user.nome} ${user.email}`.toLocaleLowerCase("pt-BR").includes(normalizedSearch)) &&
+        (!roleFilter || user.role === roleFilter) &&
+        (!activeFilter || user.active === (activeFilter === "true"))
+    );
 
     if (!isAdmin) return <Navigate to="/catalogo" replace />;
 
@@ -123,11 +134,19 @@ export default function Usuarios() {
                 <button type="button" className="header-btn" onClick={openCreateModal}>+ Novo usuário</button>
             </div>
 
+            <div className="catalog-toolbar">
+                <label className="search-bar"><SearchIcon /><input type="search" aria-label="Buscar usuário por nome ou e-mail" placeholder="Buscar nome ou e-mail..." value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+                <div className="catalog-filters" aria-label="Filtros de usuários">
+                    <CatalogFilter label="Perfil" value={roleFilter} onChange={setRoleFilter} options={[{ value: "", label: "Todos os perfis" }, { value: "ADMIN", label: "Administrador" }, { value: "MEMBER", label: "Membro" }]} />
+                    <CatalogFilter label="Situação" value={activeFilter} onChange={setActiveFilter} options={[{ value: "", label: "Todas as contas" }, { value: "true", label: "Ativa" }, { value: "false", label: "Inativa" }]} />
+                </div>
+            </div>
+
             {isLoading && <p className="users-feedback">Carregando usuários...</p>}
             {isError && <p className="users-feedback">Não foi possível carregar os usuários.</p>}
             {!isLoading && !isError && (
                 <div className="users-list">
-                    {users.map((user) => (
+                    {filteredUsers.map((user) => (
                         <article className={user.active ? "user-card" : "user-card inactive"} key={user.id}>
                             <span className="user-card-avatar" aria-hidden="true">{getInitials(user.nome)}</span>
                             <div className="user-card-info">
@@ -138,6 +157,7 @@ export default function Usuarios() {
                             {user.id !== currentUser.id && <button type="button" className="user-edit-button" onClick={() => openEditModal(user)}>Editar</button>}
                         </article>
                     ))}
+                    {filteredUsers.length === 0 && <p className="users-feedback">Nenhum usuário encontrado.</p>}
                 </div>
             )}
 
