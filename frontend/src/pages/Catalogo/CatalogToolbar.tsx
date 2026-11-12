@@ -19,7 +19,7 @@ interface CatalogToolbarProps {
 export default function CatalogToolbar({ isDesktop, canManageItems, search, onAdd, onSearchChange, type, condition, available, onTypeChange, onConditionChange, onAvailableChange }: CatalogToolbarProps) {
     return (
         <>
-            <div className="catalog-toolbar">
+            <div className={`catalog-toolbar${!isDesktop && canManageItems ? " has-mobile-add" : ""}`}>
                 <label className="search-bar">
                     <SearchIcon />
                     <input

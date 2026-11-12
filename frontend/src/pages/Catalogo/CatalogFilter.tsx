@@ -21,11 +21,24 @@ export default function CatalogFilter({ label, value, options, onChange }: Catal
             const target = event.target as Node;
             if (!triggerRef.current?.contains(target) && !menuRef.current?.contains(target)) setOpen(false);
         }
-        function closeOnScroll() { setOpen(false); }
+        function closeOnScroll(event: Event) {
+            if (menuRef.current?.contains(event.target as Node)) return;
+            setOpen(false);
+        }
         document.addEventListener("pointerdown", closeOutside);
         window.addEventListener("scroll", closeOnScroll, true);
         window.addEventListener("resize", closeOnScroll);
         const selectedButton = menuRef.current?.querySelector<HTMLButtonElement>('[aria-checked="true"]');
+        const menu = menuRef.current;
+        const trigger = triggerRef.current;
+        if (menu && trigger) {
+            const menuRect = menu.getBoundingClientRect();
+            const triggerRect = trigger.getBoundingClientRect();
+            menu.style.left = `${Math.max(8, Math.min(triggerRect.left, window.innerWidth - menuRect.width - 8))}px`;
+            if (menuRect.bottom > window.innerHeight - 8) {
+                menu.style.top = `${Math.max(8, triggerRect.top - menuRect.height - 6)}px`;
+            }
+        }
         selectedButton?.focus();
         return () => {
             document.removeEventListener("pointerdown", closeOutside);

@@ -134,7 +134,7 @@ export default function Usuarios() {
                 <button type="button" className="header-btn" onClick={openCreateModal}>+ Novo usuário</button>
             </div>
 
-            <div className="catalog-toolbar">
+            <div className="catalog-toolbar users-filter-toolbar">
                 <label className="search-bar"><SearchIcon /><input type="search" aria-label="Buscar usuário por nome ou e-mail" placeholder="Buscar nome ou e-mail..." value={search} onChange={(event) => setSearch(event.target.value)} /></label>
                 <div className="catalog-filters" aria-label="Filtros de usuários">
                     <CatalogFilter label="Perfil" value={roleFilter} onChange={setRoleFilter} options={[{ value: "", label: "Todos os perfis" }, { value: "ADMIN", label: "Administrador" }, { value: "MEMBER", label: "Membro" }]} />

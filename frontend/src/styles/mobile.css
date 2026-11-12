@@ -174,6 +174,7 @@
   /* Main content */
   .content{
     flex:1;
+    min-width:0;
     overflow-y:auto;
     padding: 16px 16px 90px;
   }
@@ -235,9 +236,9 @@
   .catalog-filters{
     display:flex;
     flex:0 1 auto;
+    flex-wrap:wrap;
     gap:8px;
     min-width:0;
-    overflow-x:auto;
   }
   .catalog-toolbar.movement-filters{
     flex-wrap:wrap;
@@ -313,6 +314,8 @@
     position:fixed;
     z-index:1000;
     max-width:calc(100vw - 16px);
+    max-height:calc(100dvh - 16px);
+    overflow-y:auto;
     padding:5px;
     border:1px solid var(--border);
     border-radius:10px;
@@ -339,8 +342,46 @@
   .catalog-filter-menu button:hover, .catalog-filter-menu button:focus-visible{ background:var(--surface-2); }
   .catalog-filter-menu button[aria-checked="true"]{ color:var(--accent-text); background:var(--accent-soft); }
   @media (max-width: 600px){
-    .catalog-toolbar .search-bar{ flex:1 0 110px; }
-    .catalog-filters{ flex:1 1 145px; }
+    .catalog-toolbar:not(.audit-toolbar):not(.movement-filters){
+      display:grid;
+      grid-template-columns:minmax(0, 1fr);
+    }
+    .catalog-toolbar.has-mobile-add{
+      grid-template-columns:minmax(0, 1fr) auto;
+    }
+    .catalog-toolbar:not(.audit-toolbar):not(.movement-filters) .search-bar{ grid-column:1; grid-row:1; }
+    .catalog-toolbar:not(.audit-toolbar):not(.movement-filters) .catalog-add-btn{ grid-column:2; grid-row:1; }
+    .catalog-toolbar:not(.audit-toolbar):not(.movement-filters) .catalog-filters{ grid-column:1 / -1; grid-row:2; }
+    .catalog-toolbar.users-filter-toolbar .search-bar{ grid-column:1 / -1; }
+    .catalog-filters{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(min(100%, 105px), 1fr));
+      width:100%;
+    }
+    .catalog-filters .catalog-filter-field{ min-width:0; }
+    .catalog-filters .catalog-filter-measure{ width:100%; min-width:0; overflow:hidden; }
+    .catalog-filters .catalog-filter-trigger span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .catalog-toolbar.audit-toolbar .search-bar,
+    .catalog-toolbar.movement-filters .search-bar{ flex:1 1 100%; }
+    .audit-toolbar .date-range-picker,
+    .movement-filters .date-range-picker{ flex:1 1 180px; min-width:0; }
+    .audit-toolbar .date-range-trigger,
+    .movement-filters .date-range-trigger{ min-width:0; }
+    .date-range-trigger span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .audit-toolbar .date-range-popover,
+    .movement-filters .date-range-popover{
+      position:fixed; top:50%; left:50%; width:min(310px, calc(100vw - 32px)); transform:translate(-50%, -50%);
+    }
+    .loan-page-layout .loan-summary{ gap:6px; }
+    .loan-page-layout .loan-summary-card{ min-width:0; min-height:90px; padding:10px 8px; }
+    .loan-page-layout .loan-summary-card strong{ font-size:22px; }
+    .loan-page-layout .loan-summary-card small{ overflow-wrap:anywhere; }
+    .user-card{ flex-wrap:wrap; }
+    .users-list .user-card-info{ flex:1 1 calc(100% - 55px); }
+    .user-role{ margin-left:49px; }
+    .user-edit-button{ margin-left:auto; }
+    .loan-history-list .loan-history-item small{ white-space:normal; overflow-wrap:anywhere; }
+    .modal-sheet .loan-modal-details{ grid-template-columns:1fr; }
   }
   .catalog-add-btn{
     width:41px;
