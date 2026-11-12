@@ -3,6 +3,7 @@ package br.ufu.facom.petsi.controlaPET.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.MailParseException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,7 @@ public class EmailService {
     private String from;
 
     public void sendPasswordReset(String recipient, String resetUrl) {
+        validateSender();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(recipient);
@@ -27,6 +29,7 @@ public class EmailService {
     }
 
     public void sendInitialPasswordSetup(String recipient, String resetUrl) {
+        validateSender();
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(recipient);
@@ -36,5 +39,11 @@ public class EmailService {
                 + resetUrl
                 + "\n\nSe você não reconhece esta conta, ignore este e-mail.");
         mailSender.send(message);
+    }
+
+    private void validateSender() {
+        if (from == null || from.isBlank()) {
+            throw new MailParseException("Remetente não configurado: informe MAIL_FROM ou MAIL_USERNAME.");
+        }
     }
 }
