@@ -22,6 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Comparator;
 import java.util.List;
 
@@ -143,9 +145,18 @@ public class MovementService {
 
     @Transactional
     public Page<UserMovementHistoryResponseDTO> getUserHistory(User user, Pageable pageable) {
+        return getUserHistory(user, null, null, null, null, pageable);
+    }
+
+    @Transactional
+    public Page<UserMovementHistoryResponseDTO> getUserHistory(User user, String itemName, String type, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         List<UserMovementHistoryResponseDTO> history = new java.util.ArrayList<>();
 
         for (Loan loan : loanRepository.findAllByUser(user, Pageable.unpaged()).getContent()) {
+            history.add(new UserMovementHistoryResponseDTO(
+                    loan.getId(), "LOAN_CREATED", loan.getItem().getName(), loan.getQuantity(),
+                    null, loan.getCheckoutDate()
+            ));
             if (loan.getStatus() == LoanStatus.COMPLETED && loan.getActualReturnDate() != null) {
                 history.add(new UserMovementHistoryResponseDTO(
                         loan.getId(), "LOAN_RETURNED", loan.getItem().getName(), loan.getQuantity(),
@@ -163,7 +174,12 @@ public class MovementService {
             }
         }
 
+        String search = itemName == null ? "" : itemName.trim().toLowerCase(Locale.ROOT);
         List<UserMovementHistoryResponseDTO> sortedHistory = history.stream()
+                .filter(event -> search.isEmpty() || event.itemName().toLowerCase(Locale.ROOT).contains(search))
+                .filter(event -> type == null || type.isBlank() || event.type().equals(type))
+                .filter(event -> startDate == null || !event.eventDate().toLocalDate().isBefore(startDate))
+                .filter(event -> endDate == null || !event.eventDate().toLocalDate().isAfter(endDate))
                 .sorted(Comparator.comparing(UserMovementHistoryResponseDTO::eventDate).reversed())
                 .toList();
         int start = Math.toIntExact(pageable.getOffset());

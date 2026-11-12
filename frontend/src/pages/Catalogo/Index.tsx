@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
+import type { ItemFilters } from "../../hooks/useItem";
 import ItemDetailsModal from "../../components/item/ItemDetailsModal";
 import ItemFormModal from "../../components/item/ItemFormModal";
 import LoanRequestModal from "../../components/item/LoanRequestModal";
@@ -21,7 +22,10 @@ export default function Catalogo() {
     const canManageItems = user?.role === "ADMIN";
     const [search, setSearch] = useState("");
     const [debouncedSearch, setDebouncedSearch] = useState("");
-    const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useItemData(debouncedSearch);
+    const [type, setType] = useState<ItemFilters["type"]>("");
+    const [condition, setCondition] = useState<ItemFilters["condition"]>("");
+    const [available, setAvailable] = useState<ItemFilters["available"]>("");
+    const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useItemData({ name: debouncedSearch, type, condition, available });
     const addItemMutation = useAddItem();
     const updateItemMutation = useUpdateItem();
     const deleteItemMutation = useDeleteItem();
@@ -152,6 +156,12 @@ export default function Catalogo() {
                 search={search}
                 onAdd={openAddModal}
                 onSearchChange={setSearch}
+                type={type}
+                condition={condition}
+                available={available}
+                onTypeChange={setType}
+                onConditionChange={setCondition}
+                onAvailableChange={setAvailable}
             />
 
             {isError && <p>Erro ao carregar os itens.</p>}

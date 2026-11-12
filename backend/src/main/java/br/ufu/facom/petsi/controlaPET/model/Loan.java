@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "loans")
+@Table(name = "loans", indexes = @Index(name = "idx_loans_status_expected_return", columnList = "status, expected_return_date"))
 @Getter
 @Setter
 @NoArgsConstructor

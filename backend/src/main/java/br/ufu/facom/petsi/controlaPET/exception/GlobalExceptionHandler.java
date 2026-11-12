@@ -2,18 +2,34 @@ package br.ufu.facom.petsi.controlaPET.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MailException.class)
+    public ResponseEntity<StandardError> handleMailException(MailException ex) {
+        Throwable cause = ex.getMostSpecificCause();
+        log.warn("Falha ao enviar e-mail: {}: {}", cause.getClass().getSimpleName(), cause.getMessage());
+        StandardError error = new StandardError(
+                HttpStatus.SERVICE_UNAVAILABLE.value(),
+                "Não foi possível enviar o e-mail. Verifique a configuração de envio e tente novamente.",
+                LocalDateTime.now(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+    }
 
     // 1. Tratamento para erros de validação dos DTOs (@Valid, @NotNull, @Min)
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -22,15 +22,22 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query(
             value = """
                     SELECT * FROM items
-                    WHERE translate(lower(name), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc')
-                        LIKE concat('%', translate(lower(cast(:name as text)), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc'), '%')
+                    WHERE (:type = '' OR type = :type)
+                      AND (:condition = '' OR condition = :condition)
+                      AND (:available = '' OR (:available = 'true' AND stock_quantity > 0) OR (:available = 'false' AND stock_quantity = 0))
+                      AND (:name = '' OR translate(lower(name), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc')
+                        LIKE concat('%', translate(lower(cast(:name as text)), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc'), '%'))
                     """,
             countQuery = """
                     SELECT count(*) FROM items
-                    WHERE translate(lower(name), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc')
-                        LIKE concat('%', translate(lower(cast(:name as text)), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc'), '%')
+                    WHERE (:type = '' OR type = :type)
+                      AND (:condition = '' OR condition = :condition)
+                      AND (:available = '' OR (:available = 'true' AND stock_quantity > 0) OR (:available = 'false' AND stock_quantity = 0))
+                      AND (:name = '' OR translate(lower(name), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc')
+                        LIKE concat('%', translate(lower(cast(:name as text)), 'áàâãäéèêëíìîïóòôõöúùûüç', 'aaaaaeeeeiiiiooooouuuuc'), '%'))
                     """,
             nativeQuery = true
     )
-    Page<Item> findByNameContainingIgnoringAccents(@Param("name") String name, Pageable pageable);
+    Page<Item> findFiltered(@Param("name") String name, @Param("type") String type,
+                            @Param("condition") String condition, @Param("available") String available, Pageable pageable);
 }

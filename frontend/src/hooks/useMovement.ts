@@ -28,16 +28,18 @@ export function useUserMovements(){
     })
 }
 
-const fetchUserMovementHistory = async(page: number): Promise<Page<UserMovementHistory>> => {
-    const response = await api.get<Page<UserMovementHistory>>("/movements/me/history", { params: { page, size: 20 } });
+export interface HistoryFilters { itemName: string; type: string; startDate: string; endDate: string }
+
+const fetchUserMovementHistory = async(page: number, filters: HistoryFilters): Promise<Page<UserMovementHistory>> => {
+    const response = await api.get<Page<UserMovementHistory>>("/movements/me/history", { params: { page, size: 20, ...filters } });
     return response.data;
 }
 
-export function useUserMovementHistory() {
+export function useUserMovementHistory(filters: HistoryFilters) {
     return useInfiniteQuery({
-        queryKey: ['user-movement-history'],
+        queryKey: ['user-movement-history', filters],
         initialPageParam: 0,
-        queryFn: ({ pageParam }) => fetchUserMovementHistory(pageParam),
+        queryFn: ({ pageParam }) => fetchUserMovementHistory(pageParam, filters),
         getNextPageParam: (lastPage) => (
             lastPage.number + 1 < lastPage.totalPages ? lastPage.number + 1 : undefined
         )

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -14,6 +15,7 @@ import jakarta.persistence.LockModeType;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
 
 public interface LoanRepository extends JpaRepository<Loan, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -25,4 +27,8 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     Page<Loan> findAllByUserAndStatusIn(User user, List<LoanStatus> statusPendents, Pageable pageable);
 
     long countByStatus(LoanStatus loanStatus);
+
+    @Modifying
+    @Query("update Loan loan set loan.status = :overdue where loan.status = :active and loan.expectedReturnDate < :today")
+    int markOverdue(@Param("active") LoanStatus active, @Param("overdue") LoanStatus overdue, @Param("today") LocalDate today);
 }

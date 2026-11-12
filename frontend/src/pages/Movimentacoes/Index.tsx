@@ -7,6 +7,9 @@ import { useReturnLoan, useUserLoans } from "../../hooks/useLoan";
 import { useUserMovementHistory } from "../../hooks/useMovement";
 import { useToast } from "../../hooks/useToast";
 import type { Loan } from "../../interfaces/Loan";
+import CatalogFilter from "../Catalogo/CatalogFilter";
+import DateRangePicker from "../../components/ui/DateRangePicker";
+import { SearchIcon } from "../../components/ui/Icons";
 
 function formatDate(date?: string | null) {
     if (!date) return "—";
@@ -27,7 +30,19 @@ function getLoanStatus(status: Loan["status"]) {
     return { label: "Em andamento", className: "active" };
 }
 
+function returnDescription(loan: Loan) {
+    if (!loan.actualReturnDate) return "Ainda não devolvido";
+    const due = Date.parse(`${loan.expectedReturnDate}T00:00:00Z`);
+    const returned = Date.parse(`${loan.actualReturnDate.slice(0, 10)}T00:00:00Z`);
+    const days = Math.round((returned - due) / 86400000);
+    return days > 0 ? `Devolvido com ${days} ${days === 1 ? "dia" : "dias"} de atraso` : "Devolvido no prazo";
+}
+
 export default function Movimentacoes() {
+    const [itemName, setItemName] = useState("");
+    const [historyType, setHistoryType] = useState("");
+    const [startDate, setStartDate] = useState("");
+    const [endDate, setEndDate] = useState("");
     const { data: loans = [], isLoading: isLoadingLoans, isError: hasLoanError } = useUserLoans();
     const {
         data: historyData,
@@ -36,11 +51,12 @@ export default function Movimentacoes() {
         hasNextPage,
         isFetchingNextPage,
         fetchNextPage
-    } = useUserMovementHistory();
+    } = useUserMovementHistory({ itemName: itemName.trim(), type: historyType, startDate, endDate });
     const returnLoan = useReturnLoan();
     const { message, showToast } = useToast();
 
     const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
+    const [historyLoan, setHistoryLoan] = useState<Loan | null>(null);
     const [defectModalOpen, setDefectModalOpen] = useState(false);
 
     const historico = historyData?.pages.flatMap((page) => page.content) ?? [];
@@ -136,7 +152,7 @@ export default function Movimentacoes() {
                                         </div>
                                     </button>
                                 );
-                            }) : <div className="loan-empty-state">Você não possui empréstimos em andamento.</div>}
+                            }) : <div className="loan-empty-state">Nenhum empréstimo em andamento encontrado.</div>}
                         </div>
                     )}
 
@@ -145,19 +161,42 @@ export default function Movimentacoes() {
                         {historico.length > 0 && <span>{historico.length} registros</span>}
                     </div>
 
+                    <div className="catalog-toolbar movement-filters">
+                        <label className="search-bar"><SearchIcon /><input type="search" aria-label="Buscar item no histórico" placeholder="Buscar item..." value={itemName} onChange={(event) => setItemName(event.target.value)} /></label>
+                        <CatalogFilter label="Tipo" value={historyType} onChange={setHistoryType} options={[
+                            { value: "", label: "Todo o histórico" }, { value: "LOAN_CREATED", label: "Empréstimo" }, { value: "LOAN_RETURNED", label: "Devolução" }, { value: "OUTBOUND_CONSUMPTION", label: "Consumo" },
+                        ]} />
+                        <DateRangePicker id="movement-date-range" startDate={startDate} endDate={endDate} onChange={(start, end) => { setStartDate(start); setEndDate(end); }} />
+                    </div>
+
                     {!isLoading && !hasError && (
                         <div className="loan-history-list">
                             {historico.length ? historico.map((entry) => {
+                                const loan = entry.type !== "OUTBOUND_CONSUMPTION" ? loans.find((item) => item.id === entry.sourceId) : undefined;
+                                if (entry.type === "LOAN_CREATED") {
+                                    return (
+                                        <button type="button" className="loan-history-item history-loan-button" key={`${entry.type}-${entry.sourceId}-${entry.eventDate}`} onClick={() => loan && setHistoryLoan(loan)} disabled={!loan}>
+                                            <div className="loan-history-icon borrowed">↗</div>
+                                            <div>
+                                                <span>Empréstimo em {formatDate(entry.eventDate)}</span>
+                                                <strong>{entry.itemName}</strong>
+                                                <small>{entry.quantity} {entry.quantity === 1 ? "unidade" : "unidades"}{loan ? ` · Prazo: ${formatDate(loan.expectedReturnDate)}` : ""}</small>
+                                            </div>
+                                            <ChevronIcon />
+                                        </button>
+                                    );
+                                }
                                 if (entry.type === "LOAN_RETURNED") {
                                     return (
-                                        <div className="loan-history-item" key={`${entry.type}-${entry.sourceId}-${entry.eventDate}`}>
+                                        <button type="button" className="loan-history-item history-loan-button" key={`${entry.type}-${entry.sourceId}-${entry.eventDate}`} onClick={() => loan && setHistoryLoan(loan)} disabled={!loan}>
                                             <div className="loan-history-icon completed">↵</div>
                                             <div>
                                                 <span>Devolvido em {formatDate(entry.eventDate)}</span>
                                                 <strong>{entry.itemName}</strong>
-                                                <small>{entry.quantity} {entry.quantity === 1 ? "unidade" : "unidades"}</small>
+                                                <small>{entry.quantity} {entry.quantity === 1 ? "unidade" : "unidades"}{loan ? ` · ${returnDescription(loan)}` : ""}</small>
                                             </div>
-                                        </div>
+                                            <ChevronIcon />
+                                        </button>
                                     );
                                 }
 
@@ -209,6 +248,16 @@ export default function Movimentacoes() {
                         </div>
                     </div>
                 )}
+            </Modal>
+
+            <Modal open={historyLoan !== null} title={historyLoan?.itemName ?? "Empréstimo"} subtitle={historyLoan ? getLoanStatus(historyLoan.status).label : undefined} closeLabel="Fechar" onClose={() => setHistoryLoan(null)}>
+                {historyLoan && <div className="loan-modal-details">
+                    <div><span>Retirado em</span><strong>{formatDate(historyLoan.checkoutDate)}</strong></div>
+                    <div><span>Prazo para devolução</span><strong>{formatDate(historyLoan.expectedReturnDate)}</strong></div>
+                    <div><span>Quantidade</span><strong>{historyLoan.quantity} {historyLoan.quantity === 1 ? "unidade" : "unidades"}</strong></div>
+                    {historyLoan.actualReturnDate && <div><span>Devolvido em</span><strong>{formatDate(historyLoan.actualReturnDate)}</strong></div>}
+                    {historyLoan.actualReturnDate && <div><span>Situação da devolução</span><strong>{returnDescription(historyLoan)}</strong></div>}
+                </div>}
             </Modal>
 
             <DefectReportModal

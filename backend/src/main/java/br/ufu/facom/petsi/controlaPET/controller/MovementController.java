@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/movements")
@@ -73,9 +74,13 @@ public class MovementController {
     @GetMapping("/me/history")
     public ResponseEntity<Page<UserMovementHistoryResponseDTO>> getUserHistory(
             @AuthenticationPrincipal User user,
+            @RequestParam(required = false) String itemName,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate,
             @PageableDefault(size = 20) Pageable pageable
     ) {
-        return ResponseEntity.ok(movementService.getUserHistory(user, pageable));
+        return ResponseEntity.ok(movementService.getUserHistory(user, itemName, type, startDate, endDate, pageable));
     }
 
     @GetMapping("/item/{id}")

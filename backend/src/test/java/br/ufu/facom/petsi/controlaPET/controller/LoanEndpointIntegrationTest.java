@@ -10,6 +10,7 @@ import br.ufu.facom.petsi.controlaPET.model.enums.UserRole;
 import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import br.ufu.facom.petsi.controlaPET.repository.LoanRepository;
 import br.ufu.facom.petsi.controlaPET.repository.UserRepository;
+import br.ufu.facom.petsi.controlaPET.service.LoanStatusService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ class LoanEndpointIntegrationTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private LoanStatusService loanStatusService;
 
     @AfterEach
     void cleanDatabase() {
@@ -114,6 +118,28 @@ class LoanEndpointIntegrationTest {
 
         assertEquals(LoanStatus.ACTIVE, loanRepository.findById(loan.getId()).orElseThrow().getStatus());
         assertEquals(0, itemRepository.findById(item.getId()).orElseThrow().getStockQuantity());
+    }
+
+    @Test
+    void marksOnlyActiveLoansPastTheirReturnDateAsOverdue() {
+        User owner = saveUser("Dona", UserRole.MEMBER);
+        Item item = saveItem("Notebook", 3);
+        LocalDate today = LocalDate.of(2026, 11, 6);
+        Loan expired = saveLoan(owner, item, LoanStatus.ACTIVE, LocalDateTime.now());
+        expired.setExpectedReturnDate(today.minusDays(1));
+        loanRepository.save(expired);
+        Loan dueToday = saveLoan(owner, item, LoanStatus.ACTIVE, LocalDateTime.now());
+        dueToday.setExpectedReturnDate(today);
+        loanRepository.save(dueToday);
+        Loan completed = saveLoan(owner, item, LoanStatus.COMPLETED, LocalDateTime.now());
+        completed.setExpectedReturnDate(today.minusDays(1));
+        loanRepository.save(completed);
+
+        assertEquals(1, loanStatusService.markOverdue(today));
+        assertEquals(0, loanStatusService.markOverdue(today));
+        assertEquals(LoanStatus.OVERDUE, loanRepository.findById(expired.getId()).orElseThrow().getStatus());
+        assertEquals(LoanStatus.ACTIVE, loanRepository.findById(dueToday.getId()).orElseThrow().getStatus());
+        assertEquals(LoanStatus.COMPLETED, loanRepository.findById(completed.getId()).orElseThrow().getStatus());
     }
 
     private User saveUser(String name, UserRole role) {

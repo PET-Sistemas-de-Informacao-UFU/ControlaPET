@@ -1,10 +1,9 @@
-import { useState } from "react";
-import Modal from "../../components/ui/Modal";
+import { useEffect, useState } from "react";
 import DateRangePicker from "../../components/ui/DateRangePicker";
-import { FilterIcon } from "../../components/ui/Icons";
-import { useIsDesktop } from "../../hooks/useIsDesktop";
+import { SearchIcon } from "../../components/ui/Icons";
 import { useAuditEvents } from "../../hooks/useAudit";
-import type { AuditEvent, AuditFilter, Log } from "../../interfaces/Log";
+import type { AuditEvent, AuditEventType, AuditFilter, Log } from "../../interfaces/Log";
+import CatalogFilter from "../Catalogo/CatalogFilter";
 
 function formatDate(date: string) {
     const hasTime = date.includes("T");
@@ -19,7 +18,7 @@ function formatDate(date: string) {
 
 function toLog(event: AuditEvent): Log {
     const labels = {
-        LOAN_CREATED: { tag: "Empréstimo", color: "var(--blue)", text: `registrou empréstimo de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
+        LOAN_CREATED: { tag: "Retirada", color: "var(--blue)", text: `retirou ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName} por empréstimo.` },
         LOAN_RETURNED: { tag: "Devolução", color: "var(--green)", text: `devolveu ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
         INBOUND: { tag: "Entrada", color: "var(--green)", text: `registrou entrada de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
         OUTBOUND_CONSUMPTION: { tag: "Consumo", color: "var(--orange)", text: `registrou consumo de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
@@ -39,80 +38,38 @@ function toLog(event: AuditEvent): Log {
 }
 
 export default function Auditoria() {
-    const isDesktop = useIsDesktop();
-    const [filter, setFilter] = useState<AuditFilter>({ startDate: null, endDate: null, name: null });
-    const [searchOpen, setSearchOpen] = useState(false);
+    const [filter, setFilter] = useState<AuditFilter>({ startDate: null, endDate: null, name: null, itemName: null, type: null });
     const [startDateInput, setStartDateInput] = useState("");
     const [endDateInput, setEndDateInput] = useState("");
     const [nameInput, setNameInput] = useState("");
+    const [itemInput, setItemInput] = useState("");
+    const [typeInput, setTypeInput] = useState("");
     const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useAuditEvents(filter);
     const logs = data?.pages.flatMap((page) => page.content).map(toLog) ?? [];
 
-    function openSearchModal() {
-        setStartDateInput(filter.startDate ?? "");
-        setEndDateInput(filter.endDate ?? "");
-        setNameInput(filter.name ?? "");
-        setSearchOpen(true);
-    }
-
-    function applyFilter() {
-        setFilter({
+    useEffect(() => {
+        const timeout = window.setTimeout(() => setFilter({
             startDate: startDateInput || null,
             endDate: endDateInput || null,
-            name: nameInput.trim() || null
-        });
-        setSearchOpen(false);
-    }
-
-    function clearFilter() {
-        setFilter({ startDate: null, endDate: null, name: null });
-        setStartDateInput("");
-        setEndDateInput("");
-        setNameInput("");
-        setSearchOpen(false);
-    }
-
-    const fields = (
-        <>
-            <div className="form-group">
-                <label htmlFor="audit-search-date-range">Período</label>
-                <DateRangePicker
-                    id="audit-search-date-range"
-                    startDate={startDateInput}
-                    endDate={endDateInput}
-                    onChange={(startDate, endDate) => {
-                        setStartDateInput(startDate);
-                        setEndDateInput(endDate);
-                    }}
-                />
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="audit-search-name">Nome</label>
-                <input
-                    type="text"
-                    id="audit-search-name"
-                    placeholder="Ex: Thiago"
-                    value={nameInput}
-                    onChange={(event) => setNameInput(event.target.value)}
-                />
-            </div>
-        </>
-    );
+            name: nameInput.trim() || null,
+            itemName: itemInput.trim() || null,
+            type: (typeInput as AuditEventType | "LOAN_ALL") || null
+        }), 300);
+        return () => window.clearTimeout(timeout);
+    }, [startDateInput, endDateInput, nameInput, itemInput, typeInput]);
 
     return (
         <>
-            {isDesktop ? (
-                <div className="audit-filters">
-                    {fields}
-                    <button type="button" className="header-btn" onClick={applyFilter}>Buscar</button>
-                    <button type="button" className="header-btn ghost" onClick={clearFilter}>Limpar</button>
-                </div>
-            ) : (
-                <div className="search-bar" onClick={openSearchModal}>
-                    <FilterIcon /><span>Pesquisar / Filtrar...</span>
-                </div>
-            )}
+            <div className="catalog-toolbar audit-toolbar">
+                <label className="search-bar"><SearchIcon /><input type="search" aria-label="Buscar por usuário" placeholder="Buscar usuário..." value={nameInput} onChange={(event) => setNameInput(event.target.value)} /></label>
+                <label className="search-bar"><SearchIcon /><input type="search" aria-label="Buscar por item" placeholder="Buscar item..." value={itemInput} onChange={(event) => setItemInput(event.target.value)} /></label>
+                <CatalogFilter label="Atividade" value={typeInput} onChange={setTypeInput} options={[
+                    { value: "", label: "Todas as atividades" }, { value: "LOAN_ALL", label: "Empréstimos" }, { value: "LOAN_CREATED", label: "Retirada" },
+                    { value: "LOAN_RETURNED", label: "Devolução" }, { value: "INBOUND", label: "Entrada" },
+                    { value: "OUTBOUND_CONSUMPTION", label: "Consumo" }, { value: "ADJUSTMENT", label: "Ajuste" },
+                ]} />
+                <DateRangePicker id="audit-search-date-range" startDate={startDateInput} endDate={endDateInput} onChange={(start, end) => { setStartDateInput(start); setEndDateInput(end); }} />
+            </div>
 
             <div className="section-label">Histórico de atividades</div>
 
@@ -145,23 +102,6 @@ export default function Auditoria() {
                 </div>
             )}
 
-            {!isDesktop && (
-                <Modal
-                    open={searchOpen}
-                    title="Pesquisar auditoria"
-                    subtitle="Filtre por data e/ou por quem realizou a ação"
-                    closeLabel="Cancelar"
-                    onClose={() => setSearchOpen(false)}
-                    actions={
-                        <>
-                            <div className="modal-btn primary" onClick={applyFilter}>Buscar</div>
-                            <div className="modal-btn" onClick={clearFilter}>Limpar filtro</div>
-                        </>
-                    }
-                >
-                    {fields}
-                </Modal>
-            )}
         </>
     );
 }

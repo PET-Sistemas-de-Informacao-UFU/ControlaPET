@@ -25,7 +25,7 @@ export interface ConsumeItem {
 
 export interface UserMovementHistory {
     sourceId: number,
-    type: 'LOAN_RETURNED' | 'OUTBOUND_CONSUMPTION',
+    type: 'LOAN_CREATED' | 'LOAN_RETURNED' | 'OUTBOUND_CONSUMPTION',
     itemName: string,
     quantity: number,
     notes: string | null,

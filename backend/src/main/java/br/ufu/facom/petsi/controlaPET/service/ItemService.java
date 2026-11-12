@@ -4,6 +4,8 @@ import br.ufu.facom.petsi.controlaPET.dto.itemDTO.CreateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.ItemResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.UpdateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.model.Item;
+import br.ufu.facom.petsi.controlaPET.model.enums.ItemType;
+import br.ufu.facom.petsi.controlaPET.model.enums.ItemCondition;
 import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +45,10 @@ public class ItemService {
         );
     }
 
-    public Page<ItemResponseDTO> getAllItems(String name, Pageable pageable) {
-
-        Page<Item> itemPage;
-
-        if(name!=null && !name.trim().isEmpty())
-            itemPage = itemRepository.findByNameContainingIgnoringAccents(name, pageable);
-        else
-            itemPage = itemRepository.findAll(pageable);
+    public Page<ItemResponseDTO> getAllItems(String name, ItemType type, ItemCondition condition, Boolean available, Pageable pageable) {
+        Page<Item> itemPage = itemRepository.findFiltered(
+                name == null ? "" : name.trim(), type == null ? "" : type.name(),
+                condition == null ? "" : condition.name(), available == null ? "" : available.toString(), pageable);
 
         return itemPage.map(
                 item -> new ItemResponseDTO(
