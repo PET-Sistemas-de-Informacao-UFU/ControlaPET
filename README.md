@@ -53,15 +53,21 @@ As credenciais padrão do banco de dados (já configuradas no Docker Compose e n
 
 O Spring Boot se encarregará de criar as tabelas automaticamente no banco (`ddl-auto=update`).
 
-### 4. Conectar a um Banco Remoto (.env)
-Se você precisa apontar a aplicação para um banco remoto (como o **Supabase**) em vez do Postgres local, copie o arquivo de exemplo na raiz do projeto e preencha os valores:
+### 4. Configurar o ambiente (.env)
+Copie o arquivo de exemplo para a raiz do projeto e preencha os valores necessários:
 cp .env.example .env
 
-O Spring Boot carrega esse arquivo automaticamente através da linha `spring.config.import` no `application.properties`. As variáveis disponíveis são:
+O backend e o frontend leem esse mesmo arquivo. Sem as variáveis de banco, o backend usa o PostgreSQL local do docker-compose. Para conectar a um banco remoto (como o **Supabase**), configure:
 - **`DB_URL_CONTROLAPET`:** URL JDBC do banco (no Supabase, use o *Transaction Pooler* e mantenha o `?prepareThreshold=0`)
 - **`DB_USER_CONTROLAPET`:** usuário do banco
 - **`DB_PASSWORD_CONTROLAPET`:** senha do banco
 - **`JWT_SECRET_CONTROLAPET`:** chave de assinatura dos tokens (gere a sua com `openssl rand -base64 64 | tr -d '\n'`)
+
+O arquivo de exemplo também documenta a URL pública da API (`VITE_API_URL`), o endereço do frontend, o envio de e-mail e opções de logs. As variáveis iniciadas por `VITE_` são públicas e não devem conter senhas ou chaves.
+
+Para produção, ative o perfil `prod` com `SPRING_PROFILES_ACTIVE=prod` no ambiente do serviço. Informe explicitamente as variáveis de banco, `JWT_SECRET_CONTROLAPET`, `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `MAIL_HOST`, `MAIL_USERNAME` e `MAIL_PASSWORD`. `CORS_ALLOWED_ORIGINS` aceita origens HTTPS exatas separadas por vírgulas, sem caminho ou barra final. A chave JWT deve ser uma chave própria em base64 com pelo menos 32 bytes.
+
+Nesse perfil, o Flyway aplica automaticamente as migrations de `backend/src/main/resources/db/migration` e o Hibernate valida o esquema. A primeira migration cria as tabelas em um banco vazio; não habilite a criação automática de baseline em bancos existentes sem comparar a estrutura e fazer backup. O usuário do banco precisa ter permissão para criar as tabelas na primeira execução. A criação do primeiro administrador ainda precisa ser definida antes da publicação.
 
 *O arquivo `.env` está no `.gitignore` e nunca deve ser commitado. O sufixo `_CONTROLAPET` evita conflito com variáveis genéricas (`DB_URL`, `JWT_SECRET`) que você possa ter exportadas no sistema por causa de outros projetos.*
 
@@ -105,4 +111,4 @@ As mensagens de commit devem ser escritas em minúsculo, no seguinte formato:
 - `refactor: otimiza DTOs com flattening e usa enum LoanStatus`
 - `fix: resolve erro ao buscar utilizador logado e corrige retorno da data`
 
-*Observação: Para rodar localmente não é preciso configurar nada, pois as configurações estão blindadas através da sintaxe `${VARIAVEL:valor_padrao}`. O arquivo `.env.example` serve apenas para quem for apontar a aplicação para um banco remoto.*
+*Observação: O backend possui valores padrão para execução local; consulte `.env.example` para configurar os serviços externos.*
