@@ -1,3 +1,5 @@
+import { isAxiosError } from "axios";
+import { useAddDefectReport } from "../../hooks/useDefectReport";
 import { useState } from "react";
 import DefectReportModal from "../../components/item/DefectReportModal";
 import { ChevronIcon } from "../../components/ui/Icons";
@@ -53,6 +55,7 @@ export default function Movimentacoes() {
         fetchNextPage
     } = useUserMovementHistory({ itemName: itemName.trim(), type: historyType, startDate, endDate });
     const returnLoan = useReturnLoan();
+    const addDefectReport = useAddDefectReport();
     const { message, showToast } = useToast();
 
     const [selectedLoan, setSelectedLoan] = useState<Loan | null>(null);
@@ -96,9 +99,11 @@ export default function Movimentacoes() {
     }
 
     function handleDefectSubmit(description: string) {
-        void description;
-        setDefectModalOpen(false);
-        showToast("Defeito reportado");
+        if (!selectedLoan || addDefectReport.isPending) return;
+        addDefectReport.mutate({ itemId: selectedLoan.itemId, description }, {
+            onSuccess: () => { setDefectModalOpen(false); showToast("Defeito relatado"); },
+            onError: error => showToast(isAxiosError(error) ? error.response?.data?.message ?? "Não foi possível enviar o relato" : "Não foi possível enviar o relato")
+        });
     }
 
     return (
@@ -224,7 +229,7 @@ export default function Movimentacoes() {
             </div>
 
             <Modal
-                open={selectedLoan !== null}
+                open={selectedLoan !== null && !defectModalOpen}
                 title={selectedLoan?.itemName ?? "Empréstimo"}
                 subtitle={selectedLoan ? `${getLoanStatus(selectedLoan.status).label} · Retirado em ${formatDate(selectedLoan.checkoutDate)}` : undefined}
                 closeLabel="Fechar"
@@ -261,6 +266,8 @@ export default function Movimentacoes() {
             </Modal>
 
             <DefectReportModal
+                key={`${selectedLoan?.id}-${defectModalOpen}`}
+                isSubmitting={addDefectReport.isPending}
                 open={defectModalOpen}
                 itemName={selectedLoan?.itemName ?? "item"}
                 onClose={() => setDefectModalOpen(false)}

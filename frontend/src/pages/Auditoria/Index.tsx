@@ -18,6 +18,9 @@ function formatDate(date: string) {
 
 function toLog(event: AuditEvent): Log {
     const labels = {
+        DEFECT_REPORTED: { tag: "Defeito relatado", color: "var(--red)", text: `relatou um defeito em ${event.itemName}.` },
+        DEFECT_RESOLVED: { tag: "Defeito resolvido", color: "var(--green)", text: `resolveu um relato de defeito em ${event.itemName}.` },
+        DEFECT_DISMISSED: { tag: "Relato descartado", color: "var(--text-dim)", text: `descartou um relato de defeito em ${event.itemName}.` },
         LOAN_CREATED: { tag: "Retirada", color: "var(--blue)", text: `retirou ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName} por empréstimo.` },
         LOAN_RETURNED: { tag: "Devolução", color: "var(--green)", text: `devolveu ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
         INBOUND: { tag: "Entrada", color: "var(--green)", text: `registrou entrada de ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
@@ -66,6 +69,7 @@ export default function Auditoria() {
                 <CatalogFilter label="Atividade" value={typeInput} onChange={setTypeInput} options={[
                     { value: "", label: "Todas as atividades" }, { value: "LOAN_ALL", label: "Empréstimos" }, { value: "LOAN_CREATED", label: "Retirada" },
                     { value: "LOAN_RETURNED", label: "Devolução" }, { value: "INBOUND", label: "Entrada" },
+                    { value: "DEFECT_REPORTED", label: "Defeito relatado" }, { value: "DEFECT_RESOLVED", label: "Defeito resolvido" }, { value: "DEFECT_DISMISSED", label: "Relato descartado" },
                     { value: "OUTBOUND_CONSUMPTION", label: "Consumo" }, { value: "ADJUSTMENT", label: "Ajuste" },
                 ]} />
                 <DateRangePicker id="audit-search-date-range" startDate={startDateInput} endDate={endDateInput} onChange={(start, end) => { setStartDateInput(start); setEndDateInput(end); }} />

@@ -1,3 +1,4 @@
+import { useAddDefectReport } from "../../hooks/useDefectReport";
 import { useContext, useEffect, useState } from "react";
 import { useItemData, useAddItem, useUpdateItem, useDeleteItem } from "../../hooks/useItem";
 import type { ItemFilters } from "../../hooks/useItem";
@@ -26,6 +27,7 @@ export default function Catalogo() {
     const [condition, setCondition] = useState<ItemFilters["condition"]>("");
     const [available, setAvailable] = useState<ItemFilters["available"]>("");
     const { data, isLoading, isError, hasNextPage, isFetchingNextPage, fetchNextPage } = useItemData({ name: debouncedSearch, type, condition, available });
+    const addDefectReportMutation = useAddDefectReport();
     const addItemMutation = useAddItem();
     const updateItemMutation = useUpdateItem();
     const deleteItemMutation = useDeleteItem();
@@ -143,9 +145,11 @@ export default function Catalogo() {
     }
 
     function handleDefectConfirm(description: string) {
-        void description;
-        setDefectItemId(null);
-        showToast("Defeito reportado");
+        if (defectItemId === null || addDefectReportMutation.isPending) return;
+        addDefectReportMutation.mutate({ itemId: defectItemId, description }, {
+            onSuccess: () => { setDetailsItemId(defectItemId); setDefectItemId(null); showToast("Defeito relatado"); },
+            onError: error => showToast(getRequestErrorMessage(error, "Não foi possível enviar o relato"))
+        });
     }
 
     return (
@@ -233,6 +237,8 @@ export default function Catalogo() {
             />
 
             <DefectReportModal
+                key={defectItemId ?? "closed"}
+                isSubmitting={addDefectReportMutation.isPending}
                 open={defectItem !== null}
                 itemName={defectItem?.name ?? ""}
                 onClose={() => setDefectItemId(null)}
