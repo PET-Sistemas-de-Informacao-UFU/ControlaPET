@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { AuthContext } from "../../context/AuthContext";
 import DefectReportList from "./DefectReportList";
 import Modal from "../ui/Modal";
 import type { Item } from "../../interfaces/Item";
@@ -11,6 +13,8 @@ interface ItemDetailsModalProps {
 }
 
 export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumir, onRelatarDefeito }: ItemDetailsModalProps) {
+    const { user } = useContext(AuthContext);
+    const canManageReports = user?.role === "ADMIN";
     const unitLabel = item?.totalQuantity === 1 ? "unidade" : "unidades";
     const typeLabels = {
         CONSUMABLE: "Consumível",
@@ -63,7 +67,7 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumi
                         </div>
                     </div>
                     {item.maintenanceQuantity > 0 && <p className="item-maintenance-summary">{item.maintenanceQuantity} {item.maintenanceQuantity === 1 ? "unidade bloqueada por defeito" : "unidades bloqueadas por defeito"}</p>}
-                    <DefectReportList key={item.id} itemId={item.id} />
+                    {canManageReports && <DefectReportList key={item.id} itemId={item.id} />}
                 </div>
             )}
         </Modal>

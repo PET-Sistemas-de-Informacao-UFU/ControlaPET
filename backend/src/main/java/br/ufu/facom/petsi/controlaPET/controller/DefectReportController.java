@@ -25,6 +25,7 @@ public class DefectReportController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Page<DefectReportResponseDTO>> getItemReports(@PathVariable Long itemId,
             @PageableDefault(size = 10, sort = {"createdAt", "id"}, direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(defectReportService.getItemReports(itemId, pageable));
