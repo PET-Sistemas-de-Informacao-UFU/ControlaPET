@@ -8,6 +8,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
@@ -48,9 +51,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    // 2. Tratamento para buscas falhas (ex: Item não encontrado)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<StandardError> handleIllegalArgumentException(IllegalArgumentException ex) {
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<StandardError> handleBusinessException(BusinessException ex) {
         StandardError error = new StandardError(
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
@@ -60,12 +62,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
-    // 3. Tratamento para regras de negócio (ex: Sem estoque, item não emprestável)
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<StandardError> handleRuntimeException(RuntimeException ex) {
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<StandardError> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
         StandardError error = new StandardError(
                 HttpStatus.BAD_REQUEST.value(),
-                ex.getMessage(),
+                "Parâmetro de requisição inválido.",
                 LocalDateTime.now(),
                 null
         );
@@ -86,7 +87,17 @@ public class GlobalExceptionHandler {
 
     // 5. Fallback genérico para erros inesperados do servidor (Protege a stack trace)
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<StandardError> handleGlobalException(Exception ex) {
+    public ResponseEntity<StandardError> handleGlobalException(Exception ex, HttpServletRequest request) {
+        if (ex instanceof ErrorResponse response && response.getStatusCode().is4xxClientError()) {
+            StandardError error = new StandardError(
+                    response.getStatusCode().value(),
+                    "Não foi possível processar a requisição.",
+                    LocalDateTime.now(),
+                    null
+            );
+            return ResponseEntity.status(response.getStatusCode()).body(error);
+        }
+        log.error("Erro inesperado ao processar {} {}", request.getMethod(), request.getRequestURI(), ex);
         StandardError error = new StandardError(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Ocorreu um erro interno inesperado no servidor.",

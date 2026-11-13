@@ -1,5 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
+import br.ufu.facom.petsi.controlaPET.exception.BusinessException;
+
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.ConsumeItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.CreateMovementRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.MovementDTO.MovementResponseDTO;
@@ -38,10 +40,10 @@ public class MovementService {
     @Transactional
     public MovementResponseDTO createConsumeMovement(User user, ConsumeItemRequestDTO request) {
         Item item = itemRepository.findByIdForUpdate(request.itemId())
-                .orElseThrow(() -> new IllegalArgumentException(("Item não encontrado")));
+                .orElseThrow(() -> new BusinessException(("Item não encontrado")));
 
         if(item.getStockQuantity()- request.quantity()<0 || !item.getType().equals(ItemType.CONSUMABLE)){
-            throw new RuntimeException(("Sem estoque o suficiente ou tipo não consumível"));
+            throw new BusinessException(("Sem estoque o suficiente ou tipo não consumível"));
         }
 
         item.setTotalQuantity(item.getTotalQuantity()- request.quantity());
@@ -73,13 +75,13 @@ public class MovementService {
     @Transactional
     public MovementResponseDTO createMovement(User user, CreateMovementRequestDTO request) {
         Item item = itemRepository.findByIdForUpdate(request.itemId())
-                .orElseThrow(() -> new IllegalArgumentException(("Item não encontrado")));
+                .orElseThrow(() -> new BusinessException(("Item não encontrado")));
 
 
 
         if(request.type().equals(MovementType.ADJUSTMENT)){
             if(item.getStockQuantity() - request.quantity()<0)
-                throw new RuntimeException(("Sem estoque o suficiente"));
+                throw new BusinessException(("Sem estoque o suficiente"));
 
             item.setTotalQuantity(item.getTotalQuantity()-request.quantity());
             item.setStockQuantity(item.getStockQuantity()-request.quantity());

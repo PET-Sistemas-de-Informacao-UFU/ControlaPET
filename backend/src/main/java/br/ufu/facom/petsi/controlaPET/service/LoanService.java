@@ -1,5 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
+import br.ufu.facom.petsi.controlaPET.exception.BusinessException;
+
 import br.ufu.facom.petsi.controlaPET.dto.loanDTO.CreateLoanRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.loanDTO.LoanResponseDTO;
 import br.ufu.facom.petsi.controlaPET.model.Item;
@@ -34,13 +36,13 @@ public class LoanService {
     @Transactional
     public LoanResponseDTO createLoan(User user, CreateLoanRequestDTO request) {
         Item item = itemRepository.findByIdForUpdate(request.itemId())
-                .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+                .orElseThrow(() -> new BusinessException("Item não encontrado"));
 
         if(item.getStockQuantity()==0 || !item.getType().equals(ItemType.BORROWABLE))
-            throw new RuntimeException("Item sem estoque ou não emprestável");
+            throw new BusinessException("Item sem estoque ou não emprestável");
 
         if(item.getStockQuantity()-request.quantity()<0)
-            throw new RuntimeException("Estoque insuficiente");
+            throw new BusinessException("Estoque insuficiente");
 
         item.setStockQuantity(item.getStockQuantity()-request.quantity());
         itemRepository.save(item);
@@ -104,10 +106,10 @@ public class LoanService {
     @Transactional
     public LoanResponseDTO returnLoan(User user, Long id) {
         Loan loan = loanRepository.findByIdForUpdate(id)
-                .orElseThrow(() -> new IllegalArgumentException("Loan não encontrado"));
+                .orElseThrow(() -> new BusinessException("Loan não encontrado"));
 
         if(loan.getStatus().equals(LoanStatus.COMPLETED))
-            throw new RuntimeException("Esse empréstimo já foi devolvido");
+            throw new BusinessException("Esse empréstimo já foi devolvido");
 
         if(!user.getId().equals(loan.getUser().getId()) && !user.getRole().equals(UserRole.ADMIN))
             throw new AccessDeniedException("Loan não pertence ao usuário");
@@ -116,7 +118,7 @@ public class LoanService {
         loan.setStatus(LoanStatus.COMPLETED);
 
         Item item = itemRepository.findByIdForUpdate(loan.getItem().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+                .orElseThrow(() -> new BusinessException("Item não encontrado"));
         int maintenanceQuantity = 0;
         for (var report : defectReportRepository.findWaitingForReturn(loan.getId())) {
             maintenanceQuantity += report.getActiveReservedQuantity();
@@ -127,7 +129,7 @@ public class LoanService {
             }
         }
         if (maintenanceQuantity > loan.getQuantity())
-            throw new IllegalArgumentException("As reservas por defeito ultrapassam a quantidade deste empréstimo.");
+            throw new BusinessException("As reservas por defeito ultrapassam a quantidade deste empréstimo.");
         item.setStockQuantity(item.getStockQuantity() + loan.getQuantity() - maintenanceQuantity);
         item.setMaintenanceQuantity(item.getMaintenanceQuantity() + maintenanceQuantity);
 

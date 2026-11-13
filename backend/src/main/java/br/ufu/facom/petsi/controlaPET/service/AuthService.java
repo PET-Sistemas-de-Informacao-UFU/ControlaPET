@@ -1,5 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
+import br.ufu.facom.petsi.controlaPET.exception.BusinessException;
+
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.AuthResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.LoginRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.RefreshTokenRequestDTO;
@@ -50,7 +52,7 @@ public class AuthService {
         );
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -63,7 +65,7 @@ public class AuthService {
 
         if (userEmail != null) {
             User user = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+                    .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
 
             if (jwtService.isTokenValid(request.refreshToken(), user)) {
                 String accessToken = jwtService.generateToken(user);
@@ -73,7 +75,7 @@ public class AuthService {
             }
         }
 
-        throw new IllegalArgumentException("Refresh token inválido ou expirado");
+        throw new BusinessException("Refresh token inválido ou expirado");
     }
 
     @Transactional
@@ -119,10 +121,10 @@ public class AuthService {
     @Transactional
     public void resetPassword(ResetPasswordRequestDTO request) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hashToken(request.token()))
-                .orElseThrow(() -> new IllegalArgumentException("Link de redefinição inválido ou expirado."));
+                .orElseThrow(() -> new BusinessException("Link de redefinição inválido ou expirado."));
 
         if (resetToken.isUsed() || (resetToken.getExpiresAt() != null && resetToken.getExpiresAt().isBefore(LocalDateTime.now()))) {
-            throw new IllegalArgumentException("Link de redefinição inválido ou expirado.");
+            throw new BusinessException("Link de redefinição inválido ou expirado.");
         }
 
         User user = resetToken.getUser();

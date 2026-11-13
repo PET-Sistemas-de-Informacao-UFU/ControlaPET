@@ -1,5 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
+import br.ufu.facom.petsi.controlaPET.exception.BusinessException;
+
 import br.ufu.facom.petsi.controlaPET.dto.defectReport.*;
 import br.ufu.facom.petsi.controlaPET.model.*;
 import br.ufu.facom.petsi.controlaPET.model.enums.DefectReportStatus;
@@ -30,16 +32,16 @@ public class DefectReportService {
         Loan loan = request.loanId() == null ? null : getLoanForUpdate(request.loanId());
         Item item = getItemForUpdate(itemId);
         if (loan != null) {
-            if (!loan.getItem().getId().equals(itemId)) throw new IllegalArgumentException("Empréstimo não pertence ao item.");
+            if (!loan.getItem().getId().equals(itemId)) throw new BusinessException("Empréstimo não pertence ao item.");
             if (!loan.getUser().getId().equals(user.getId()) && user.getRole() != UserRole.ADMIN)
                 throw new AccessDeniedException("Empréstimo não pertence ao usuário.");
             if (loan.getStatus() == LoanStatus.COMPLETED)
-                throw new IllegalArgumentException("Para um empréstimo já devolvido, relate o defeito pelo catálogo.");
+                throw new BusinessException("Para um empréstimo já devolvido, relate o defeito pelo catálogo.");
         }
         long maximum = loan == null ? item.getStockQuantity()
                 : loan.getQuantity() - defectReportRepository.sumReservedQuantityByLoanId(loan.getId(), null);
         if (request.quantity() > maximum)
-            throw new IllegalArgumentException("A quantidade afetada ultrapassa as unidades disponíveis na origem informada.");
+            throw new BusinessException("A quantidade afetada ultrapassa as unidades disponíveis na origem informada.");
         DefectReport report = DefectReport.builder().item(item).reportedBy(user).loan(loan)
                 .quantity(request.quantity()).reservedQuantity(request.quantity())
                 .description(request.description().trim()).status(DefectReportStatus.OPEN).build();
@@ -53,7 +55,7 @@ public class DefectReportService {
 
     @Transactional(readOnly = true)
     public Page<DefectReportResponseDTO> getItemReports(Long itemId, Pageable pageable) {
-        if (!itemRepository.existsById(itemId)) throw new IllegalArgumentException("Item não encontrado");
+        if (!itemRepository.existsById(itemId)) throw new BusinessException("Item não encontrado");
         return defectReportRepository.findAllByItemId(itemId, pageable).map(this::toResponse);
     }
 
@@ -74,7 +76,7 @@ public class DefectReportService {
     @Transactional(readOnly = true)
     public DefectReportResponseDTO getReport(Long id) {
         return toResponse(defectReportRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Relato não encontrado")));
+                .orElseThrow(() -> new BusinessException("Relato não encontrado")));
     }
 
     @Transactional(readOnly = true)
@@ -97,17 +99,17 @@ public class DefectReportService {
         Item item = getItemForUpdate(itemId);
         DefectReport report = getReportForUpdate(itemId, id);
         if (report.getStatus() != DefectReportStatus.OPEN)
-            throw new IllegalArgumentException("Somente relatos abertos podem ser confirmados.");
+            throw new BusinessException("Somente relatos abertos podem ser confirmados.");
         int quantity = request.quantity();
         if (report.getQuantity() != null && quantity > report.getQuantity())
-            throw new IllegalArgumentException("A quantidade confirmada não pode ultrapassar a quantidade relatada.");
+            throw new BusinessException("A quantidade confirmada não pode ultrapassar a quantidade relatada.");
         if (loan != null && defectReportRepository.sumReservedQuantityByLoanId(loan.getId(), id) + quantity > loan.getQuantity())
-            throw new IllegalArgumentException("Já existem unidades deste empréstimo reservadas em outros relatos.");
+            throw new BusinessException("Já existem unidades deste empréstimo reservadas em outros relatos.");
         int previousReservation = report.getActiveReservedQuantity();
         if (report.getStockReservedAt() != null) {
             int released = previousReservation - quantity;
             if (released < 0 || item.getMaintenanceQuantity() < previousReservation)
-                throw new IllegalArgumentException("As quantidades do item estão inconsistentes com a reserva deste relato.");
+                throw new BusinessException("As quantidades do item estão inconsistentes com a reserva deste relato.");
             item.setStockQuantity(item.getStockQuantity() + released);
             item.setMaintenanceQuantity(item.getMaintenanceQuantity() - released);
         }
@@ -120,7 +122,7 @@ public class DefectReportService {
         } else {
             if (report.getStockReservedAt() == null) {
                 if (quantity > item.getStockQuantity())
-                    throw new IllegalArgumentException("Não há unidades disponíveis suficientes para enviar à manutenção.");
+                    throw new BusinessException("Não há unidades disponíveis suficientes para enviar à manutenção.");
                 item.setStockQuantity(item.getStockQuantity() - quantity);
                 item.setMaintenanceQuantity(item.getMaintenanceQuantity() + quantity);
                 report.setStockReservedAt(LocalDateTime.now());
@@ -136,30 +138,30 @@ public class DefectReportService {
         if (request.status() != DefectReportStatus.RESOLVED
                 && request.status() != DefectReportStatus.DISMISSED
                 && request.status() != DefectReportStatus.WRITTEN_OFF)
-            throw new IllegalArgumentException("Escolha reparo, descarte do relato ou baixa definitiva.");
+            throw new BusinessException("Escolha reparo, descarte do relato ou baixa definitiva.");
         lockReportLoan(id);
         Item item = getItemForUpdate(itemId);
         DefectReport report = getReportForUpdate(itemId, id);
         if (report.getClosedAt() != null)
-            throw new IllegalArgumentException("Este relato já foi encerrado.");
+            throw new BusinessException("Este relato já foi encerrado.");
         if (report.getStatus() == DefectReportStatus.WAITING_RETURN)
-            throw new IllegalArgumentException("Aguarde a devolução para concluir a avaliação das unidades.");
+            throw new BusinessException("Aguarde a devolução para concluir a avaliação das unidades.");
         if (report.getStatus() == DefectReportStatus.OPEN) {
             if (request.status() != DefectReportStatus.DISMISSED)
-                throw new IllegalArgumentException("Confirme a manutenção antes de registrar reparo ou baixa definitiva.");
+                throw new BusinessException("Confirme a manutenção antes de registrar reparo ou baixa definitiva.");
             if (report.getStockReservedAt() != null) {
                 int quantity = report.getActiveReservedQuantity();
                 if (item.getMaintenanceQuantity() < quantity)
-                    throw new IllegalArgumentException("As quantidades do item estão inconsistentes com a reserva deste relato.");
+                    throw new BusinessException("As quantidades do item estão inconsistentes com a reserva deste relato.");
                 item.setMaintenanceQuantity(item.getMaintenanceQuantity() - quantity);
                 item.setStockQuantity(item.getStockQuantity() + quantity);
             }
         } else if (report.getStatus() == DefectReportStatus.IN_MAINTENANCE) {
             if (request.status() == DefectReportStatus.DISMISSED)
-                throw new IllegalArgumentException("A manutenção deve ser concluída com reparo ou baixa definitiva. Descartar se aplica apenas a relatos ainda não confirmados.");
+                throw new BusinessException("A manutenção deve ser concluída com reparo ou baixa definitiva. Descartar se aplica apenas a relatos ainda não confirmados.");
             int quantity = report.getConfirmedQuantity();
             if (item.getMaintenanceQuantity() < quantity || item.getTotalQuantity() < quantity)
-                throw new IllegalArgumentException("As quantidades do item estão inconsistentes com esta manutenção.");
+                throw new BusinessException("As quantidades do item estão inconsistentes com esta manutenção.");
             item.setMaintenanceQuantity(item.getMaintenanceQuantity() - quantity);
             if (request.status() == DefectReportStatus.WRITTEN_OFF) {
                 item.setTotalQuantity(item.getTotalQuantity() - quantity);
@@ -167,7 +169,7 @@ public class DefectReportService {
                 item.setStockQuantity(item.getStockQuantity() + quantity);
             }
         } else {
-            throw new IllegalArgumentException("Este relato já foi encerrado.");
+            throw new BusinessException("Este relato já foi encerrado.");
         }
         report.setStatus(request.status());
         report.setClosedBy(user);
@@ -181,17 +183,17 @@ public class DefectReportService {
     }
 
     private Loan getLoanForUpdate(Long id) {
-        return loanRepository.findByIdForUpdate(id).orElseThrow(() -> new IllegalArgumentException("Empréstimo não encontrado."));
+        return loanRepository.findByIdForUpdate(id).orElseThrow(() -> new BusinessException("Empréstimo não encontrado."));
     }
 
     private Item getItemForUpdate(Long id) {
-        return itemRepository.findByIdForUpdate(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        return itemRepository.findByIdForUpdate(id).orElseThrow(() -> new BusinessException("Item não encontrado"));
     }
 
     private DefectReport getReportForUpdate(Long itemId, Long id) {
         DefectReport report = defectReportRepository.findByIdForUpdate(id)
-                .orElseThrow(() -> new IllegalArgumentException("Relato não encontrado"));
-        if (!report.getItem().getId().equals(itemId)) throw new IllegalArgumentException("Relato não pertence ao item");
+                .orElseThrow(() -> new BusinessException("Relato não encontrado"));
+        if (!report.getItem().getId().equals(itemId)) throw new BusinessException("Relato não pertence ao item");
         return report;
     }
 
