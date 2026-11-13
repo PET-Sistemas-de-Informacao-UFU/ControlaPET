@@ -4,8 +4,8 @@ import { AuthContext } from "./AuthContext";
 import type { User } from "../interfaces/User";
 import type { AuthResponse, LoginData, SignupData } from "../interfaces/Auth";
 import { api } from "../service/api";
-import { setupInterceptors } from "../service/AuthInterceptor";
-import { clearTokens, readToken, storeTokens } from "../service/authStorage";
+import { refreshAccessToken, setupInterceptors } from "../service/AuthInterceptor";
+import { clearTokens, storeToken } from "../service/authStorage";
 
 interface AuthProviderProps {
     children: ReactNode;
@@ -13,10 +13,10 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | undefined>(undefined);
-    const [authenticated, setAuthenticated] = useState(() => !!readToken());
+    const [authenticated, setAuthenticated] = useState(false);
     const queryClient = useQueryClient();
 
-    const [loading, setLoading] = useState(() => !!readToken());
+    const [loading, setLoading] = useState(true);
 
     const handleLogout = useCallback(() => {
         setAuthenticated(false);
@@ -43,11 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }, [handleLogout]);
 
     useEffect(() => {
-        if (readToken()) {
-            void refreshUser();
-        } else {
-            setLoading(false);
-        }
+        void refreshAccessToken().then(() => refreshUser()).catch(() => setLoading(false));
     }, [refreshUser]);
 
     async function handleLogin({ email, password }: LoginData) {
@@ -55,9 +51,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             const response = await api.post<AuthResponse>("/auth/login", {
                 email,
                 password
-            });
+            }, { headers: { "X-Auth-Request": "1" } });
 
-            storeTokens(response.data.token, response.data.refreshToken);
+            storeToken(response.data.token);
 
             await refreshUser();
         } catch (error) {

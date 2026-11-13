@@ -14,5 +14,4 @@ export interface SignupData{
 
 export interface AuthResponse{
     token: string
-    refreshToken: string
 }

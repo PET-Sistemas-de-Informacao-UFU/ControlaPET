@@ -45,6 +45,7 @@ public class AuthService {
     private final EmailService emailService;
     private final PasswordResetRateLimiter passwordResetRateLimiter;
     private final LoginRateLimiter loginRateLimiter;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
@@ -52,8 +53,10 @@ public class AuthService {
     @Transactional
     public void logout(User user) {
         userRepository.revokeSessions(user.getId());
+        jdbcTemplate.update("DELETE FROM refresh_tokens WHERE user_id = ?", user.getId());
     }
 
+    @Transactional
     public @Nullable AuthResponseDTO login(LoginRequestDTO request) {
         if (!loginRateLimiter.tryAcquire(request.email())) {
             throw new org.springframework.web.server.ResponseStatusException(
@@ -68,10 +71,12 @@ public class AuthService {
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
+        saveRefreshToken(user, refreshToken);
 
         return new AuthResponseDTO(accessToken, refreshToken);
     }
 
+    @Transactional
     public @Nullable AuthResponseDTO refreshToken(RefreshTokenRequestDTO request) {
         String userEmail;
         try {
@@ -85,14 +90,24 @@ public class AuthService {
                     .orElseThrow(() -> new BadCredentialsException("Token inválido ou expirado."));
 
             if (jwtService.isTokenValid(request.refreshToken(), user, "refresh")) {
+                int consumed = jdbcTemplate.update("DELETE FROM refresh_tokens WHERE token_hash = ? AND user_id = ? AND expires_at > CURRENT_TIMESTAMP",
+                        hashToken(request.refreshToken()), user.getId());
+                if (consumed != 1) throw new BadCredentialsException("Token inválido ou expirado.");
                 String accessToken = jwtService.generateToken(user);
                 String refreshToken = jwtService.generateRefreshToken(user);
+                saveRefreshToken(user, refreshToken);
 
                 return new AuthResponseDTO(accessToken, refreshToken);
             }
         }
 
         throw new BadCredentialsException("Token inválido ou expirado.");
+    }
+
+    private void saveRefreshToken(User user, String token) {
+        jdbcTemplate.update("DELETE FROM refresh_tokens WHERE expires_at <= CURRENT_TIMESTAMP");
+        jdbcTemplate.update("INSERT INTO refresh_tokens(token_hash, user_id, expires_at) VALUES (?, ?, ?)",
+                hashToken(token), user.getId(), java.sql.Timestamp.from(jwtService.getExpiration(token).toInstant()));
     }
 
     @Transactional

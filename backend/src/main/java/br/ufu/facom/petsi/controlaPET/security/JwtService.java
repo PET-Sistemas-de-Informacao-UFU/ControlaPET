@@ -63,6 +63,7 @@ public class JwtService {
         }
         return Jwts.builder()
                 .claims(claims)
+                .id(java.util.UUID.randomUUID().toString())
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + refreshJwtExpiration))
@@ -92,6 +93,10 @@ public class JwtService {
 
     private Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
+    }
+
+    public Date getExpiration(String token) {
+        return extractExpiration(token);
     }
 
     private Claims extractAllClaims(String token) {

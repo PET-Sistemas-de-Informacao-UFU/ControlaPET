@@ -1,67 +1,55 @@
-import axios from "axios";
+﻿import axios from "axios";
 import { api, BASE_URL } from "./api";
-import { readRefreshToken, readToken, storeTokens } from "./authStorage";
+import { readToken, storeToken } from "./authStorage";
 import type { AuthResponse } from "../interfaces/Auth";
+
+let pendingRefresh: Promise<string> | null = null;
+
+export function refreshAccessToken(): Promise<string> {
+    if (!pendingRefresh) {
+        const refresh = async () => {
+            const response = await axios.post<AuthResponse>(`${BASE_URL}/auth/refresh`, null, {
+                withCredentials: true,
+                headers: { "X-Auth-Request": "1" },
+            });
+            storeToken(response.data.token);
+            return response.data.token;
+        };
+        // Serializa a rotação do cookie entre abas quando a API Web Locks está disponível.
+        const task = navigator.locks ? navigator.locks.request("controlapet-refresh", refresh) : refresh();
+        pendingRefresh = task.finally(() => { pendingRefresh = null; });
+    }
+    return pendingRefresh;
+}
 
 function isAuthRequest(url?: string) {
     return url?.includes("/auth/login") || url?.includes("/auth/refresh");
 }
 
 export function setupInterceptors(handleLogout: () => void) {
-    const requestInterceptorId = api.interceptors.request.use(
-        (config) => {
-            const token = readToken();
-
-            if (token && !isAuthRequest(config.url)) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
-
-            return config;
+    const requestId = api.interceptors.request.use((config) => {
+        const token = readToken();
+        if (token && !isAuthRequest(config.url)) config.headers.Authorization = `Bearer ${token}`;
+        return config;
+    });
+    const responseId = api.interceptors.response.use((response) => response, async (error) => {
+        const original = error.config;
+        if (!original || error.response?.status !== 401 || isAuthRequest(original.url)) return Promise.reject(error);
+        if (original._retry) {
+            handleLogout();
+            return Promise.reject(error);
         }
-    );
-
-    const responseInterceptorId = api.interceptors.response.use(
-        (response) => response,
-
-        async (error) => {
-            const originalRequest = error.config;
-
-            if (error.response?.status !== 401 || isAuthRequest(originalRequest?.url)) {
-                return Promise.reject(error);
-            }
-
-            const refreshToken = readRefreshToken();
-
-            if (originalRequest._retry || !refreshToken) {
-                handleLogout();
-                return Promise.reject(error);
-            }
-
-            originalRequest._retry = true;
-
-            try {
-                const response = await axios.post<AuthResponse>(
-                    `${BASE_URL}/auth/refresh`,
-                    {
-                        refreshToken
-                    }
-                );
-
-                storeTokens(
-                    response.data.token,
-                    response.data.refreshToken
-                );
-
-                return api(originalRequest);
-            } catch (refreshError) {
-                handleLogout();
-                return Promise.reject(refreshError);
-            }
+        original._retry = true;
+        try {
+            await refreshAccessToken();
+            return api(original);
+        } catch (refreshError) {
+            handleLogout();
+            return Promise.reject(refreshError);
         }
-    );
-
+    });
     return () => {
-        api.interceptors.request.eject(requestInterceptorId);
-        api.interceptors.response.eject(responseInterceptorId);
+        api.interceptors.request.eject(requestId);
+        api.interceptors.response.eject(responseId);
     };
 }

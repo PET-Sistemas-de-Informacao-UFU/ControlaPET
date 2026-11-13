@@ -1,32 +1,17 @@
-const TOKEN_KEY = "@Auth:token";
-const REFRESH_TOKEN_KEY = "@Auth:refreshToken";
+﻿let accessToken: string | null = null;
 
-function read(key: string): string | null {
-    const raw = localStorage.getItem(key);
-
-    if (!raw || raw === "undefined") return null;
-
-    try {
-        return JSON.parse(raw) as string;
-    } catch {
-        return null;
-    }
-}
+// Remove tokens gravados por versões anteriores.
+localStorage.removeItem("@Auth:token");
+localStorage.removeItem("@Auth:refreshToken");
 
 export function readToken(): string | null {
-    return read(TOKEN_KEY);
+    return accessToken;
 }
 
-export function readRefreshToken(): string | null {
-    return read(REFRESH_TOKEN_KEY);
-}
-
-export function storeTokens(token: string, refreshToken: string) {
-    localStorage.setItem(TOKEN_KEY, JSON.stringify(token));
-    localStorage.setItem(REFRESH_TOKEN_KEY, JSON.stringify(refreshToken));
+export function storeToken(token: string) {
+    accessToken = token;
 }
 
 export function clearTokens() {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    accessToken = null;
 }

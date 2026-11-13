@@ -54,6 +54,7 @@ class AuthServiceTest {
     @Mock private EmailService emailService;
     @Mock private PasswordResetRateLimiter passwordResetRateLimiter;
     @Mock private LoginRateLimiter loginRateLimiter;
+    @Mock private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
     @InjectMocks private AuthService authService;
 
     @BeforeEach
@@ -68,6 +69,7 @@ class AuthServiceTest {
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(jwtService.generateToken(user)).thenReturn("access-token");
         when(jwtService.generateRefreshToken(user)).thenReturn("refresh-token");
+        when(jwtService.getExpiration("refresh-token")).thenReturn(new java.util.Date(System.currentTimeMillis() + 60000));
 
         AuthResponseDTO response = authService.login(new LoginRequestDTO(user.getEmail(), "senha"));
 
@@ -87,6 +89,8 @@ class AuthServiceTest {
         when(jwtService.isTokenValid("refresh-token", user, "refresh")).thenReturn(true);
         when(jwtService.generateToken(user)).thenReturn("new-access-token");
         when(jwtService.generateRefreshToken(user)).thenReturn("new-refresh-token");
+        when(jwtService.getExpiration("new-refresh-token")).thenReturn(new java.util.Date(System.currentTimeMillis() + 60000));
+        when(jdbcTemplate.update(org.mockito.ArgumentMatchers.startsWith("DELETE FROM refresh_tokens WHERE token_hash"), any(), any())).thenReturn(1);
 
         AuthResponseDTO response = authService.refreshToken(new RefreshTokenRequestDTO("refresh-token"));
 
