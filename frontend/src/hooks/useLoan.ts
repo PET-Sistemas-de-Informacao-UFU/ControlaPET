@@ -88,6 +88,10 @@ export function useReturnLoan(){
             queryClient.invalidateQueries({queryKey: ['user-loans-data']});
             queryClient.invalidateQueries({queryKey: ['user-pending-loans-data']});
             queryClient.invalidateQueries({queryKey: ['user-movement-history']});
+            queryClient.invalidateQueries({queryKey: ['items-data']});
+            queryClient.invalidateQueries({queryKey: ['item']});
+            queryClient.invalidateQueries({queryKey: ['defect-reports']});
+            queryClient.invalidateQueries({queryKey: ['audit-events']});
         }
     })
 }

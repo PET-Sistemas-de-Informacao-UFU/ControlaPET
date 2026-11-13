@@ -98,9 +98,9 @@ export default function Movimentacoes() {
         );
     }
 
-    function handleDefectSubmit(description: string) {
+    function handleDefectSubmit(description: string, quantity: number) {
         if (!selectedLoan || addDefectReport.isPending) return;
-        addDefectReport.mutate({ itemId: selectedLoan.itemId, description }, {
+        addDefectReport.mutate({ itemId: selectedLoan.itemId, loanId: selectedLoan.id, description, quantity }, {
             onSuccess: () => { setDefectModalOpen(false); showToast("Defeito relatado"); },
             onError: error => showToast(isAxiosError(error) ? error.response?.data?.message ?? "Não foi possível enviar o relato" : "Não foi possível enviar o relato")
         });
@@ -268,6 +268,7 @@ export default function Movimentacoes() {
             <DefectReportModal
                 key={`${selectedLoan?.id}-${defectModalOpen}`}
                 isSubmitting={addDefectReport.isPending}
+                maxQuantity={selectedLoan?.quantity ?? 0}
                 open={defectModalOpen}
                 itemName={selectedLoan?.itemName ?? "item"}
                 onClose={() => setDefectModalOpen(false)}

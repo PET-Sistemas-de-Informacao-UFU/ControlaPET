@@ -144,9 +144,9 @@ export default function Catalogo() {
         );
     }
 
-    function handleDefectConfirm(description: string) {
+    function handleDefectConfirm(description: string, quantity: number) {
         if (defectItemId === null || addDefectReportMutation.isPending) return;
-        addDefectReportMutation.mutate({ itemId: defectItemId, description }, {
+        addDefectReportMutation.mutate({ itemId: defectItemId, description, quantity }, {
             onSuccess: () => { setDetailsItemId(defectItemId); setDefectItemId(null); showToast("Defeito relatado"); },
             onError: error => showToast(getRequestErrorMessage(error, "Não foi possível enviar o relato"))
         });
@@ -239,6 +239,7 @@ export default function Catalogo() {
             <DefectReportModal
                 key={defectItemId ?? "closed"}
                 isSubmitting={addDefectReportMutation.isPending}
+                maxQuantity={defectItem?.stockQuantity ?? 0}
                 open={defectItem !== null}
                 itemName={defectItem?.name ?? ""}
                 onClose={() => setDefectItemId(null)}

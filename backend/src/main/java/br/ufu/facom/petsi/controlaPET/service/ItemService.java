@@ -40,6 +40,7 @@ public class ItemService {
                 newItem.getCondition(),
                 newItem.getTotalQuantity(),
                 newItem.getStockQuantity(),
+                newItem.getMaintenanceQuantity(),
                 newItem.getCreatedAt(),
                 newItem.getUpdatedAt()
         );
@@ -59,6 +60,7 @@ public class ItemService {
                         item.getCondition(),
                         item.getTotalQuantity(),
                         item.getStockQuantity(),
+                item.getMaintenanceQuantity(),
                         item.getCreatedAt(),
                         item.getUpdatedAt()
                 )
@@ -77,6 +79,7 @@ public class ItemService {
                 item.getCondition(),
                 item.getTotalQuantity(),
                 item.getStockQuantity(),
+                item.getMaintenanceQuantity(),
                 item.getCreatedAt(),
                 item.getUpdatedAt()
         );
@@ -102,13 +105,14 @@ public class ItemService {
             item.setCondition(request.condition());
         }
 
-        if (request.totalQuantity() != null) {
-            item.setTotalQuantity(request.totalQuantity());
-        }
-
-        if (request.stockQuantity() != null) {
-            item.setStockQuantity(request.stockQuantity());
-        }
+        int total = request.totalQuantity() == null ? item.getTotalQuantity() : request.totalQuantity();
+        long stock = (long) item.getStockQuantity() + total - item.getTotalQuantity();
+        if (stock < 0 || stock > Integer.MAX_VALUE)
+            throw new IllegalArgumentException("A quantidade total deve preservar as unidades emprestadas e em manutenção.");
+        if (request.stockQuantity() != null && request.stockQuantity() != stock)
+            throw new IllegalArgumentException("O estoque disponível deve preservar as unidades emprestadas e em manutenção.");
+        item.setTotalQuantity(total);
+        item.setStockQuantity((int) stock);
 
         Item newItem = itemRepository.saveAndFlush(item);
 
@@ -120,6 +124,7 @@ public class ItemService {
                 newItem.getCondition(),
                 newItem.getTotalQuantity(),
                 newItem.getStockQuantity(),
+                newItem.getMaintenanceQuantity(),
                 newItem.getCreatedAt(),
                 newItem.getUpdatedAt()
         );

@@ -13,6 +13,7 @@ public record ItemResponseDTO(
         ItemCondition condition,
         int totalQuantity,
         int stockQuantity,
+        int maintenanceQuantity,
         LocalDate createdAt,
         LocalDate updatedAt
 ) {

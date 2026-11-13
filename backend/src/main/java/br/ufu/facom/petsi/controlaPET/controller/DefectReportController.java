@@ -30,6 +30,14 @@ public class DefectReportController {
         return ResponseEntity.ok(defectReportService.getItemReports(itemId, pageable));
     }
 
+    @PatchMapping("/{id}/confirm")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DefectReportResponseDTO> confirmReport(@AuthenticationPrincipal User user,
+            @PathVariable Long itemId, @PathVariable Long id,
+            @Valid @RequestBody ConfirmDefectReportRequestDTO request) {
+        return ResponseEntity.ok(defectReportService.confirmReport(user, itemId, id, request));
+    }
+
     @PatchMapping("/{id}/close")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DefectReportResponseDTO> closeReport(@AuthenticationPrincipal User user,

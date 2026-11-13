@@ -9,6 +9,8 @@ import br.ufu.facom.petsi.controlaPET.model.enums.ItemType;
 import br.ufu.facom.petsi.controlaPET.model.enums.LoanStatus;
 import br.ufu.facom.petsi.controlaPET.model.enums.UserRole;
 import br.ufu.facom.petsi.controlaPET.repository.ItemRepository;
+import br.ufu.facom.petsi.controlaPET.repository.DefectReportRepository;
+import br.ufu.facom.petsi.controlaPET.model.enums.DefectReportStatus;
 import br.ufu.facom.petsi.controlaPET.repository.LoanRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class LoanService {
 
     private final LoanRepository loanRepository;
     private final ItemRepository itemRepository;
+    private final DefectReportRepository defectReportRepository;
 
     @Transactional
     public LoanResponseDTO createLoan(User user, CreateLoanRequestDTO request) {
@@ -114,7 +117,14 @@ public class LoanService {
 
         Item item = itemRepository.findByIdForUpdate(loan.getItem().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
-        item.setStockQuantity(item.getStockQuantity() + loan.getQuantity());
+        int maintenanceQuantity = 0;
+        for (var report : defectReportRepository.findWaitingForReturn(loan.getId())) {
+            maintenanceQuantity += report.getConfirmedQuantity();
+            report.setStatus(DefectReportStatus.IN_MAINTENANCE);
+            report.setMaintenanceStartedAt(loan.getActualReturnDate());
+        }
+        item.setStockQuantity(item.getStockQuantity() + loan.getQuantity() - maintenanceQuantity);
+        item.setMaintenanceQuantity(item.getMaintenanceQuantity() + maintenanceQuantity);
 
         itemRepository.save(item);
         Loan newLoan = loanRepository.save(loan);

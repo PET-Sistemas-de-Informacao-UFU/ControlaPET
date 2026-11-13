@@ -82,3 +82,9 @@ body{
 .defect-report>.header-btn{justify-self:start;}
 
 .modal-sheet.item-details-sheet{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain;}
+
+.defect-status-waiting_return,.defect-status-in_maintenance,.item-maintenance-summary{color:var(--orange);}
+.item-maintenance-summary{font-size:13px;margin-top:14px;}
+.defect-origin{font-size:12px;color:var(--text-dim);line-height:1.5;}
+.defect-report-actions{display:flex;flex-wrap:wrap;gap:8px;}
+.defect-quantity-field{max-width:200px;}

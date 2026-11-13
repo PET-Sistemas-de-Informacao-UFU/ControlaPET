@@ -61,7 +61,12 @@ public class AuditService {
 
         for (var report : defectReportRepository.findAll()) {
             events.add(new AuditEventResponseDTO(report.getId(), AuditEventType.DEFECT_REPORTED,
-                    report.getReportedBy().getName(), report.getItem().getId(), report.getItem().getName(), 0, report.getCreatedAt()));
+                    report.getReportedBy().getName(), report.getItem().getId(), report.getItem().getName(), report.getQuantity() == null ? 0 : report.getQuantity(), report.getCreatedAt()));
+            if (report.getConfirmedAt() != null) {
+                events.add(new AuditEventResponseDTO(report.getId(), AuditEventType.DEFECT_CONFIRMED,
+                        report.getConfirmedBy().getName(), report.getItem().getId(), report.getItem().getName(),
+                        report.getConfirmedQuantity(), report.getConfirmedAt()));
+            }
             if (report.getClosedAt() != null) {
                 var eventType = report.getStatus() == DefectReportStatus.RESOLVED
                         ? AuditEventType.DEFECT_RESOLVED : AuditEventType.DEFECT_DISMISSED;

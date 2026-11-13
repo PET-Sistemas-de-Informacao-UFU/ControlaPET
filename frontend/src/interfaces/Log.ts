@@ -8,7 +8,7 @@ export interface Log {
     color: string
 }
 
-export type AuditEventType = "DEFECT_REPORTED" | "DEFECT_RESOLVED" | "DEFECT_DISMISSED" | "LOAN_CREATED" | "LOAN_RETURNED" | "INBOUND" | "OUTBOUND_CONSUMPTION" | "ADJUSTMENT";
+export type AuditEventType = "DEFECT_CONFIRMED" | "DEFECT_REPORTED" | "DEFECT_RESOLVED" | "DEFECT_DISMISSED" | "LOAN_CREATED" | "LOAN_RETURNED" | "INBOUND" | "OUTBOUND_CONSUMPTION" | "ADJUSTMENT";
 
 export interface AuditEvent {
     sourceId: number
