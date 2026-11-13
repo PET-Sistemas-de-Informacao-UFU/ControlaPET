@@ -65,6 +65,8 @@ O backend e o frontend leem esse mesmo arquivo. Sem as variáveis de banco, o ba
 
 O arquivo de exemplo também documenta a URL pública da API (`VITE_API_URL`), o endereço do frontend, o envio de e-mail e opções de logs. As variáveis iniciadas por `VITE_` são públicas e não devem conter senhas ou chaves.
 
+Quando o frontend e a API forem publicados no mesmo domínio, configure `VITE_API_URL=/api` antes de gerar o frontend. O servidor web precisa encaminhar `/api` para o backend, preservando esse prefixo. A URL do frontend e as origens do CORS devem usar o domínio HTTPS real. Alterações em `VITE_API_URL` exigem gerar novamente o frontend.
+
 Para produção, ative o perfil `prod` com `SPRING_PROFILES_ACTIVE=prod` no ambiente do serviço. Informe explicitamente as variáveis de banco, `JWT_SECRET_CONTROLAPET`, `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `MAIL_HOST`, `MAIL_USERNAME` e `MAIL_PASSWORD`. `CORS_ALLOWED_ORIGINS` aceita origens HTTPS exatas separadas por vírgulas, sem caminho ou barra final. A chave JWT deve ser uma chave própria em base64 com pelo menos 32 bytes.
 
 Nesse perfil, o Flyway aplica automaticamente as migrations de `backend/src/main/resources/db/migration` e o Hibernate valida o esquema. A primeira migration cria as tabelas em um banco vazio; não habilite a criação automática de baseline em bancos existentes sem comparar a estrutura e fazer backup. O usuário do banco precisa ter permissão para criar as tabelas na primeira execução.
@@ -86,6 +88,8 @@ A API estará disponível e rodando na porta **8080**: `http://localhost:8080`
 ---
 
 ## Logs do backend
+
+Os scripts e orientações para backup e restauração do PostgreSQL estão em [deploy/README.md](deploy/README.md).
 
 O backend grava avisos e erros no console e em `logs/controlapet.log`, relativo ao diretório de execução. A variável `LOG_FILE` permite definir outro caminho; no deploy, use um diretório persistente com permissão de escrita.
 
