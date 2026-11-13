@@ -19,6 +19,7 @@ export default function AccountMenu({ variant }: AccountMenuProps) {
     const navigate = useNavigate();
     const { user, handleLogout, refreshUser } = useContext(AuthContext);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [logoutError, setLogoutError] = useState<string | null>(null);
     const [passwordModalOpen, setPasswordModalOpen] = useState(false);
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
@@ -36,7 +37,16 @@ export default function AccountMenu({ variant }: AccountMenuProps) {
     function openPasswordModal() {
         setMenuOpen(false); setPasswordError(null); setCurrentPassword(""); setNewPassword(""); setConfirmation(""); setPasswordModalOpen(true);
     }
-    function logout() { handleLogout(); navigate("/login", { replace: true }); }
+    function clearSession() { handleLogout(); navigate("/login", { replace: true }); }
+    async function logout() {
+        setLogoutError(null);
+        try {
+            await api.post("/auth/logout");
+            clearSession();
+        } catch {
+            setLogoutError("Não foi possível encerrar a sessão. Tente novamente.");
+        }
+    }
 
     async function submitPassword(event: FormEvent) {
         event.preventDefault(); setPasswordError(null);
@@ -45,7 +55,7 @@ export default function AccountMenu({ variant }: AccountMenuProps) {
         setChangingPassword(true);
         try {
             await api.patch("/users/me/password", { currentPassword, newPassword });
-            logout();
+            clearSession();
         } catch (error: unknown) {
             const message = typeof error === "object" && error !== null && "response" in error ? (error as { response?: { data?: { message?: string } } }).response?.data?.message : undefined;
             setPasswordError(message ?? "Não foi possível alterar a senha.");
@@ -69,9 +79,10 @@ export default function AccountMenu({ variant }: AccountMenuProps) {
     return <>
         <div className={`account-control ${variant}`}>
             {menuOpen && <div className="account-menu" role="menu">
+                {logoutError && <p role="alert">{logoutError}</p>}
                 <button type="button" role="menuitem" onClick={openNameModal}>Alterar nome</button>
                 <button type="button" role="menuitem" onClick={openPasswordModal}>Redefinir senha</button>
-                <button type="button" className="account-menu-logout" role="menuitem" onClick={logout}>Sair da conta</button>
+                <button type="button" className="account-menu-logout" role="menuitem" onClick={() => void logout()}>Sair da conta</button>
             </div>}
             <button type="button" className={variant === "sidebar" ? "side-nav-user" : "header-user"} aria-label="Opções da conta" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
                 <span className="side-nav-user-avatar" aria-hidden="true">{getInitials(user?.nome)}</span>

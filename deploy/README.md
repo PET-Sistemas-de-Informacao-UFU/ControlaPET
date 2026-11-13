@@ -12,6 +12,8 @@ docker compose -f docker-compose.prod.yml logs --tail=100 backend
 
 Depois do convite inicial, defina `BOOTSTRAP_ADMIN_ENABLED=false`. O SMTP e externo e precisa estar configurado para enviar convites e recuperar senhas. A verificacao de saude verifica aplicacao e banco; nao verifica entrega de e-mail.
 
+O login permite ate 10 tentativas por e-mail em uma janela de 15 minutos, inclusive tentativas bem-sucedidas. O controle fica em memoria, reinicia com o backend e e independente em cada instancia; protecao distribuida e por IP deve ser configurada na infraestrutura depois de identificar os proxies confiaveis da UFU. Ao sair da conta, todas as sessoes desse usuario sao revogadas. A reutilizacao de refresh tokens e o armazenamento dos tokens no navegador ainda precisam de revisao.
+
 A porta padrao e `127.0.0.1:8080`, acessivel no proprio servidor. Configure o Apache ou Nginx da UFU para encaminhar o dominio HTTPS para esse endereco. O Nginx do container serve o frontend e encaminha `/api` ao backend. Banco e backend nao publicam portas no servidor. Dominio, certificado HTTPS e compatibilidade com o site existente dependem da inspecao do servidor.
 
 Os volumes `controlapet_database` e `controlapet_logs` persistem dados e logs. O backend executa com usuario sem privilegios. Logs da aplicacao seguem a rotacao configurada no Spring; logs dos containers sao limitados a tres arquivos de 10 MB por container. `restart: unless-stopped` reinicia processos que encerram e restaura os servicos apos reiniciar o Docker. Um container marcado como unhealthy exige investigacao; esse estado sozinho nao dispara reinicializacao.

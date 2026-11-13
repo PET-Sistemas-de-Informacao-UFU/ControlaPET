@@ -44,11 +44,21 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
     private final PasswordResetRateLimiter passwordResetRateLimiter;
+    private final LoginRateLimiter loginRateLimiter;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
 
+    @Transactional
+    public void logout(User user) {
+        userRepository.revokeSessions(user.getId());
+    }
+
     public @Nullable AuthResponseDTO login(LoginRequestDTO request) {
+        if (!loginRateLimiter.tryAcquire(request.email())) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.TOO_MANY_REQUESTS, "Muitas tentativas. Tente novamente mais tarde.");
+        }
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password())
         );

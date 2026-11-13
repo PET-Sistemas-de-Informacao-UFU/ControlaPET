@@ -53,6 +53,7 @@ class AuthServiceTest {
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private EmailService emailService;
     @Mock private PasswordResetRateLimiter passwordResetRateLimiter;
+    @Mock private LoginRateLimiter loginRateLimiter;
     @InjectMocks private AuthService authService;
 
     @BeforeEach
@@ -63,6 +64,7 @@ class AuthServiceTest {
     @Test
     void logsInAndReturnsAccessAndRefreshTokens() {
         User user = user("membro@teste.com");
+        when(loginRateLimiter.tryAcquire(user.getEmail())).thenReturn(true);
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(jwtService.generateToken(user)).thenReturn("access-token");
         when(jwtService.generateRefreshToken(user)).thenReturn("refresh-token");

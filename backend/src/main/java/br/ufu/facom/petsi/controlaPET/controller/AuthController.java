@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
+import br.ufu.facom.petsi.controlaPET.model.User;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -21,6 +23,12 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal User user) {
+        authService.logout(user);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping("/login")
     private ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO request){
