@@ -1,5 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
+import br.ufu.facom.petsi.controlaPET.exception.BusinessException;
+
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.CreateUserRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangePasswordRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.userDTO.ChangeNameRequestDTO;
@@ -30,7 +32,7 @@ public class UserService {
                 authService.sendInitialPasswordSetup(existingUser);
                 return;
             }
-            throw new IllegalArgumentException("E-mail já cadastrado");
+            throw new BusinessException("E-mail já cadastrado");
         }
 
         User user = User.builder()
@@ -51,7 +53,7 @@ public class UserService {
 
     public void changePassword(User user, ChangePasswordRequestDTO request) {
         if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("A senha atual está incorreta");
+            throw new BusinessException("A senha atual está incorreta");
         }
 
         user.setPassword(passwordEncoder.encode(request.newPassword()));
@@ -67,36 +69,36 @@ public class UserService {
 
     public void changeRole(User authenticatedUser, UUID userId, br.ufu.facom.petsi.controlaPET.model.enums.UserRole role) {
         if (authenticatedUser.getId().equals(userId)) {
-            throw new IllegalArgumentException("Não é possível alterar o próprio perfil.");
+            throw new BusinessException("Não é possível alterar o próprio perfil.");
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado."));
         user.setRole(role);
         userRepository.save(user);
     }
 
     public void changeStatus(User authenticatedUser, UUID userId, boolean active) {
         if (authenticatedUser.getId().equals(userId) && !active) {
-            throw new IllegalArgumentException("Não é possível desativar a própria conta.");
+            throw new BusinessException("Não é possível desativar a própria conta.");
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado."));
         user.setActive(active);
         userRepository.save(user);
     }
 
     public void updateUser(User authenticatedUser, UUID userId, br.ufu.facom.petsi.controlaPET.dto.userDTO.UpdateUserRequestDTO request) {
         if (authenticatedUser.getId().equals(userId)) {
-            throw new IllegalArgumentException("Altere os dados da própria conta pelo menu de usuário.");
+            throw new BusinessException("Altere os dados da própria conta pelo menu de usuário.");
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado."));
+                .orElseThrow(() -> new BusinessException("Usuário não encontrado."));
         userRepository.findByEmail(request.email().trim())
                 .filter(foundUser -> !foundUser.getId().equals(userId))
-                .ifPresent(foundUser -> { throw new IllegalArgumentException("E-mail já cadastrado"); });
+                .ifPresent(foundUser -> { throw new BusinessException("E-mail já cadastrado"); });
 
         user.setName(request.name().trim());
         user.setEmail(request.email().trim());

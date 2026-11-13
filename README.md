@@ -77,6 +77,14 @@ A API estará disponível e rodando na porta **8080**: `http://localhost:8080`
 
 ---
 
+## Logs do backend
+
+O backend grava avisos e erros no console e em `logs/controlapet.log`, relativo ao diretório de execução. A variável `LOG_FILE` permite definir outro caminho; no deploy, use um diretório persistente com permissão de escrita.
+
+Os arquivos são rotacionados diariamente ou ao atingir 10 MB, com arquivos antigos comprimidos. A retenção é de até 30 dias e 1 GB de arquivos arquivados. Os logs são ignorados pelo Git.
+
+Cada requisição recebe um identificador gerado pelo servidor no cabeçalho de resposta `X-Request-ID`. Esse mesmo identificador aparece nos logs da requisição, incluindo falhas internas, permitindo localizar o erro sem registrar senhas, tokens ou o corpo enviado.
+
 ## 📝 Padrões de Commit
 
 O projeto segue rigorosamente a convenção do **Conventional Commits** para manter o histórico do Git limpo, rastreável e profissional.

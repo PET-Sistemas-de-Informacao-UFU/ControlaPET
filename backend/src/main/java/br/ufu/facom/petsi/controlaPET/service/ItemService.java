@@ -1,5 +1,7 @@
 package br.ufu.facom.petsi.controlaPET.service;
 
+import br.ufu.facom.petsi.controlaPET.exception.BusinessException;
+
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.CreateItemRequestDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.ItemResponseDTO;
 import br.ufu.facom.petsi.controlaPET.dto.itemDTO.UpdateItemRequestDTO;
@@ -69,7 +71,7 @@ public class ItemService {
 
 
     public ItemResponseDTO getItem(Long id) {
-        Item item = itemRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        Item item = itemRepository.findById(id).orElseThrow(() -> new BusinessException("Item não encontrado"));
 
         return new ItemResponseDTO(
                 item.getId(),
@@ -87,7 +89,7 @@ public class ItemService {
 
     @Transactional
     public ItemResponseDTO updateItem(Long id, UpdateItemRequestDTO request) {
-        Item item = itemRepository.findByIdForUpdate(id).orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
+        Item item = itemRepository.findByIdForUpdate(id).orElseThrow(() -> new BusinessException("Item não encontrado"));
 
         if (request.name() != null) {
             item.setName(request.name());
@@ -108,9 +110,9 @@ public class ItemService {
         int total = request.totalQuantity() == null ? item.getTotalQuantity() : request.totalQuantity();
         long stock = (long) item.getStockQuantity() + total - item.getTotalQuantity();
         if (stock < 0 || stock > Integer.MAX_VALUE)
-            throw new IllegalArgumentException("A quantidade total deve preservar as unidades emprestadas e bloqueadas por defeito.");
+            throw new BusinessException("A quantidade total deve preservar as unidades emprestadas e bloqueadas por defeito.");
         if (request.stockQuantity() != null && request.stockQuantity() != stock)
-            throw new IllegalArgumentException("O estoque disponível deve preservar as unidades emprestadas e bloqueadas por defeito.");
+            throw new BusinessException("O estoque disponível deve preservar as unidades emprestadas e bloqueadas por defeito.");
         item.setTotalQuantity(total);
         item.setStockQuantity((int) stock);
 
@@ -133,7 +135,7 @@ public class ItemService {
     @Transactional
     public void deleteItem(Long id) {
         if (!itemRepository.existsById(id)) {
-            throw new IllegalArgumentException("Item não encontrado com o ID: " + id);
+            throw new BusinessException("Item não encontrado com o ID: " + id);
         }
 
         itemRepository.deleteById(id);
