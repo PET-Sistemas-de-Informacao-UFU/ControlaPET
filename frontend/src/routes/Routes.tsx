@@ -4,6 +4,7 @@ import HomeRoute from "./HomeRoute";
 import Catalogo from "../pages/Catalogo/Index";
 import Movimentacoes from "../pages/Movimentacoes/Index";
 import Auditoria from "../pages/Auditoria/Index";
+import Defeitos from "../pages/Defeitos/Index";
 import Usuarios from "../pages/Usuario/Index";
 import Login from "../pages/Login/Index";
 import EsqueciSenha from "../pages/EsqueciSenha/Index";
@@ -27,6 +28,7 @@ export const routes = createBrowserRouter(
                     <Route path="/catalogo" element={<Catalogo />} />
                     <Route path="/movimentacoes" element={<Movimentacoes />} />
                     <Route element={<AdminRoute />}>
+                        <Route path="/defeitos" element={<Defeitos />} />
                         <Route path="/auditoria" element={<Auditoria />} />
                         <Route path="/usuarios" element={<Usuarios />} />
                     </Route>

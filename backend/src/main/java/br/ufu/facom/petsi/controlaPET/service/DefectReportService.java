@@ -12,6 +12,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Locale;
+import java.util.ArrayList;
+import jakarta.persistence.criteria.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +55,40 @@ public class DefectReportService {
     public Page<DefectReportResponseDTO> getItemReports(Long itemId, Pageable pageable) {
         if (!itemRepository.existsById(itemId)) throw new IllegalArgumentException("Item não encontrado");
         return defectReportRepository.findAllByItemId(itemId, pageable).map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<DefectReportResponseDTO> getReports(String itemName, List<DefectReportStatus> statuses, Pageable pageable) {
+        String search = itemName == null ? "" : itemName.trim().toLowerCase(Locale.ROOT);
+        return defectReportRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if (!search.isEmpty()) {
+                String escaped = search.replace("!", "!!").replace("%", "!%").replace("_", "!_");
+                predicates.add(cb.like(cb.lower(root.get("item").get("name")), "%" + escaped + "%", '!'));
+            }
+            if (statuses != null && !statuses.isEmpty()) predicates.add(root.get("status").in(statuses));
+            return cb.and(predicates.toArray(Predicate[]::new));
+        }, pageable).map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public DefectReportResponseDTO getReport(Long id) {
+        return toResponse(defectReportRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Relato não encontrado")));
+    }
+
+    @Transactional(readOnly = true)
+    public DefectReportSummaryDTO getSummary() {
+        long open = 0, waiting = 0, maintenance = 0, closed = 0;
+        for (var count : defectReportRepository.countByReportStatus()) {
+            switch (count.getStatus()) {
+                case OPEN -> open = count.getTotal();
+                case WAITING_RETURN -> waiting = count.getTotal();
+                case IN_MAINTENANCE -> maintenance = count.getTotal();
+                default -> closed += count.getTotal();
+            }
+        }
+        return new DefectReportSummaryDTO(open, waiting, maintenance, closed);
     }
 
     @Transactional
@@ -158,7 +196,7 @@ public class DefectReportService {
     }
 
     private DefectReportResponseDTO toResponse(DefectReport report) {
-        return new DefectReportResponseDTO(report.getId(), report.getItem().getId(), report.getReportedBy().getName(),
+        return new DefectReportResponseDTO(report.getId(), report.getItem().getId(), report.getItem().getName(), report.getReportedBy().getName(),
                 report.getDescription(), report.getStatus(), report.getCreatedAt(), report.getQuantity(), report.getConfirmedQuantity(),
                 report.getActiveReservedQuantity(), report.getStockReservedAt(),
                 report.getLoan() == null ? null : report.getLoan().getId(),

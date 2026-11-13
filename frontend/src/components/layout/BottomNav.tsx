@@ -1,7 +1,8 @@
+import DefectReportBadge from "./DefectReportBadge";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../context/AuthContext";
-import { AuditIcon, CatalogIcon, LoanIcon, UsersIcon } from "../ui/Icons";
+import { AuditIcon, CatalogIcon, DefectIcon, LoanIcon, UsersIcon } from "../ui/Icons";
 
 export default function BottomNav() {
     const navigate = useNavigate();
@@ -28,6 +29,10 @@ export default function BottomNav() {
 
             {user?.role === "ADMIN" && (
                 <>
+                    <button type="button" className={pathname === "/defeitos" ? "nav-item active" : "nav-item"} aria-current={pathname === "/defeitos" ? "page" : undefined} onClick={() => navigate("/defeitos")}>
+                        <span className="defect-nav-icon"><DefectIcon /><DefectReportBadge /></span>
+                        <span>Defeitos</span>
+                    </button>
                     <div
                         className={pathname === "/auditoria" ? "nav-item active" : "nav-item"}
                         onClick={() => navigate("/auditoria")}

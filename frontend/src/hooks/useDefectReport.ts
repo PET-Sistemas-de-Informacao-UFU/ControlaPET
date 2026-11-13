@@ -1,4 +1,6 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../service/api";
 import type { Page } from "../interfaces/Page";
 
@@ -6,6 +8,7 @@ export type DefectReportStatus = "OPEN" | "WAITING_RETURN" | "IN_MAINTENANCE" | 
 export interface DefectReport {
     id: number
     itemId: number
+    itemName: string
     reportedByName: string
     description: string
     quantity: number | null
@@ -44,7 +47,7 @@ export function useAddDefectReport() {
             return response.data;
         },
         onSuccess: (_, { itemId }) => {
-            queryClient.invalidateQueries({ queryKey: ["defect-reports", itemId] });
+            queryClient.invalidateQueries({ queryKey: ["defect-reports"] });
             queryClient.invalidateQueries({ queryKey: ["audit-events"] });
             queryClient.invalidateQueries({ queryKey: ["items-data"] });
             queryClient.invalidateQueries({ queryKey: ["item", itemId] });
@@ -60,7 +63,7 @@ export function useCloseDefectReport(itemId: number | null) {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["defect-reports", itemId] });
+            queryClient.invalidateQueries({ queryKey: ["defect-reports"] });
             queryClient.invalidateQueries({ queryKey: ["audit-events"] });
             queryClient.invalidateQueries({ queryKey: ["items-data"] });
             queryClient.invalidateQueries({ queryKey: ["item", itemId] });
@@ -76,10 +79,56 @@ export function useConfirmDefectReport(itemId: number) {
             return response.data;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["defect-reports", itemId] });
+            queryClient.invalidateQueries({ queryKey: ["defect-reports"] });
             queryClient.invalidateQueries({ queryKey: ["items-data"] });
             queryClient.invalidateQueries({ queryKey: ["item", itemId] });
             queryClient.invalidateQueries({ queryKey: ["audit-events"] });
         }
+    });
+}
+
+export interface DefectReportSummary {
+    open: number
+    waitingReturn: number
+    inMaintenance: number
+    closed: number
+}
+
+export function useDefectReportSummary() {
+    const { user } = useContext(AuthContext);
+    return useQuery({
+        queryKey: ["defect-reports", "summary"],
+        enabled: user?.role === "ADMIN",
+        queryFn: async () => (await api.get<DefectReportSummary>("/defect-reports/summary")).data,
+        staleTime: 30000,
+        refetchInterval: 60000
+    });
+}
+
+export function useAdminDefectReports(itemName: string, status: string) {
+    return useInfiniteQuery({
+        queryKey: ["defect-reports", "all", itemName, status],
+        initialPageParam: 0,
+        queryFn: async ({ pageParam }) => {
+            const response = await api.get<Page<DefectReport>>("/defect-reports", {
+                params: {
+                    itemName,
+                    status: status === "ACTIVE" ? "OPEN,WAITING_RETURN,IN_MAINTENANCE" : status || undefined,
+                    page: pageParam,
+                    size: 20
+                }
+            });
+            return response.data;
+        },
+        getNextPageParam: page => page.number + 1 < page.totalPages ? page.number + 1 : undefined,
+        refetchInterval: 60000
+    });
+}
+
+export function useDefectReport(id: number | null) {
+    return useQuery({
+        queryKey: ["defect-reports", "detail", id],
+        enabled: id !== null,
+        queryFn: async () => (await api.get<DefectReport>(`/defect-reports/${id}`)).data
     });
 }

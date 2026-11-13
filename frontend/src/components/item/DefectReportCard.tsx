@@ -1,10 +1,10 @@
 import { useContext, useState } from "react";
 import { isAxiosError } from "axios";
 import { AuthContext } from "../../context/AuthContext";
-import { useCloseDefectReport, useConfirmDefectReport, useDefectReports } from "../../hooks/useDefectReport";
+import { useCloseDefectReport, useConfirmDefectReport } from "../../hooks/useDefectReport";
 import type { DefectReport } from "../../hooks/useDefectReport";
 
-const labels = {
+export const DEFECT_STATUS_LABELS = {
     OPEN: "Aguardando avaliação", WAITING_RETURN: "Aguardando devolução", IN_MAINTENANCE: "Em manutenção",
     RESOLVED: "Resolvido", DISMISSED: "Relato descartado", WRITTEN_OFF: "Baixa definitiva"
 };
@@ -13,9 +13,9 @@ type ReportAction = "confirm" | "resolve" | "dismiss" | "writeOff";
 const actionLabels = { confirm: "Confirmar manutenção", resolve: "Concluir reparo", dismiss: "Descartar relato", writeOff: "Dar baixa definitiva" };
 const units = (quantity: number) => `${quantity} ${quantity === 1 ? "unidade" : "unidades"}`;
 
-export default function DefectReportList({ itemId }: { itemId: number }) {
+export default function DefectReportCard({ report }: { report: DefectReport }) {
+    const itemId = report.itemId;
     const { user } = useContext(AuthContext);
-    const { data, isLoading, isError, hasNextPage, fetchNextPage, isFetchingNextPage } = useDefectReports(itemId);
     const closeReport = useCloseDefectReport(itemId);
     const confirmReport = useConfirmDefectReport(itemId);
     const [editingId, setEditingId] = useState<number | null>(null);
@@ -52,16 +52,10 @@ export default function DefectReportList({ itemId }: { itemId: number }) {
     }
 
     return (
-        <section className="defect-reports" aria-label="Relatos de defeito">
-            <h3>Relatos de defeito</h3>
-            {isLoading && <p>Carregando relatos...</p>}
-            {isError && <p role="alert">Não foi possível carregar os relatos.</p>}
-            {data?.pages[0].totalElements === 0 && <p>Nenhum defeito relatado.</p>}
-            {data?.pages.flatMap(page => page.content).map(report => (
                 <article className="defect-report" key={report.id}>
                     <div className="defect-report-heading">
                         <strong>{report.reportedByName}</strong>
-                        <span className={`defect-status defect-status-${report.status.toLowerCase()}`}>{labels[report.status]}</span>
+                        <span className={`defect-status defect-status-${report.status.toLowerCase()}`}>{DEFECT_STATUS_LABELS[report.status]}</span>
                     </div>
                     <time dateTime={report.createdAt}>{formatDate(report.createdAt)}</time>
                     <p className="defect-origin">{report.quantity === null ? "Quantidade não informada (relato anterior)" : `${units(report.quantity)} com possível defeito`}{report.loanId ? " · Empréstimo" : " · Estoque disponível"}</p>
@@ -133,8 +127,5 @@ export default function DefectReportList({ itemId }: { itemId: number }) {
                         )
                     )}
                 </article>
-            ))}
-            {hasNextPage && <button type="button" className="header-btn ghost" disabled={isFetchingNextPage} onClick={() => fetchNextPage()}>{isFetchingNextPage ? "Carregando..." : "Carregar mais"}</button>}
-        </section>
     );
 }
