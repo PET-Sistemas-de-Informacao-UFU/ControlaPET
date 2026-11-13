@@ -223,7 +223,7 @@
     height:41px;
   }
   .catalog-toolbar .header-btn{ height:41px; padding:0 12px; }
-  .catalog-create-btn{ gap:5px; }
+  .header-btn.catalog-create-btn{ gap:5px; justify-content:center; align-items:center; line-height:1; }
   .catalog-create-btn svg{
     width:14px;
     height:14px;
@@ -346,7 +346,7 @@
       display:grid;
       grid-template-columns:minmax(0, 1fr);
     }
-    .catalog-toolbar.has-mobile-add{
+    .catalog-toolbar.has-mobile-add:not(.audit-toolbar):not(.movement-filters){
       grid-template-columns:minmax(0, 1fr) auto;
     }
     .catalog-toolbar:not(.audit-toolbar):not(.movement-filters) .search-bar{ grid-column:1; grid-row:1; }
@@ -359,6 +359,15 @@
       width:100%;
     }
     .catalog-filters .catalog-filter-field{ min-width:0; }
+    .catalog-filters.catalog-item-filters{
+      grid-template-columns:minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, .95fr);
+      gap:6px;
+    }
+    .catalog-item-filters .catalog-filter-trigger{
+      padding:0 8px;
+      gap:4px;
+      font-size:12px;
+    }
     .catalog-filters .catalog-filter-measure{ width:100%; min-width:0; overflow:hidden; }
     .catalog-filters .catalog-filter-trigger span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .catalog-toolbar.audit-toolbar .search-bar,

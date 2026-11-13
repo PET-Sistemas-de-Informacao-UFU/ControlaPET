@@ -31,7 +31,7 @@ export default function CatalogToolbar({ isDesktop, canManageItems, search, onAd
                     />
                 </label>
 
-                <div className="catalog-filters" aria-label="Filtros do catálogo">
+                <div className="catalog-filters catalog-item-filters" aria-label="Filtros do catálogo">
                     <CatalogFilter label="Tipo" value={type} onChange={(value) => onTypeChange(value as ItemFilters["type"])} options={[
                         { value: "", label: "Todos os tipos" }, { value: "BORROWABLE", label: "Empréstimo" },
                         { value: "CONSUMABLE", label: "Consumo" }, { value: "PERMANENT", label: "Permanente" },
