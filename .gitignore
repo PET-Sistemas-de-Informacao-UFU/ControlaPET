@@ -34,3 +34,7 @@ build/
 
 ### Variaveis de ambiente locais ###
 .env
+
+### Logs da aplicacao ###
+logs/
+*.log
