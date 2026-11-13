@@ -18,6 +18,7 @@ function formatDate(date: string) {
 
 function toLog(event: AuditEvent): Log {
     const labels = {
+        DEFECT_WRITTEN_OFF: { tag: "Baixa definitiva", color: "var(--red)", text: `deu baixa definitiva em ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} de ${event.itemName}.` },
         DEFECT_CONFIRMED: { tag: "Defeito confirmado", color: "var(--orange)", text: `confirmou ${event.quantity} ${event.quantity === 1 ? "unidade" : "unidades"} com defeito em ${event.itemName}.` },
         DEFECT_REPORTED: { tag: "Defeito relatado", color: "var(--red)", text: `relatou um defeito em ${event.itemName}.` },
         DEFECT_RESOLVED: { tag: "Defeito resolvido", color: "var(--green)", text: `resolveu um relato de defeito em ${event.itemName}.` },
@@ -70,7 +71,7 @@ export default function Auditoria() {
                 <CatalogFilter label="Atividade" value={typeInput} onChange={setTypeInput} options={[
                     { value: "", label: "Todas as atividades" }, { value: "LOAN_ALL", label: "Empréstimos" }, { value: "LOAN_CREATED", label: "Retirada" },
                     { value: "LOAN_RETURNED", label: "Devolução" }, { value: "INBOUND", label: "Entrada" },
-                    { value: "DEFECT_CONFIRMED", label: "Defeito confirmado" }, { value: "DEFECT_REPORTED", label: "Defeito relatado" }, { value: "DEFECT_RESOLVED", label: "Defeito resolvido" }, { value: "DEFECT_DISMISSED", label: "Relato descartado" },
+                    { value: "DEFECT_WRITTEN_OFF", label: "Baixa definitiva" }, { value: "DEFECT_CONFIRMED", label: "Defeito confirmado" }, { value: "DEFECT_REPORTED", label: "Defeito relatado" }, { value: "DEFECT_RESOLVED", label: "Defeito resolvido" }, { value: "DEFECT_DISMISSED", label: "Relato descartado" },
                     { value: "OUTBOUND_CONSUMPTION", label: "Consumo" }, { value: "ADJUSTMENT", label: "Ajuste" },
                 ]} />
                 <DateRangePicker id="audit-search-date-range" startDate={startDateInput} endDate={endDateInput} onChange={(start, end) => { setStartDateInput(start); setEndDateInput(end); }} />

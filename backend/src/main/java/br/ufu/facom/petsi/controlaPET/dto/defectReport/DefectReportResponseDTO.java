@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public record DefectReportResponseDTO(
     Long id, Long itemId, String reportedByName, String description,
     DefectReportStatus status, LocalDateTime createdAt,
-    Integer quantity, Integer confirmedQuantity, Long loanId,
+    Integer quantity, Integer confirmedQuantity, int reservedQuantity, LocalDateTime stockReservedAt, Long loanId,
     String confirmedByName, LocalDateTime confirmedAt, LocalDateTime maintenanceStartedAt,
     String closedByName, LocalDateTime closedAt, String resolutionNotes
 ) {}

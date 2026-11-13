@@ -62,7 +62,7 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumi
                             <strong>{conditionLabels[item.condition]}</strong>
                         </div>
                     </div>
-                    {item.maintenanceQuantity > 0 && <p className="item-maintenance-summary">{item.maintenanceQuantity} {item.maintenanceQuantity === 1 ? "unidade em manutenção" : "unidades em manutenção"}</p>}
+                    {item.maintenanceQuantity > 0 && <p className="item-maintenance-summary">{item.maintenanceQuantity} {item.maintenanceQuantity === 1 ? "unidade bloqueada por defeito" : "unidades bloqueadas por defeito"}</p>}
                     <DefectReportList key={item.id} itemId={item.id} />
                 </div>
             )}

@@ -3,13 +3,14 @@ import { isAxiosError } from "axios";
 import { AuthContext } from "../../context/AuthContext";
 import { useCloseDefectReport, useConfirmDefectReport, useDefectReports } from "../../hooks/useDefectReport";
 import type { DefectReport } from "../../hooks/useDefectReport";
-import FormSelect from "../ui/FormSelect";
 
 const labels = {
-    OPEN: "Aberto", WAITING_RETURN: "Aguardando devolução", IN_MAINTENANCE: "Em manutenção",
-    RESOLVED: "Resolvido", DISMISSED: "Descartado"
+    OPEN: "Aguardando avaliação", WAITING_RETURN: "Aguardando devolução", IN_MAINTENANCE: "Em manutenção",
+    RESOLVED: "Resolvido", DISMISSED: "Relato descartado", WRITTEN_OFF: "Baixa definitiva"
 };
 const formatDate = (value: string) => new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(value));
+type ReportAction = "confirm" | "resolve" | "dismiss" | "writeOff";
+const actionLabels = { confirm: "Confirmar manutenção", resolve: "Concluir reparo", dismiss: "Descartar relato", writeOff: "Dar baixa definitiva" };
 const units = (quantity: number) => `${quantity} ${quantity === 1 ? "unidade" : "unidades"}`;
 
 export default function DefectReportList({ itemId }: { itemId: number }) {
@@ -18,18 +19,16 @@ export default function DefectReportList({ itemId }: { itemId: number }) {
     const closeReport = useCloseDefectReport(itemId);
     const confirmReport = useConfirmDefectReport(itemId);
     const [editingId, setEditingId] = useState<number | null>(null);
-    const [action, setAction] = useState<"confirm" | "close">("confirm");
+    const [action, setAction] = useState<ReportAction>("confirm");
     const [quantity, setQuantity] = useState("1");
-    const [status, setStatus] = useState<"RESOLVED" | "DISMISSED">("RESOLVED");
     const [notes, setNotes] = useState("");
     const [error, setError] = useState("");
     const isPending = closeReport.isPending || confirmReport.isPending;
 
-    function openForm(report: DefectReport, nextAction: "confirm" | "close") {
+    function openForm(report: DefectReport, nextAction: ReportAction) {
         setEditingId(report.id);
         setAction(nextAction);
         setQuantity(String(report.quantity ?? 1));
-        setStatus("RESOLVED");
         setNotes("");
         setError("");
     }
@@ -45,7 +44,11 @@ export default function DefectReportList({ itemId }: { itemId: number }) {
                 : "Não foi possível atualizar o relato.")
         };
         if (action === "confirm") confirmReport.mutate({ id: editingId, quantity: Number(quantity) }, callbacks);
-        else closeReport.mutate({ id: editingId, status, resolutionNotes: notes.trim() }, callbacks);
+        else closeReport.mutate({
+            id: editingId,
+            status: action === "writeOff" ? "WRITTEN_OFF" : action === "dismiss" ? "DISMISSED" : "RESOLVED",
+            resolutionNotes: notes.trim()
+        }, callbacks);
     }
 
     return (
@@ -63,6 +66,11 @@ export default function DefectReportList({ itemId }: { itemId: number }) {
                     <time dateTime={report.createdAt}>{formatDate(report.createdAt)}</time>
                     <p className="defect-origin">{report.quantity === null ? "Quantidade não informada (relato anterior)" : `${units(report.quantity)} com possível defeito`}{report.loanId ? " · Empréstimo" : " · Estoque disponível"}</p>
                     <p className="defect-description">{report.description}</p>
+                    {report.status === "OPEN" && report.reservedQuantity > 0 && (
+                        <p className="defect-origin">{units(report.reservedQuantity)} {report.stockReservedAt
+                            ? "bloqueadas no estoque, aguardando avaliação."
+                            : "reservadas no empréstimo; ficarão bloqueadas no estoque ao devolver."}</p>
+                    )}
                     {report.confirmedAt && (
                         <div className="defect-resolution">
                             <p>{units(report.confirmedQuantity!)} para manutenção · Confirmado por {report.confirmedByName} em {formatDate(report.confirmedAt)}.</p>
@@ -82,31 +90,45 @@ export default function DefectReportList({ itemId }: { itemId: number }) {
                                             <label htmlFor={`defect-confirm-quantity-${report.id}`}>Quantidade confirmada</label>
                                             <input id={`defect-confirm-quantity-${report.id}`} type="number" required min={1} step={1} max={report.quantity ?? undefined} value={quantity} disabled={isPending} onChange={event => setQuantity(event.target.value)} />
                                         </div>
-                                        <p className="defect-origin">{report.loanId ? "Se o empréstimo estiver em andamento, as unidades entrarão em manutenção na devolução." : "As unidades confirmadas serão retiradas do estoque disponível para manutenção."}</p>
+                                        <p className="defect-origin">{report.reservedQuantity > 0
+                                            ? "As unidades já estão bloqueadas. Se confirmar uma quantidade menor, o excedente será liberado do bloqueio por defeito."
+                                            : report.loanId ? "Se o empréstimo estiver em andamento, as unidades entrarão em manutenção na devolução." : "As unidades confirmadas serão retiradas do estoque disponível para manutenção."}</p>
                                     </>
                                 ) : (
                                     <>
+                                        <strong className="defect-action-title">{actionLabels[action]}</strong>
                                         <div className="form-group">
-                                            <label htmlFor={`defect-status-${report.id}`}>Encerramento</label>
-                                            <FormSelect id={`defect-status-${report.id}`} value={status} placeholder="Selecione" options={[{ value: "RESOLVED", label: report.status === "IN_MAINTENANCE" ? "Reparado" : "Resolvido" }, { value: "DISMISSED", label: "Descartado" }]} onChange={value => setStatus(value as "RESOLVED" | "DISMISSED")} />
-                                        </div>
-                                        <div className="form-group">
-                                            <label htmlFor={`defect-notes-${report.id}`}>Solução ou motivo do descarte</label>
+                                            <label htmlFor={`defect-notes-${report.id}`}>{action === "writeOff" ? "Motivo da baixa definitiva" : action === "dismiss" ? "Motivo do descarte do relato" : "Reparo realizado"}</label>
                                             <textarea id={`defect-notes-${report.id}`} required maxLength={3000} rows={3} value={notes} onChange={event => setNotes(event.target.value)} disabled={isPending} />
                                         </div>
-                                        {report.status === "IN_MAINTENANCE" && <p className="defect-origin">Ao encerrar, {units(report.confirmedQuantity!)} voltarão ao estoque disponível. Encerre apenas se estiverem aptas para uso.</p>}
+                                        {action === "resolve" && <p className="defect-origin">{units(report.confirmedQuantity!)} voltarão ao estoque disponível. Confirme apenas se estiverem aptas para uso.</p>}
+                                        {action === "writeOff" && <p className="defect-write-off-warning">A baixa removerá definitivamente {units(report.confirmedQuantity!)} do total do item. Essas unidades não voltarão ao estoque disponível.</p>}
+                                        {action === "dismiss" && <p className="defect-origin">{report.reservedQuantity === 0
+                                            ? "O relato será encerrado sem alterar as quantidades do item."
+                                            : report.stockReservedAt
+                                                ? `${units(report.reservedQuantity)} serão liberadas para o estoque disponível.`
+                                                : "O bloqueio por defeito será removido. As unidades continuam emprestadas até a devolução."}</p>}
                                     </>
                                 )}
                                 {error && <p role="alert" className="defect-error">{error}</p>}
                                 <div className="modal-actions-inline">
                                     <button type="button" className="modal-btn" disabled={isPending} onClick={() => setEditingId(null)}>Cancelar</button>
-                                    <button type="submit" className="modal-btn primary" disabled={isPending || (action === "close" ? !notes.trim() : !Number.isInteger(Number(quantity)) || Number(quantity) < 1)}>{isPending ? "Salvando..." : "Confirmar"}</button>
+                                    <button type="submit" className={action === "writeOff" ? "modal-btn danger" : "modal-btn primary"} disabled={isPending || (action !== "confirm" ? !notes.trim() : !Number.isInteger(Number(quantity)) || Number(quantity) < 1)}>{isPending ? "Salvando..." : actionLabels[action]}</button>
                                 </div>
                             </form>
                         ) : (
                             <div className="defect-report-actions">
-                                {report.status === "OPEN" && <button type="button" className="header-btn" disabled={isPending} onClick={() => openForm(report, "confirm")}>Confirmar manutenção</button>}
-                                <button type="button" className="header-btn ghost" disabled={isPending} onClick={() => openForm(report, "close")}>{report.status === "IN_MAINTENANCE" ? "Concluir manutenção" : "Encerrar relato"}</button>
+                                {report.status === "OPEN" ? (
+                                    <>
+                                        <button type="button" className="header-btn" disabled={isPending} onClick={() => openForm(report, "confirm")}>Confirmar manutenção</button>
+                                        <button type="button" className="header-btn ghost" disabled={isPending} onClick={() => openForm(report, "dismiss")}>Descartar relato</button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button type="button" className="header-btn" disabled={isPending} onClick={() => openForm(report, "resolve")}>Concluir reparo</button>
+                                        <button type="button" className="header-btn ghost defect-write-off-action" disabled={isPending} onClick={() => openForm(report, "writeOff")}>Dar baixa</button>
+                                    </>
+                                )}
                             </div>
                         )
                     )}

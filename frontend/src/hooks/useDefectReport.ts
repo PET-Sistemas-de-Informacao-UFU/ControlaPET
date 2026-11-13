@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { api } from "../service/api";
 import type { Page } from "../interfaces/Page";
 
-export type DefectReportStatus = "OPEN" | "WAITING_RETURN" | "IN_MAINTENANCE" | "RESOLVED" | "DISMISSED";
+export type DefectReportStatus = "OPEN" | "WAITING_RETURN" | "IN_MAINTENANCE" | "RESOLVED" | "DISMISSED" | "WRITTEN_OFF";
 export interface DefectReport {
     id: number
     itemId: number
@@ -10,6 +10,8 @@ export interface DefectReport {
     description: string
     quantity: number | null
     confirmedQuantity: number | null
+    reservedQuantity: number
+    stockReservedAt: string | null
     loanId: number | null
     confirmedByName: string | null
     confirmedAt: string | null
@@ -53,7 +55,7 @@ export function useAddDefectReport() {
 export function useCloseDefectReport(itemId: number | null) {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: async ({ id, status, resolutionNotes }: { id: number; status: "RESOLVED" | "DISMISSED"; resolutionNotes: string }) => {
+        mutationFn: async ({ id, status, resolutionNotes }: { id: number; status: "RESOLVED" | "DISMISSED" | "WRITTEN_OFF"; resolutionNotes: string }) => {
             const response = await api.patch<DefectReport>(`/items/${itemId}/defect-reports/${id}/close`, { status, resolutionNotes });
             return response.data;
         },

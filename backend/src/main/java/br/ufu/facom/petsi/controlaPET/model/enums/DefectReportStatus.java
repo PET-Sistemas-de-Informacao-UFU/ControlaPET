@@ -5,5 +5,6 @@ public enum DefectReportStatus {
     WAITING_RETURN,
     IN_MAINTENANCE,
     RESOLVED,
+    WRITTEN_OFF,
     DISMISSED
 }

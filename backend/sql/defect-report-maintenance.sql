@@ -16,7 +16,7 @@ BEGIN
             EXECUTE format('ALTER TABLE public.defect_reports DROP CONSTRAINT %I', status_constraint.conname);
         END LOOP;
         ALTER TABLE public.defect_reports ADD CONSTRAINT defect_reports_status_check
-            CHECK (status IN ('OPEN', 'WAITING_RETURN', 'IN_MAINTENANCE', 'RESOLVED', 'DISMISSED'));
+            CHECK (status IN ('OPEN', 'WAITING_RETURN', 'IN_MAINTENANCE', 'RESOLVED', 'DISMISSED', 'WRITTEN_OFF'));
     END IF;
 END $$;
 COMMIT;

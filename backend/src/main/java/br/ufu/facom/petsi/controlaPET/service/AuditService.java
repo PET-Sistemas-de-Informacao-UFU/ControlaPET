@@ -6,7 +6,6 @@ import br.ufu.facom.petsi.controlaPET.model.Movement;
 import br.ufu.facom.petsi.controlaPET.model.enums.AuditEventType;
 import br.ufu.facom.petsi.controlaPET.repository.LoanRepository;
 import br.ufu.facom.petsi.controlaPET.repository.DefectReportRepository;
-import br.ufu.facom.petsi.controlaPET.model.enums.DefectReportStatus;
 import br.ufu.facom.petsi.controlaPET.repository.MovementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -68,10 +67,13 @@ public class AuditService {
                         report.getConfirmedQuantity(), report.getConfirmedAt()));
             }
             if (report.getClosedAt() != null) {
-                var eventType = report.getStatus() == DefectReportStatus.RESOLVED
-                        ? AuditEventType.DEFECT_RESOLVED : AuditEventType.DEFECT_DISMISSED;
+                var eventType = switch (report.getStatus()) {
+                    case RESOLVED -> AuditEventType.DEFECT_RESOLVED;
+                    case WRITTEN_OFF -> AuditEventType.DEFECT_WRITTEN_OFF;
+                    default -> AuditEventType.DEFECT_DISMISSED;
+                };
                 events.add(new AuditEventResponseDTO(report.getId(), eventType, report.getClosedBy().getName(),
-                        report.getItem().getId(), report.getItem().getName(), 0, report.getClosedAt()));
+                        report.getItem().getId(), report.getItem().getName(), report.getConfirmedQuantity() == null ? 0 : report.getConfirmedQuantity(), report.getClosedAt()));
             }
         }
 

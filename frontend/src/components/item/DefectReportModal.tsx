@@ -23,6 +23,7 @@ export default function DefectReportModal({ open, itemName, isSubmitting, maxQua
         <Modal open={open} title={`Relatar defeito — ${itemName}`} subtitle="Descreva o problema encontrado" closeLabel="Cancelar" onClose={() => !isSubmitting && onClose()}
             actions={<button type="submit" form="defect-report-form" className="modal-btn primary" disabled={isSubmitting || !description.trim() || !Number.isInteger(Number(quantity)) || Number(quantity) < 1 || Number(quantity) > maxQuantity}>{isSubmitting ? "Enviando..." : "Enviar relato"}</button>}>
             <form id="defect-report-form" className="defect-close-form" onSubmit={handleConfirm}>
+                <p className="defect-origin">As unidades relatadas ficarão indisponíveis para novos empréstimos até a avaliação do administrador.</p>
                 <div className="form-group defect-quantity-field">
                     <label htmlFor="defect-quantity">Quantidade com defeito</label>
                     <input id="defect-quantity" type="number" required min={1} max={maxQuantity} step={1} value={quantity} disabled={isSubmitting} onChange={event => setQuantity(event.target.value)} />

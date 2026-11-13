@@ -42,6 +42,15 @@ public class DefectReport {
 
     private Integer confirmedQuantity;
 
+    // Null on older reports, which reserved stock only after confirmation.
+    private Integer reservedQuantity;
+    private LocalDateTime stockReservedAt;
+
+    public int getActiveReservedQuantity() {
+        if (closedAt != null) return 0;
+        return reservedQuantity != null ? reservedQuantity : confirmedQuantity == null ? 0 : confirmedQuantity;
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loan_id")
     private Loan loan;

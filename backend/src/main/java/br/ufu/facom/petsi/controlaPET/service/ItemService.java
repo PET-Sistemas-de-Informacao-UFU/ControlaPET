@@ -108,9 +108,9 @@ public class ItemService {
         int total = request.totalQuantity() == null ? item.getTotalQuantity() : request.totalQuantity();
         long stock = (long) item.getStockQuantity() + total - item.getTotalQuantity();
         if (stock < 0 || stock > Integer.MAX_VALUE)
-            throw new IllegalArgumentException("A quantidade total deve preservar as unidades emprestadas e em manutenção.");
+            throw new IllegalArgumentException("A quantidade total deve preservar as unidades emprestadas e bloqueadas por defeito.");
         if (request.stockQuantity() != null && request.stockQuantity() != stock)
-            throw new IllegalArgumentException("O estoque disponível deve preservar as unidades emprestadas e em manutenção.");
+            throw new IllegalArgumentException("O estoque disponível deve preservar as unidades emprestadas e bloqueadas por defeito.");
         item.setTotalQuantity(total);
         item.setStockQuantity((int) stock);
 

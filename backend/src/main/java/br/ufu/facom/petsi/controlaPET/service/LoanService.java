@@ -119,10 +119,15 @@ public class LoanService {
                 .orElseThrow(() -> new IllegalArgumentException("Item não encontrado"));
         int maintenanceQuantity = 0;
         for (var report : defectReportRepository.findWaitingForReturn(loan.getId())) {
-            maintenanceQuantity += report.getConfirmedQuantity();
-            report.setStatus(DefectReportStatus.IN_MAINTENANCE);
-            report.setMaintenanceStartedAt(loan.getActualReturnDate());
+            maintenanceQuantity += report.getActiveReservedQuantity();
+            report.setStockReservedAt(loan.getActualReturnDate());
+            if (report.getConfirmedAt() != null) {
+                report.setStatus(DefectReportStatus.IN_MAINTENANCE);
+                report.setMaintenanceStartedAt(loan.getActualReturnDate());
+            }
         }
+        if (maintenanceQuantity > loan.getQuantity())
+            throw new IllegalArgumentException("As reservas por defeito ultrapassam a quantidade deste empréstimo.");
         item.setStockQuantity(item.getStockQuantity() + loan.getQuantity() - maintenanceQuantity);
         item.setMaintenanceQuantity(item.getMaintenanceQuantity() + maintenanceQuantity);
 

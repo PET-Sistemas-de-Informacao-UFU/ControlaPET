@@ -88,3 +88,7 @@ body{
 .defect-origin{font-size:12px;color:var(--text-dim);line-height:1.5;}
 .defect-report-actions{display:flex;flex-wrap:wrap;gap:8px;}
 .defect-quantity-field{max-width:200px;}
+
+.defect-status-written_off,.defect-write-off-warning,.header-btn.defect-write-off-action{color:var(--red);}
+.defect-write-off-warning{font-size:12px;line-height:1.5;}
+.defect-action-title{font-size:13px;}
