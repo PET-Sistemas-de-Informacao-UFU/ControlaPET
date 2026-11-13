@@ -95,3 +95,12 @@ export function UsersIcon() {
         </svg>
     );
 }
+
+export function DefectIcon() {
+    return (
+        <svg {...strokeProps}>
+            <path d="M10.3 4.2 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0Z" />
+            <path d="M12 9v4M12 17h.01" />
+        </svg>
+    );
+}

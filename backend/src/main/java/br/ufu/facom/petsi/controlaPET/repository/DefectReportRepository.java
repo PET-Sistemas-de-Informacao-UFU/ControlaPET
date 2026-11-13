@@ -1,0 +1,45 @@
+package br.ufu.facom.petsi.controlaPET.repository;
+
+import br.ufu.facom.petsi.controlaPET.model.DefectReport;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
+import br.ufu.facom.petsi.controlaPET.model.enums.DefectReportStatus;
+import org.springframework.data.jpa.repository.*;
+import org.springframework.data.repository.query.Param;
+import java.util.Optional;
+import java.util.List;
+
+public interface DefectReportRepository extends JpaRepository<DefectReport, Long>, JpaSpecificationExecutor<DefectReport> {
+    @EntityGraph(attributePaths = {"reportedBy", "closedBy", "confirmedBy", "item"})
+    Page<DefectReport> findAllByItemId(Long itemId, Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"reportedBy", "closedBy", "confirmedBy", "item"})
+    Page<DefectReport> findAll(Specification<DefectReport> specification, Pageable pageable);
+
+    interface StatusCount {
+        DefectReportStatus getStatus();
+        long getTotal();
+    }
+
+    @Query("select r.status as status, count(r) as total from DefectReport r group by r.status")
+    List<StatusCount> countByReportStatus();
+
+    @Query(value = "select loan_id from defect_reports where id = :id", nativeQuery = true)
+    Optional<Long> findLoanIdById(@Param("id") Long id);
+
+    @Query("select coalesce(sum(coalesce(r.reservedQuantity, r.confirmedQuantity, 0)), 0) from DefectReport r "
+            + "where r.loan.id = :loanId and r.closedAt is null and (:reportId is null or r.id <> :reportId)")
+    long sumReservedQuantityByLoanId(@Param("loanId") Long loanId, @Param("reportId") Long reportId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select r from DefectReport r where r.loan.id = :loanId and r.closedAt is null "
+            + "and r.stockReservedAt is null and r.maintenanceStartedAt is null "
+            + "and coalesce(r.reservedQuantity, r.confirmedQuantity, 0) > 0 order by r.id")
+    List<DefectReport> findWaitingForReturn(@Param("loanId") Long loanId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select r from DefectReport r where r.id = :id")
+    Optional<DefectReport> findByIdForUpdate(@Param("id") Long id);
+}

@@ -28,14 +28,14 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumi
             title={item?.name ?? "Item"}
             subtitle={item ? `${item.stockQuantity} de ${item.totalQuantity} ${unitLabel} em estoque` : undefined}
             subtitleClassName="item-stock-summary"
-            sheetClassName="modal-sheet-compact"
+            sheetClassName="modal-sheet-compact item-details-sheet"
             closeLabel="Fechar"
             onClose={onClose}
             actions={
                 <div className="modal-actions-inline">
-                    <div className="modal-btn danger" onClick={onRelatarDefeito}>
-                        Reportar defeito
-                    </div>
+                    <button type="button" className="modal-btn danger" onClick={onRelatarDefeito}>
+                        Relatar defeito
+                    </button>
                     {item?.type === "BORROWABLE" && (
                         <div className="modal-btn primary" onClick={onEmprestar}>
                             Registrar empréstimo
@@ -61,6 +61,7 @@ export default function ItemDetailsModal({ item, onClose, onEmprestar, onConsumi
                             <strong>{conditionLabels[item.condition]}</strong>
                         </div>
                     </div>
+                    {item.maintenanceQuantity > 0 && <p className="item-maintenance-summary">{item.maintenanceQuantity} {item.maintenanceQuantity === 1 ? "unidade bloqueada por defeito" : "unidades bloqueadas por defeito"}</p>}
                 </div>
             )}
         </Modal>

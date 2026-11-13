@@ -41,6 +41,9 @@ public class Item {
     @Column(nullable = false)
     private int stockQuantity;
 
+    @Column(nullable = false, columnDefinition = "integer default 0")
+    private int maintenanceQuantity;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDate createdAt;

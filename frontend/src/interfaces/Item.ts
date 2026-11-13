@@ -9,6 +9,7 @@ export interface Item {
     condition: ItemCondition
     totalQuantity: number
     stockQuantity: number
+    maintenanceQuantity: number
     createdAt: string
     updatedAt: string
 }
