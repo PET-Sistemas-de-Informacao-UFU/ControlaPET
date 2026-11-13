@@ -67,7 +67,9 @@ O arquivo de exemplo também documenta a URL pública da API (`VITE_API_URL`), o
 
 Para produção, ative o perfil `prod` com `SPRING_PROFILES_ACTIVE=prod` no ambiente do serviço. Informe explicitamente as variáveis de banco, `JWT_SECRET_CONTROLAPET`, `FRONTEND_URL`, `CORS_ALLOWED_ORIGINS`, `MAIL_HOST`, `MAIL_USERNAME` e `MAIL_PASSWORD`. `CORS_ALLOWED_ORIGINS` aceita origens HTTPS exatas separadas por vírgulas, sem caminho ou barra final. A chave JWT deve ser uma chave própria em base64 com pelo menos 32 bytes.
 
-Nesse perfil, o Flyway aplica automaticamente as migrations de `backend/src/main/resources/db/migration` e o Hibernate valida o esquema. A primeira migration cria as tabelas em um banco vazio; não habilite a criação automática de baseline em bancos existentes sem comparar a estrutura e fazer backup. O usuário do banco precisa ter permissão para criar as tabelas na primeira execução. A criação do primeiro administrador ainda precisa ser definida antes da publicação.
+Nesse perfil, o Flyway aplica automaticamente as migrations de `backend/src/main/resources/db/migration` e o Hibernate valida o esquema. A primeira migration cria as tabelas em um banco vazio; não habilite a criação automática de baseline em bancos existentes sem comparar a estrutura e fazer backup. O usuário do banco precisa ter permissão para criar as tabelas na primeira execução.
+
+Na primeira instalação, configure `BOOTSTRAP_ADMIN_ENABLED=true`, `BOOTSTRAP_ADMIN_NAME` e `BOOTSTRAP_ADMIN_EMAIL`. Com o banco vazio, a aplicação cria o administrador e envia um link para definir a senha, usando o serviço de e-mail configurado. Falhas no envio interrompem a inicialização e desfazem a criação, permitindo tentar novamente. Se o banco já tiver usuários, nenhuma conta é criada ou alterada. Depois da criação, remova essas variáveis ou defina `BOOTSTRAP_ADMIN_ENABLED=false`.
 
 *O arquivo `.env` está no `.gitignore` e nunca deve ser commitado. O sufixo `_CONTROLAPET` evita conflito com variáveis genéricas (`DB_URL`, `JWT_SECRET`) que você possa ter exportadas no sistema por causa de outros projetos.*
 
