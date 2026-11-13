@@ -1,3 +1,34 @@
+# Docker de producao
+
+O servidor precisa de Docker Engine e Docker Compose v2. Execute os comandos na raiz do repositorio. O Compose de producao inclui PostgreSQL 15, Java 21 e frontend compilado servido pelo Nginx. Maven e Node sao usados nas etapas de compilacao das imagens.
+
+Na primeira instalacao, copie `deploy/.env.example` para `.env` na raiz do servidor e preencha credenciais, chave JWT propria, dominio HTTPS e dados do administrador. Proteja o arquivo com `chmod 600 .env`. O Compose configura a URL interna do banco e o frontend usa `/api`. O banco chama-se `controlapet`. A migration inicial roda automaticamente no backend.
+
+```bash
+docker compose -f docker-compose.prod.yml up -d --build --wait
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs --tail=100 backend
+```
+
+Depois do convite inicial, defina `BOOTSTRAP_ADMIN_ENABLED=false`. O SMTP e externo e precisa estar configurado para enviar convites e recuperar senhas. A verificacao de saude verifica aplicacao e banco; nao verifica entrega de e-mail.
+
+A porta padrao e `127.0.0.1:8080`, acessivel no proprio servidor. Configure o Apache ou Nginx da UFU para encaminhar o dominio HTTPS para esse endereco. O Nginx do container serve o frontend e encaminha `/api` ao backend. Banco e backend nao publicam portas no servidor. Dominio, certificado HTTPS e compatibilidade com o site existente dependem da inspecao do servidor.
+
+Os volumes `controlapet_database` e `controlapet_logs` persistem dados e logs. O backend executa com usuario sem privilegios. Logs da aplicacao seguem a rotacao configurada no Spring; logs dos containers sao limitados a tres arquivos de 10 MB por container. `restart: unless-stopped` reinicia processos que encerram e restaura os servicos apos reiniciar o Docker. Um container marcado como unhealthy exige investigacao; esse estado sozinho nao dispara reinicializacao.
+
+Para atualizar, faca backup antes de baixar a nova versao e execute novamente `up -d --build --wait`. Migrations pendentes serao aplicadas. Uma reversao que envolva alteracoes no banco precisa considerar a restauracao do backup. Para parar use `docker compose -f docker-compose.prod.yml down`. **Nao use `down -v`: ele remove os volumes com banco e logs.**
+
+Para usar o script de backup sem instalar clientes PostgreSQL no servidor:
+
+```bash
+mkdir -p /caminho/persistente/backups
+docker compose -f docker-compose.prod.yml exec -T db bash -c 'PGUSER="$POSTGRES_USER" PGDATABASE="$POSTGRES_DB" bash /dev/stdin /tmp/backups' < deploy/backup-db.sh
+docker compose -f docker-compose.prod.yml cp db:/tmp/backups/. /caminho/persistente/backups/
+chmod 600 /caminho/persistente/backups/*
+```
+
+Copie os backups para armazenamento externo e defina agendamento e retencao no servidor. Para restaurar com o script abaixo, configure os clientes PostgreSQL ou execute-o no container com o arquivo de backup montado e um nome novo de banco.
+
 # Backup e restauracao do PostgreSQL
 
 Os scripts requerem Bash e os clientes PostgreSQL (`pg_dump`, `pg_restore` e `createdb`). Use a mesma versao principal do servidor ou uma versao de cliente compativel. A primeira migration foi validada com PostgreSQL 15.

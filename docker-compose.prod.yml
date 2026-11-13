@@ -1,0 +1,66 @@
+name: controlapet
+
+x-logging: &logging
+  driver: local
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: controlapet
+      POSTGRES_USER: ${DB_USER_CONTROLAPET:?Defina DB_USER_CONTROLAPET no .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD_CONTROLAPET:?Defina DB_PASSWORD_CONTROLAPET no .env}
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d controlapet']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging: *logging
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL_CONTROLAPET: jdbc:postgresql://db:5432/controlapet
+      PORT: 8080
+      LOG_FILE: /app/logs/controlapet.log
+      TZ: America/Sao_Paulo
+    volumes:
+      - logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://localhost:8080/actuator/health]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
+    logging: *logging
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "${WEB_BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, wget, -q, --spider, http://127.0.0.1/health]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    logging: *logging
+
+volumes:
+  database:
+  logs:
