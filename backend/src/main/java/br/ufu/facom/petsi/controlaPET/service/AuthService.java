@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -61,13 +63,18 @@ public class AuthService {
     }
 
     public @Nullable AuthResponseDTO refreshToken(RefreshTokenRequestDTO request) {
-        String userEmail = jwtService.extractUsername(request.refreshToken());
+        String userEmail;
+        try {
+            userEmail = jwtService.extractUsername(request.refreshToken());
+        } catch (JwtException | IllegalArgumentException ex) {
+            throw new BadCredentialsException("Token inválido ou expirado.");
+        }
 
         if (userEmail != null) {
             User user = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new BusinessException("Usuário não encontrado"));
+                    .orElseThrow(() -> new BadCredentialsException("Token inválido ou expirado."));
 
-            if (jwtService.isTokenValid(request.refreshToken(), user)) {
+            if (jwtService.isTokenValid(request.refreshToken(), user, "refresh")) {
                 String accessToken = jwtService.generateToken(user);
                 String refreshToken = jwtService.generateRefreshToken(user);
 
@@ -75,7 +82,7 @@ public class AuthService {
             }
         }
 
-        throw new BusinessException("Refresh token inválido ou expirado");
+        throw new BadCredentialsException("Token inválido ou expirado.");
     }
 
     @Transactional
@@ -100,7 +107,7 @@ public class AuthService {
         PasswordResetToken resetToken = PasswordResetToken.builder()
                 .tokenHash(hashToken(token))
                 .user(user)
-                .expiresAt(initialSetup ? LocalDateTime.of(9999, 12, 31, 23, 59, 59) : LocalDateTime.now().plusMinutes(30))
+                .expiresAt(initialSetup ? LocalDateTime.now().plusHours(48) : LocalDateTime.now().plusMinutes(30))
                 .used(false)
                 .build();
 
@@ -123,11 +130,17 @@ public class AuthService {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hashToken(request.token()))
                 .orElseThrow(() -> new BusinessException("Link de redefinição inválido ou expirado."));
 
-        if (resetToken.isUsed() || (resetToken.getExpiresAt() != null && resetToken.getExpiresAt().isBefore(LocalDateTime.now()))) {
+        LocalDateTime now = LocalDateTime.now();
+        if (resetToken.isUsed() || resetToken.getExpiresAt() == null
+                || resetToken.getExpiresAt().isBefore(now)
+                || resetToken.getExpiresAt().isAfter(now.plusHours(48))) {
             throw new BusinessException("Link de redefinição inválido ou expirado.");
         }
 
         User user = resetToken.getUser();
+        if (!user.isActive()) {
+            throw new BusinessException("Link de redefinição inválido ou expirado.");
+        }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setPasswordChangedAt(LocalDateTime.now());
         user.setSessionVersion(user.getSessionVersion() == null ? 1L : user.getSessionVersion() + 1);

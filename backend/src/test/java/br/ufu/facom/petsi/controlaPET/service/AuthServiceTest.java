@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -81,7 +82,7 @@ class AuthServiceTest {
         User user = user("membro@teste.com");
         when(jwtService.extractUsername("refresh-token")).thenReturn(user.getEmail());
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(jwtService.isTokenValid("refresh-token", user)).thenReturn(true);
+        when(jwtService.isTokenValid("refresh-token", user, "refresh")).thenReturn(true);
         when(jwtService.generateToken(user)).thenReturn("new-access-token");
         when(jwtService.generateRefreshToken(user)).thenReturn("new-refresh-token");
 
@@ -96,12 +97,12 @@ class AuthServiceTest {
         User user = user("membro@teste.com");
         when(jwtService.extractUsername("expired-token")).thenReturn(user.getEmail());
         when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(jwtService.isTokenValid("expired-token", user)).thenReturn(false);
+        when(jwtService.isTokenValid("expired-token", user, "refresh")).thenReturn(false);
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        BadCredentialsException exception = assertThrows(BadCredentialsException.class,
                 () -> authService.refreshToken(new RefreshTokenRequestDTO("expired-token")));
 
-        assertEquals("Refresh token inválido ou expirado", exception.getMessage());
+        assertEquals("Token inválido ou expirado.", exception.getMessage());
     }
 
     @Test

@@ -42,6 +42,7 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        extraClaims.put("tokenType", "access");
         if (userDetails instanceof User user) {
             extraClaims.put("sessionVersion", user.getSessionVersion() == null ? 0L : user.getSessionVersion());
         }
@@ -56,6 +57,7 @@ public class JwtService {
 
     public String generateRefreshToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "refresh");
         if (userDetails instanceof User user) {
             claims.put("sessionVersion", user.getSessionVersion() == null ? 0L : user.getSessionVersion());
         }
@@ -68,9 +70,11 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetails userDetails, String expectedType) {
         final String username = extractUsername(token);
-        if (!username.equals(userDetails.getUsername()) || !userDetails.isEnabled() || isTokenExpired(token)) {
+        String tokenType = extractClaim(token, claims -> claims.get("tokenType", String.class));
+        if (username == null || !username.equals(userDetails.getUsername()) || !expectedType.equals(tokenType)
+                || !userDetails.isEnabled() || isTokenExpired(token)) {
             return false;
         }
 
