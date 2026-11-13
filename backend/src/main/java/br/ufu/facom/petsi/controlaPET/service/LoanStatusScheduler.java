@@ -19,11 +19,24 @@ public class LoanStatusScheduler {
 
     @EventListener(ApplicationReadyEvent.class)
     public void updateOnStartup() {
-        updateOverdueLoans();
+        try {
+            updateStatuses();
+        } catch (RuntimeException ex) {
+            log.error("Falha ao atualizar emprestimos atrasados na inicializacao", ex);
+            throw ex;
+        }
     }
 
     @Scheduled(cron = "0 0 0 * * *", zone = TIME_ZONE)
     public void updateOverdueLoans() {
+        try {
+            updateStatuses();
+        } catch (RuntimeException ex) {
+            log.error("Falha na atualizacao agendada de emprestimos atrasados; nova tentativa na proxima execucao", ex);
+        }
+    }
+
+    private void updateStatuses() {
         int updated = loanStatusService.markOverdue(LocalDate.now(ZoneId.of(TIME_ZONE)));
         if (updated > 0) {
             log.info("Marked {} loans as overdue", updated);
